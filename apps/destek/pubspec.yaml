@@ -1,0 +1,44 @@
+name: destek
+description: "Bogahost Destek — chat.bogahost.com canlı destek temsilci uygulaması"
+publish_to: 'none'
+version: 1.0.0+1
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  boga_ortak:
+    path: ../../packages/boga_ortak
+  intl: any
+  url_launcher: ^6.3.3
+  shared_preferences: ^2.5.6
+  file_picker: ^13.4.0
+  image_picker: ^1.2.4
+  open_filex: ^5.0.0
+  share_plus: ^13.3.1
+  path_provider: ^2.1.6
+  dio: ^5.11.1
+  window_manager: ^0.5.1
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  # Phosphor simgeleri (MIT, assets/fonts/phosphor/LICENSE). Eşleme: lib/ortak/simgeler.dart
+  fonts:
+    - family: PhosphorLight
+      fonts:
+        - asset: assets/fonts/phosphor/Phosphor-Light.ttf
+    - family: PhosphorRegular
+      fonts:
+        - asset: assets/fonts/phosphor/Phosphor-Regular.ttf
+    - family: PhosphorFill
+      fonts:
+        - asset: assets/fonts/phosphor/Phosphor-Fill.ttf
