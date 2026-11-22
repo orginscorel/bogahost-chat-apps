@@ -44,3 +44,7 @@ flutter:
     - family: PhosphorFill
       fonts:
         - asset: assets/fonts/phosphor/Phosphor-Fill.ttf
+
+dependency_overrides:
+  # AGP 9 ile 'proguard-android.txt' reddediliyor; 1.2.0-beta.3 'proguard-android-optimize.txt' kullanıyor
+  flutter_inappwebview_android: 1.2.0-beta.3

@@ -202,9 +202,15 @@ jobs:
           echo "Sürüm: $(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' $APP/Info.plist) ($(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' $APP/Info.plist))"
       - name: TestFlight'a yükle
         if: steps.g.outputs.var == '1'
+        timeout-minutes: 25
         run: |
           xcrun altool --validate-app -f uygulama.ipa -t ios --apiKey $ASC_KEY_ID --apiIssuer $ASC_ISSUER
-          xcrun altool --upload-app -f uygulama.ipa -t ios --apiKey $ASC_KEY_ID --apiIssuer $ASC_ISSUER
+          # Apple'ın depolama ucu ara sıra bağlantıyı düşürüyor; 3 deneme
+          for d in 1 2 3; do
+            if xcrun altool --upload-app -f uygulama.ipa -t ios --apiKey $ASC_KEY_ID --apiIssuer $ASC_ISSUER; then exit 0; fi
+            echo "::warning::Yükleme $d. denemede başarısız, 30 sn sonra yeniden"; sleep 30
+          done
+          exit 1
       - name: Güncelleme işareti
         if: steps.g.outputs.var == '1'
         env:
@@ -299,7 +305,11 @@ jobs:
         if: steps.g.outputs.var == '1'
         run: |
           xcrun altool --validate-app -f cikti/uygulama.pkg -t macos --apiKey $ASC_KEY_ID --apiIssuer $ASC_ISSUER
-          xcrun altool --upload-app -f cikti/uygulama.pkg -t macos --apiKey $ASC_KEY_ID --apiIssuer $ASC_ISSUER
+          for d in 1 2 3; do
+            if xcrun altool --upload-app -f cikti/uygulama.pkg -t macos --apiKey $ASC_KEY_ID --apiIssuer $ASC_ISSUER; then exit 0; fi
+            echo "::warning::Yükleme $d. denemede başarısız, 30 sn sonra yeniden"; sleep 30
+          done
+          exit 1
       - name: Güncelleme işareti
         if: steps.g.outputs.var == '1'
         env:
