@@ -8,6 +8,62 @@ import 'package:flutter/widgets.dart';
 
 /// Varsayılan: ince (Light) çizgi.
 abstract final class Simgeler {
+  // --- Uygulama ekleri (arama, ekran, CRM, ayarlar)
+  static const IconData phone = IconData(0xe3b8, fontFamily: 'PhosphorLight');
+  static const IconData phoneX = IconData(0xe3c4, fontFamily: 'PhosphorLight');
+  static const IconData phoneDisconnect = IconData(0xe3bc, fontFamily: 'PhosphorLight');
+  static const IconData phoneCall = IconData(0xe3ba, fontFamily: 'PhosphorLight');
+  static const IconData videocam = IconData(0xe4da, fontFamily: 'PhosphorLight');
+  static const IconData videocamOff = IconData(0xe4dc, fontFamily: 'PhosphorLight');
+  static const IconData mic = IconData(0xe326, fontFamily: 'PhosphorLight');
+  static const IconData micOff = IconData(0xe328, fontFamily: 'PhosphorLight');
+  static const IconData whatsapp = IconData(0xe5d0, fontFamily: 'PhosphorLight');
+  static const IconData monitor = IconData(0xe32e, fontFamily: 'PhosphorLight');
+  static const IconData tag = IconData(0xe478, fontFamily: 'PhosphorLight');
+  static const IconData cursorClick = IconData(0xe7c8, fontFamily: 'PhosphorLight');
+  static const IconData chatDots = IconData(0xe16c, fontFamily: 'PhosphorLight');
+  static const IconData noteBlank = IconData(0xe34a, fontFamily: 'PhosphorLight');
+  static const IconData usersThree = IconData(0xe68e, fontFamily: 'PhosphorLight');
+  static const IconData speaker = IconData(0xe44a, fontFamily: 'PhosphorLight');
+  static const IconData speakerOff = IconData(0xe45a, fontFamily: 'PhosphorLight');
+  static const IconData cameraRotate = IconData(0xe7a4, fontFamily: 'PhosphorLight');
+  static const IconData handPointing = IconData(0xe29a, fontFamily: 'PhosphorLight');
+  static const IconData clock = IconData(0xe19a, fontFamily: 'PhosphorLight');
+  static const IconData calendarCheck = IconData(0xe712, fontFamily: 'PhosphorLight');
+  static const IconData gauge = IconData(0xe628, fontFamily: 'PhosphorLight');
+  static const IconData chartBar = IconData(0xe150, fontFamily: 'PhosphorLight');
+  static const IconData shieldCheck = IconData(0xe40c, fontFamily: 'PhosphorLight');
+  static const IconData siren = IconData(0xe9b8, fontFamily: 'PhosphorLight');
+  static const IconData prohibit = IconData(0xe3de, fontFamily: 'PhosphorLight');
+  static const IconData listChecks = IconData(0xeadc, fontFamily: 'PhosphorLight');
+  static const IconData bellRinging = IconData(0xe5e8, fontFamily: 'PhosphorLight');
+  static const IconData bellSlash = IconData(0xe0d4, fontFamily: 'PhosphorLight');
+  static const IconData userCircle = IconData(0xe4c4, fontFamily: 'PhosphorLight');
+  static const IconData lockKey = IconData(0xe2fe, fontFamily: 'PhosphorLight');
+  static const IconData sliders = IconData(0xe432, fontFamily: 'PhosphorLight');
+  static const IconData paintBrush = IconData(0xe6f0, fontFamily: 'PhosphorLight');
+  static const IconData gitBranch = IconData(0xe278, fontFamily: 'PhosphorLight');
+  static const IconData notePencil = IconData(0xe34c, fontFamily: 'PhosphorLight');
+  static const IconData xCircle = IconData(0xe4f8, fontFamily: 'PhosphorLight');
+  static const IconData crown = IconData(0xe614, fontFamily: 'PhosphorLight');
+  static const IconData arrowsOut = IconData(0xe0a2, fontFamily: 'PhosphorLight');
+  static const IconData arrowsIn = IconData(0xe09a, fontFamily: 'PhosphorLight');
+  static const IconData clipboardText = IconData(0xe198, fontFamily: 'PhosphorLight');
+  static const IconData megaphone = IconData(0xe324, fontFamily: 'PhosphorLight');
+  static const IconData clockCountdown = IconData(0xed2c, fontFamily: 'PhosphorLight');
+  static const IconData chats = IconData(0xe17c, fontFamily: 'PhosphorLight');
+  static const IconData chatText = IconData(0xe17a, fontFamily: 'PhosphorLight');
+  static const IconData fingerprint = IconData(0xe23e, fontFamily: 'PhosphorLight');
+  static const IconData target = IconData(0xe47c, fontFamily: 'PhosphorLight');
+  static const IconData funnel = IconData(0xe266, fontFamily: 'PhosphorLight');
+  static const IconData sparkle = IconData(0xe6a2, fontFamily: 'PhosphorLight');
+  static const IconData desktop = IconData(0xe560, fontFamily: 'PhosphorLight');
+  static const IconData deviceMobile = IconData(0xe1e0, fontFamily: 'PhosphorLight');
+  static const IconData browser = IconData(0xe0f4, fontFamily: 'PhosphorLight');
+  static const IconData mapPin = IconData(0xe316, fontFamily: 'PhosphorLight');
+  static const IconData broadcast = IconData(0xe0f2, fontFamily: 'PhosphorLight');
+  static const IconData idBadge = IconData(0xe6f6, fontFamily: 'PhosphorLight');
+  static const IconData users = IconData(0xe4d6, fontFamily: 'PhosphorLight');
   static const IconData accountBalance = IconData(0xe0b4, fontFamily: 'PhosphorLight'); // bank
   static const IconData accountTree = IconData(0xe67c, fontFamily: 'PhosphorLight'); // treeStructure
   static const IconData add = IconData(0xe3d4, fontFamily: 'PhosphorLight'); // plus
@@ -522,6 +578,19 @@ abstract final class SimgelerKalin {
 
 /// Yalnızca etkin gezinme öğesi / seçili durum için dolu (Fill).
 abstract final class SimgelerDolu {
+  static const IconData phone = IconData(0xe3b8, fontFamily: 'PhosphorFill');
+  static const IconData phoneX = IconData(0xe3c4, fontFamily: 'PhosphorFill');
+  static const IconData videocam = IconData(0xe4da, fontFamily: 'PhosphorFill');
+  static const IconData videocamOff = IconData(0xe4dc, fontFamily: 'PhosphorFill');
+  static const IconData mic = IconData(0xe326, fontFamily: 'PhosphorFill');
+  static const IconData micOff = IconData(0xe328, fontFamily: 'PhosphorFill');
+  static const IconData whatsapp = IconData(0xe5d0, fontFamily: 'PhosphorFill');
+  static const IconData monitor = IconData(0xe32e, fontFamily: 'PhosphorFill');
+  static const IconData chatDots = IconData(0xe16c, fontFamily: 'PhosphorFill');
+  static const IconData speaker = IconData(0xe44a, fontFamily: 'PhosphorFill');
+  static const IconData speakerOff = IconData(0xe45a, fontFamily: 'PhosphorFill');
+  static const IconData handPointing = IconData(0xe29a, fontFamily: 'PhosphorFill');
+  static const IconData bellRinging = IconData(0xe5e8, fontFamily: 'PhosphorFill');
   static const IconData accountBalance = IconData(0xe0b4, fontFamily: 'PhosphorFill'); // bank
   static const IconData accountTree = IconData(0xe67c, fontFamily: 'PhosphorFill'); // treeStructure
   static const IconData add = IconData(0xe3d4, fontFamily: 'PhosphorFill'); // plus

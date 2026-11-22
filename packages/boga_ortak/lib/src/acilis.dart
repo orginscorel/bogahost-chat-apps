@@ -118,7 +118,14 @@ void _rozetCiz(Canvas c, Offset m, double y, AcilisIsaret i, {required Color hal
     final b = RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(0, -y * .06), width: y * 1.14, height: y * .86), Radius.circular(y * .3));
     final beyaz = Paint()..color = Colors.white;
     c.drawRRect(b, beyaz);
-    c.drawPath(Path()..moveTo(-y * .22, b.bottom - y * .04)..lineTo(-y * .42, b.bottom + y * .3)..lineTo(y * .1, b.bottom - y * .04)..close(), beyaz);
+    c.drawPath(
+      Path()
+        ..moveTo(-y * .22, b.bottom - y * .04)
+        ..lineTo(-y * .42, b.bottom + y * .3)
+        ..lineTo(y * .1, b.bottom - y * .04)
+        ..close(),
+      beyaz,
+    );
     final nokta = Paint()..color = Marka.yesil;
     for (final x in [-.3, 0.0, .3]) {
       c.drawCircle(Offset(x * y, -y * .06), y * .09, nokta);

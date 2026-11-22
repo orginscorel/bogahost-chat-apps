@@ -1,12 +1,14 @@
 import 'dart:io';
 
 import 'package:boga_ortak/boga_ortak.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'ekranlar/acilis.dart';
 import 'ekranlar/kabuk.dart';
 import 'oturum.dart';
 import 'veri/tercihler.dart';
@@ -45,8 +47,16 @@ class DestekUygulamasi extends StatelessWidget {
         locale: const Locale('tr', 'TR'),
         supportedLocales: const [Locale('tr', 'TR')],
         localizationsDelegates: const [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
-        home: AcilisEkrani(alt: 'CHAT', isaret: AcilisIsaret.destek, hazirla: () async => await Uyg.yukle() ? const Kabuk() : Uyg.girisEkrani()),
+        scrollBehavior: const _Kaydirma(),
+        home: AcilisChat(hazirla: () async => await Uyg.yukle() ? const Kabuk() : Uyg.girisEkrani()),
       ),
     );
   }
+}
+
+/// Mac/Windows'ta fare ile sürükleyerek de kaydırılsın (yatay sekme şeritleri, listeler).
+class _Kaydirma extends MaterialScrollBehavior {
+  const _Kaydirma();
+  @override
+  Set<PointerDeviceKind> get dragDevices => {PointerDeviceKind.touch, PointerDeviceKind.mouse, PointerDeviceKind.trackpad, PointerDeviceKind.stylus};
 }

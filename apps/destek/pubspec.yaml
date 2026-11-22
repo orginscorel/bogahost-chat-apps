@@ -1,7 +1,7 @@
 name: destek
 description: "Bogahost Chat — chat.bogahost.com canlı destek temsilci uygulaması"
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.1.0+4
 resolution: workspace
 
 environment:
@@ -24,6 +24,8 @@ dependencies:
   path_provider: ^2.1.6
   dio: ^5.11.1
   window_manager: ^0.5.1
+  flutter_webrtc: ^1.6.3
+  flutter_inappwebview: ^6.1.5
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -9,6 +9,7 @@ import '../oturum.dart';
 import '../veri/depo.dart';
 import '../veri/modeller.dart';
 import 'kabuk.dart';
+import 'ziyaretci_detay.dart';
 
 /// Sitedeki canlı ziyaretçiler: sayfa, konum, cihaz; davet / sohbet başlat.
 class ZiyaretcilerEkrani extends StatefulWidget {
@@ -101,7 +102,7 @@ class _ZiyaretcilerEkraniState extends State<ZiyaretcilerEkrani> {
     final sohbette = z.sohbette;
     return Kutu(
       padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
-      onTap: sohbette ? () => bolumIstegi.value = Bolum.sohbetler : null,
+      onTap: () => ZiyaretciDetayEkrani.ac(context, z.id, ad: z.gosterimAdi),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -181,8 +182,16 @@ class _ZiyaretcilerEkraniState extends State<ZiyaretcilerEkrani> {
           if (!sohbette && Uyg.yetki('chats.reply'))
             PopupMenuButton<String>(
               tooltip: 'İşlem',
-              onSelected: (v) => v == 'davet' ? _davet(z) : _baslat(z),
+              onSelected: (v) => v == 'davet'
+                  ? _davet(z)
+                  : v == 'detay'
+                  ? ZiyaretciDetayEkrani.ac(context, z.id, ad: z.gosterimAdi)
+                  : _baslat(z),
               itemBuilder: (_) => const [
+                PopupMenuItem(
+                  value: 'detay',
+                  child: ListTile(dense: true, leading: Icon(Simgeler.userCircle), title: Text('Ziyaretçi detayı')),
+                ),
                 PopupMenuItem(
                   value: 'davet',
                   child: ListTile(dense: true, leading: Icon(Simgeler.wavingHand), title: Text('Sohbete davet et')),
@@ -193,8 +202,12 @@ class _ZiyaretcilerEkraniState extends State<ZiyaretcilerEkrani> {
                 ),
               ],
             )
-          else if (sohbette)
-            const Padding(padding: EdgeInsets.all(8), child: Icon(Simgeler.chevronRight)),
+          else
+            IconButton(
+              tooltip: 'Sohbete git',
+              icon: const Icon(Simgeler.chevronRight),
+              onPressed: sohbette ? () => bolumIstegi.value = Bolum.sohbetler : () => ZiyaretciDetayEkrani.ac(context, z.id, ad: z.gosterimAdi),
+            ),
         ],
       ),
     );

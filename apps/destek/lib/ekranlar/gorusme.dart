@@ -12,6 +12,9 @@ import '../ortak/yardimci.dart';
 import '../oturum.dart';
 import '../veri/depo.dart';
 import '../veri/modeller.dart';
+import 'arama.dart';
+import 'ekran_izle.dart';
+import 'ziyaretci_detay.dart';
 
 /// Tek görüşme: mesaj akışı (2 sn yoklama), yanıt kutusu, hazır yanıtlar, ekler, eylemler, ziyaretçi bilgisi.
 class GorusmeEkrani extends StatefulWidget {
@@ -46,6 +49,8 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
   int get _sonId => _mesajlar.isEmpty ? 0 : _mesajlar.last.id;
   bool get _kapali => (_son?.durum ?? widget.ilk?.durum) == 'closed';
   bool get _yanitYetkisi => Uyg.yetki('chats.reply');
+  String get _ad => widget.ilk?.ziyaretci ?? 'Sohbet #$_id';
+  bool get _aramaOlur => _yanitYetkisi && !_kapali && Uyg.yetki('chats.call') && (_son?.cevrimici ?? widget.ilk?.cevrimici ?? false);
 
   @override
   void initState() {
@@ -248,6 +253,19 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
         await _talepFormu();
       case 'bilgi':
         setState(() => _bilgiAcik = !_bilgiAcik);
+      case 'sesli':
+        await AramaEkrani.baslat(context, sohbetId: _id, ad: _ad, video: false);
+      case 'goruntulu':
+        await AramaEkrani.baslat(context, sohbetId: _id, ad: _ad, video: true);
+      case 'ekran':
+        if (_son?.oturumId != null) await EkranIzleEkrani.ac(context, oturumId: _son!.oturumId!, ad: _ad, kip: 'consent', sohbetId: _id, url: _son?.url);
+      case 'ekranDirekt':
+        if (_son?.oturumId != null &&
+            await onayla(context, 'Onaysız ekran izleme', mesaj: 'Ziyaretçiye izin sorulmaz; denetim kaydına yazılır. Devam edilsin mi?', evet: 'İzle')) {
+          if (mounted) await EkranIzleEkrani.ac(context, oturumId: _son!.oturumId!, ad: _ad, kip: 'direct', sohbetId: _id, url: _son?.url);
+        }
+      case 'ziyaretci':
+        if (_son?.oturumId != null) await ZiyaretciDetayEkrani.ac(context, _son!.oturumId!, ad: _ad);
     }
     _yokla();
   }
@@ -450,6 +468,10 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
               renk: durumRengi(durum),
             ),
           ),
+          if (_aramaOlur) ...[
+            IconButton(tooltip: 'Sesli arama', onPressed: () => _eylem('sesli'), icon: const Icon(Simgeler.phoneCall)),
+            IconButton(tooltip: 'Görüntülü arama', onPressed: () => _eylem('goruntulu'), icon: const Icon(Simgeler.videocam)),
+          ],
           IconButton(
             tooltip: 'Ziyaretçi bilgisi',
             onPressed: () => setState(() => _bilgiAcik = !_bilgiAcik),
@@ -478,6 +500,33 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
                   value: 'izle',
                   child: ListTile(dense: true, leading: Icon(Simgeler.visibility), title: Text('İzle (sessiz)')),
                 ),
+              ],
+              if (_son?.oturumId != null) ...[
+                const PopupMenuDivider(),
+                const PopupMenuItem(
+                  value: 'ziyaretci',
+                  child: ListTile(dense: true, leading: Icon(Simgeler.userCircle), title: Text('Ziyaretçi detayı / CRM')),
+                ),
+                if (_aramaOlur) ...[
+                  const PopupMenuItem(
+                    value: 'sesli',
+                    child: ListTile(dense: true, leading: Icon(Simgeler.phoneCall), title: Text('Sesli arama')),
+                  ),
+                  const PopupMenuItem(
+                    value: 'goruntulu',
+                    child: ListTile(dense: true, leading: Icon(Simgeler.videocam), title: Text('Görüntülü arama')),
+                  ),
+                ],
+                if (Uyg.yetki('screen.consent') && (_son?.cevrimici ?? false))
+                  const PopupMenuItem(
+                    value: 'ekran',
+                    child: ListTile(dense: true, leading: Icon(Simgeler.monitor), title: Text('Ekranı izle (onaylı)')),
+                  ),
+                if (Uyg.yetki('screen.direct') && (_son?.cevrimici ?? false))
+                  const PopupMenuItem(
+                    value: 'ekranDirekt',
+                    child: ListTile(dense: true, leading: Icon(Simgeler.desktop), title: Text('Ekranı izle (onaysız)')),
+                  ),
               ],
               const PopupMenuDivider(),
               if (_yanitYetkisi) ...[

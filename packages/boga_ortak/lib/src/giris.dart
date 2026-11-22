@@ -87,7 +87,13 @@ class _GirisEkraniState extends State<GirisEkrani> {
     try {
       final dynamic v;
       if (_mfaJeton == null) {
-        v = await widget.api.post(widget.girisYolu, {'email': _adres.text.trim(), 'username': _adres.text.trim(), 'password': _sifre.text, if (widget.kaydetSecenegi) 'save': _kaydet, if (_destek) ...await _cihazBilgisi()});
+        v = await widget.api.post(widget.girisYolu, {
+          'email': _adres.text.trim(),
+          'username': _adres.text.trim(),
+          'password': _sifre.text,
+          if (widget.kaydetSecenegi) 'save': _kaydet,
+          if (_destek) ...await _cihazBilgisi(),
+        });
       } else {
         final kod = _kod.text.replaceAll(' ', '').trim();
         if (kod.isEmpty) {
@@ -149,7 +155,15 @@ class _GirisEkraniState extends State<GirisEkrani> {
         ad = (await d.windowsInfo).computerName;
       }
     } catch (_) {}
-    final platform = Platform.isIOS ? 'ios' : Platform.isMacOS ? 'macos' : Platform.isAndroid ? 'android' : Platform.isWindows ? 'windows' : Platform.operatingSystem;
+    final platform = Platform.isIOS
+        ? 'ios'
+        : Platform.isMacOS
+        ? 'macos'
+        : Platform.isAndroid
+        ? 'android'
+        : Platform.isWindows
+        ? 'windows'
+        : Platform.operatingSystem;
     return {'device_name': ad, 'platform': platform, 'app_version': widget.api.surum};
   }
 
@@ -230,7 +244,11 @@ class _GirisEkraniState extends State<GirisEkrani> {
               ),
               const Spacer(),
               Text(
-                _destek ? 'Müşterileriniz\nher an yanınızda.' : widget.isaret == AcilisIsaret.posta ? 'İletişiminiz\ntek yerde.' : 'Posta altyapınız\nkontrolünüzde.',
+                _destek
+                    ? 'Müşterileriniz\nher an yanınızda.'
+                    : widget.isaret == AcilisIsaret.posta
+                    ? 'İletişiminiz\ntek yerde.'
+                    : 'Posta altyapınız\nkontrolünüzde.',
                 style: gosterim(44, renk: Colors.white, satir: 1.08),
               ),
               const SizedBox(height: 14),
@@ -471,8 +489,13 @@ class _GirisEkraniState extends State<GirisEkrani> {
             autocorrect: false,
             textInputAction: TextInputAction.next,
             autofillHints: const [AutofillHints.email, AutofillHints.username],
-            decoration: InputDecoration(labelText: _destek ? 'Kullanıcı adı veya e-posta' : 'E-posta adresi', hintText: widget.adresIpucu, prefixIcon: const Icon(Simge.eposta)),
-            validator: (v) => _destek ? ((v ?? '').trim().isEmpty ? 'Kullanıcı adınızı girin' : null) : ((v ?? '').contains('@') ? null : 'Geçerli bir e-posta adresi girin'),
+            decoration: InputDecoration(
+              labelText: _destek ? 'Kullanıcı adı veya e-posta' : 'E-posta adresi',
+              hintText: widget.adresIpucu,
+              prefixIcon: const Icon(Simge.eposta),
+            ),
+            validator: (v) =>
+                _destek ? ((v ?? '').trim().isEmpty ? 'Kullanıcı adınızı girin' : null) : ((v ?? '').contains('@') ? null : 'Geçerli bir e-posta adresi girin'),
           ),
           const SizedBox(height: 12),
           TextFormField(

@@ -83,15 +83,34 @@ Future<Uint8List> _png(int boyut, void Function(Canvas c, double k) ciz) async {
   return b!.buffer.asUint8List();
 }
 
-/// Tam kare zemin + işaret (iOS, Android eski).
+/// Rozet: yeşil daire içinde beyaz sohbet balonu + üç nokta (amblemin sağ altı).
+void _rozet(Canvas c, Offset m, double y, {Color halka = const Color(0xFF3624A6)}) {
+  c.drawCircle(m, y * 1.18, Paint()..color = halka);
+  c.drawCircle(m, y, Paint()..color = Marka.yesil);
+  final b = RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(m.dx, m.dy - y * .06), width: y * 1.14, height: y * .86), Radius.circular(y * .3));
+  final beyaz = Paint()..color = Colors.white;
+  c.drawRRect(b, beyaz);
+  c.drawPath(Path()..moveTo(m.dx - y * .22, b.bottom - y * .04)..lineTo(m.dx - y * .42, b.bottom + y * .3)..lineTo(m.dx + y * .1, b.bottom - y * .04)..close(), beyaz);
+  for (final x in [-.3, 0.0, .3]) {
+    c.drawCircle(Offset(m.dx + x * y, m.dy - y * .06), y * .09, Paint()..color = Marka.yesil);
+  }
+}
+
+/// Gerçek Bogahost amblemi (üç sunucu sütunu) + rozet; 1024 tuvalde.
+void _amblemRozet(Canvas c, {double olcek = 1}) {
+  final hedef = Rect.fromCenter(center: const Offset(482, 500), width: 520 * olcek, height: 520 * olcek);
+  BogahostLogo.amblemCiz(c, hedef, renk: Colors.white);
+  _rozet(c, Offset(512 + 250 * olcek, 512 + 220 * olcek), 112 * olcek);
+}
+
+/// Tam kare zemin + amblem (iOS, Android eski, Windows).
 void _kare(Canvas c, double k, AcilisIsaret i, {double radius = 0}) {
   c.scale(k);
   const r = Rect.fromLTWH(0, 0, 1024, 1024);
   final rr = RRect.fromRectAndRadius(r, Radius.circular(radius));
-  c.drawRRect(rr, Paint()..shader = isaretDegradesi(i).createShader(r));
+  c.drawRRect(rr, Paint()..shader = const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF7B6DF0), Marka.mor, Color(0xFF3624A6)], stops: [0, .5, 1]).createShader(r));
   c.drawRRect(rr, Paint()..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.center, colors: [Colors.white.withValues(alpha: .18), Colors.white.withValues(alpha: 0)]).createShader(r));
-  c.scale(1024 / 64);
-  isaretCiz(c, i, zemin: false);
+  _amblemRozet(c);
 }
 
 /// macOS: 1024 tuvalde 824'lük yuvarlatılmış kare, yumuşak gölge.
@@ -104,21 +123,27 @@ void _mac(Canvas c, double k, AcilisIsaret i) {
     ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18));
   c.save();
   c.clipRRect(rr);
-  c.drawRect(r, Paint()..shader = isaretDegradesi(i).createShader(r));
+  c.drawRect(r, Paint()..shader = const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF7B6DF0), Marka.mor, Color(0xFF3624A6)], stops: [0, .5, 1]).createShader(r));
   c.drawRect(r, Paint()..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.center, colors: [Colors.white.withValues(alpha: .18), Colors.white.withValues(alpha: 0)]).createShader(r));
   c.translate(100, 100);
-  c.scale(824 / 64);
-  isaretCiz(c, i, zemin: false);
+  c.scale(824 / 1024);
+  _amblemRozet(c);
   c.restore();
+}
+
+/// Başlangıç (launch) görseli: şeffaf zemin, beyaz amblem + rozet (iOS LaunchImage, Android launch_image).
+void _baslangic(Canvas c, double k) {
+  c.scale(k);
+  _amblemRozet(c, olcek: .9);
 }
 
 /// Android uyarlanabilir ön plan: içerik ortadaki güvenli alanda (~%60), şeffaf zemin.
 void _onPlan(Canvas c, double k, AcilisIsaret i) {
   c.scale(k);
   c.translate(512, 512);
-  c.scale(1024 / 108);
-  c.translate(-32, -32);
-  isaretCiz(c, i, zemin: false);
+  c.scale(.56);
+  c.translate(-512, -512);
+  _amblemRozet(c);
 }
 
 Uint8List _ico(List<(int, Uint8List)> pngler) {
@@ -156,6 +181,16 @@ void main() {
         final m = RegExp(r'Icon-App-([\d.]+)x[\d.]+@(\d)x\.png$').firstMatch(f.path)!;
         final px = (double.parse(m[1]!) * int.parse(m[2]!)).round();
         f.writeAsBytesSync(await _opakPng(px, (c, k) => _kare(c, k, isaret)));
+      }
+      // iOS başlangıç görseli (LaunchScreen.storyboard → LaunchImage, 1x/2x/3x = 160/320/480 px)
+      final li = '$d/ios/Runner/Assets.xcassets/LaunchImage.imageset';
+      for (final (ad, px) in [('LaunchImage.png', 160), ('LaunchImage@2x.png', 320), ('LaunchImage@3x.png', 480)]) {
+        File('$li/$ad').writeAsBytesSync(await _png(px, (c, k) => _baslangic(c, k)));
+      }
+      // Android başlangıç görseli (launch_background.xml → @mipmap/launch_image)
+      const lyog = {'mdpi': 120, 'hdpi': 180, 'xhdpi': 240, 'xxhdpi': 360, 'xxxhdpi': 480};
+      for (final e in lyog.entries) {
+        File('$d/android/app/src/main/res/mipmap-${e.key}/launch_image.png').writeAsBytesSync(await _png(e.value, (c, k) => _baslangic(c, k)));
       }
       // macOS
       for (final s in [16, 32, 64, 128, 256, 512, 1024]) {

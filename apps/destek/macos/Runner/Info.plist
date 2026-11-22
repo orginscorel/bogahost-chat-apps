@@ -34,5 +34,9 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Ziyaretçiyle görüntülü görüşme için kamera kullanılır.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Ziyaretçiyle sesli/görüntülü görüşme için mikrofon kullanılır.</string>
 </dict>
 </plist>

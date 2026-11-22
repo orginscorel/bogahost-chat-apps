@@ -126,7 +126,7 @@ class _SohbetlerEkraniState extends State<SohbetlerEkrani> {
           IconButton(tooltip: 'Yenile', onPressed: () => _yukle(), icon: const Icon(Simgeler.refresh)),
         ],
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(96),
+          preferredSize: const Size.fromHeight(108),
           child: Column(
             children: [
               Padding(
@@ -142,21 +142,19 @@ class _SohbetlerEkraniState extends State<SohbetlerEkrani> {
                   ),
                 ),
               ),
-              SizedBox(
-                height: 40,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
                   children: [
                     for (final (k, ad) in _sekmeler)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 6),
-                        child: ChoiceChip(
-                          selected: _durum == k,
-                          onSelected: (_) => _sekme(k),
-                          avatar: _durum == k ? null : Nokta(durumRengi(k), boyut: 8),
-                          label: Text('$ad${(_sayilar[k] ?? 0) > 0 ? ' · ${_sayilar[k]}' : ''}'),
-                        ),
+                      ChoiceChip(
+                        selected: _durum == k,
+                        onSelected: (_) => _sekme(k),
+                        visualDensity: VisualDensity.compact,
+                        avatar: _durum == k ? null : Nokta(durumRengi(k), boyut: 8),
+                        label: Text('$ad${(_sayilar[k] ?? 0) > 0 ? ' · ${_sayilar[k]}' : ''}'),
                       ),
                   ],
                 ),
