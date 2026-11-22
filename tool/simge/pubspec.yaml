@@ -1,5 +1,5 @@
 name: simge
-description: Bogahost Destek uygulama simgelerini işaretten üretir (elle çalıştırılır).
+description: Bogahost Chat uygulama simgelerini işaretten üretir (elle çalıştırılır).
 publish_to: 'none'
 resolution: workspace
 environment:

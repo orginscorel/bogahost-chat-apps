@@ -1,4 +1,4 @@
-# Bogahost Destek — uygulamalar
+# Bogahost Chat — uygulamalar
 
 chat.bogahost.com canlı destek panelinin **yerel** (web görünümü değil) temsilci uygulaması. Flutter 3.47 ile tek kod tabanından
 iPhone/iPad, Mac, Android ve Windows.

@@ -53,7 +53,7 @@ class Uyg {
 
   static Widget girisEkrani() => GirisEkrani(
     api: api,
-    baslik: 'Bogahost Destek',
+    baslik: 'Bogahost Chat',
     aciklama: 'Canlı destek personel hesabınızla (WHMCS yönetici girişi) oturum açın.',
     girisYolu: '$apiKok/login',
     isaret: AcilisIsaret.destek,

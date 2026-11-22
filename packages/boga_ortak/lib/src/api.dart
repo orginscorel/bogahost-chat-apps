@@ -60,7 +60,7 @@ class BogaApi {
   /// 401 geldiğinde (giriş istekleri hariç) çağrılır: uygulama giriş ekranına döner.
   VoidCallback? oturumDustu;
 
-  /// Taşıyıcı (Bearer) jeton kipi — Bogahost Destek: oturum çerezi yerine `Authorization: Bearer <jeton>`.
+  /// Taşıyıcı (Bearer) jeton kipi — Bogahost Chat: oturum çerezi yerine `Authorization: Bearer <jeton>`.
   /// Giriş yanıtında `token` alanı gelirse kendiliğinden kaydedilir ([jetonYolu] ile başlayan isteklerde).
   String? jeton;
   String? jetonYolu;
@@ -211,7 +211,7 @@ class BogaApi {
     final d = c.statusCode ?? 0;
     if (d >= 200 && d < 300) {
       final v = c.data;
-      // Bogahost Destek: giriş yanıtındaki jeton kalıcı kaydedilir.
+      // Bogahost Chat: giriş yanıtındaki jeton kalıcı kaydedilir.
       if (jetonYolu != null && yol.startsWith(jetonYolu!) && v is Map && v['token'] is String && (v['token'] as String).isNotEmpty) {
         await jetonKaydet(v['token'] as String);
       }
@@ -222,7 +222,7 @@ class BogaApi {
     String? alan;
     final v = c.data;
     if (v is Map && v['error'] is String) {
-      // Düz biçim: {ok:false, error:'kod', message:'…'} (Bogahost Destek API) ya da Laravel {message, errors}
+      // Düz biçim: {ok:false, error:'kod', message:'…'} (Bogahost Chat API) ya da Laravel {message, errors}
       kod = '${v['error']}';
       final m = '${v['message'] ?? ''}'.trim();
       mesaj = m.isNotEmpty ? m : (_hataMetni[kod] ?? mesaj);

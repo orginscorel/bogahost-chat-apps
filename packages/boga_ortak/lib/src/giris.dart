@@ -133,7 +133,7 @@ class _GirisEkraniState extends State<GirisEkrani> {
     if (mounted) setState(() => _bekliyor = false);
   }
 
-  /// Bogahost Destek: sunucu jetonu cihaz adıyla etiketler (Ayarlar › Oturumlar).
+  /// Bogahost Chat: sunucu jetonu cihaz adıyla etiketler (Ayarlar › Oturumlar).
   Future<Map<String, dynamic>> _cihazBilgisi() async {
     String ad = '';
     try {
@@ -185,7 +185,7 @@ class _GirisEkraniState extends State<GirisEkrani> {
   String get _uygulamaAdi => switch (widget.isaret) {
     AcilisIsaret.posta => 'BogaMail',
     AcilisIsaret.yonetim => 'BogaMail Yönetim',
-    AcilisIsaret.destek => 'Bogahost Destek',
+    AcilisIsaret.destek => 'Bogahost Chat',
   };
 
   bool get _destek => widget.isaret == AcilisIsaret.destek;

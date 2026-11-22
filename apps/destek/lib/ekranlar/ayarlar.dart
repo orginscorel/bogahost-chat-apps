@@ -209,7 +209,7 @@ class _AyarlarEkraniState extends State<AyarlarEkrani> {
                 children: [
                   const BogaIsaret(boyut: 36, isaret: AcilisIsaret.destek),
                   const SizedBox(height: 8),
-                  Text('Bogahost Destek ${Uyg.api.surum} · $platform', style: TextStyle(color: r.silik, fontSize: 12)),
+                  Text('Bogahost Chat ${Uyg.api.surum} · $platform', style: TextStyle(color: r.silik, fontSize: 12)),
                   if (Uyg.sunucuSurumu.isNotEmpty) Text('Sunucu ${Uyg.sunucuSurumu}', style: TextStyle(color: r.silik, fontSize: 11.5)),
                 ],
               ),

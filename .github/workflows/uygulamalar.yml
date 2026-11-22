@@ -1,4 +1,4 @@
-# Bogahost Destek — dört platform.
+# Bogahost Chat — dört platform.
 #  - Android : kalıcı anahtarla imzalı APK  → GitHub sürümü
 #  - iPhone  : App Store profiliyle imzalanır → TestFlight
 #  - Mac     : Mac App Store imzası + .pkg     → App Store Connect (TestFlight / Mac)
@@ -33,7 +33,7 @@ env:
   ASC_KEY_ID: 5Z9AN85989
   ASC_ISSUER: e0998d8d-1026-4fe2-b8bd-d2f5715dbef8
   UYGULAMA: destek
-  AD: Bogahost-Destek
+  AD: Bogahost-Chat
 
 jobs:
   hazirla:
@@ -61,7 +61,7 @@ jobs:
         run: |
           T="surum-${{ github.run_number }}"; R="${{ github.repository }}"
           gh release view "$T" --repo "$R" >/dev/null 2>&1 || gh release create "$T" --repo "$R" --target "${{ github.sha }}" \
-            --title "Bogahost Destek derleme ${{ github.run_number }}" --notes-file kurulum/surum-notlari.md --prerelease
+            --title "Bogahost Chat derleme ${{ github.run_number }}" --notes-file kurulum/surum-notlari.md --prerelease
 
   analiz:
     runs-on: ubuntu-latest

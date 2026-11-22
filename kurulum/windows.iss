@@ -1,5 +1,5 @@
-; Bogahost Destek Windows kurulumu (Inno Setup 6). CI tanımları: Uygulama (destek), Dosya, Surum, Kaynak, Cikti, Simge.
-#define Ad "Bogahost Destek"
+; Bogahost Chat Windows kurulumu (Inno Setup 6). CI tanımları: Uygulama (destek), Dosya, Surum, Kaynak, Cikti, Simge.
+#define Ad "Bogahost Chat"
 #define Exe "destek.exe"
 #define Kimlik "{{B0A7D3C2-5E41-4F7A-9C88-2D6E1F0A4B57}"
 

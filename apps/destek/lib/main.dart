@@ -20,7 +20,7 @@ Future<void> main() async {
   if (!Platform.isAndroid && !Platform.isIOS) {
     await windowManager.ensureInitialized();
     await windowManager.setMinimumSize(const Size(420, 640));
-    await windowManager.setTitle('Bogahost Destek');
+    await windowManager.setTitle('Bogahost Chat');
   }
   await Uyg.api.baslat();
   Uyg.api.oturumDustu = Uyg.oturumDustu;
@@ -35,7 +35,7 @@ class DestekUygulamasi extends StatelessWidget {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: temaKipi,
       builder: (_, kip, _) => MaterialApp(
-        title: 'Bogahost Destek',
+        title: 'Bogahost Chat',
         debugShowCheckedModeBanner: false,
         navigatorKey: kokGezgin,
         scaffoldMessengerKey: kokMesaj,
@@ -45,7 +45,7 @@ class DestekUygulamasi extends StatelessWidget {
         locale: const Locale('tr', 'TR'),
         supportedLocales: const [Locale('tr', 'TR')],
         localizationsDelegates: const [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
-        home: AcilisEkrani(alt: 'DESTEK', isaret: AcilisIsaret.destek, hazirla: () async => await Uyg.yukle() ? const Kabuk() : Uyg.girisEkrani()),
+        home: AcilisEkrani(alt: 'CHAT', isaret: AcilisIsaret.destek, hazirla: () async => await Uyg.yukle() ? const Kabuk() : Uyg.girisEkrani()),
       ),
     );
   }
