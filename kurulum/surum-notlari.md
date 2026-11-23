@@ -1,3 +1,7 @@
+## 1.2.10
+
+- Sohbetler listesinin tepesinde sabit Butoi girişi (`_butoiSatiri`, secilenSohbet = -1 → `ButoiSohbetEkrani` gömülü). Web: chats listesinin tepesinde admin/ai#train bağlantısı.
+
 ## 1.2.9
 
 - Butoi (yapay zeka): WHMCS köprüsü `ai_catalog` ile ürün/fiyat/alan adı/bilgi bankası/ödeme yöntemleri `ai_knowledge` (source=system, ext_key) olarak senkronlanır (gece 05:15 + elle). Eğitim sohbeti (`panel/ai/train*`), küçük konuşma üretimi (selam/teşekkür/veda), adlı throttle sayaçları (429 düzeltmesi).

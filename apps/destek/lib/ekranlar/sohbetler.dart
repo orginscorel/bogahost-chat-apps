@@ -9,6 +9,7 @@ import '../ortak/yardimci.dart';
 import '../oturum.dart';
 import '../veri/depo.dart';
 import '../veri/modeller.dart';
+import 'ayar/yapay_zeka.dart';
 import 'gorusme.dart';
 import 'kabuk.dart';
 
@@ -207,6 +208,7 @@ class _SohbetlerEkraniState extends State<SohbetlerEkrani> {
       body: Column(
         children: [
           if (gomulu) gomuluBas,
+          if (Uyg.yetki('settings.manage')) _butoiSatiri(r),
           Expanded(
             child: _hata != null
                 ? Durum.hata(_hata!, tekrar: _yukle)
@@ -252,9 +254,68 @@ class _SohbetlerEkraniState extends State<SohbetlerEkrani> {
         Expanded(
           child: secilenSohbet.value == null
               ? Scaffold(body: Durum.bos('Soldan bir sohbet seçin.', ikon: Simgeler.forum))
+              : secilenSohbet.value == -1
+              ? const ButoiSohbetEkrani(key: ValueKey('butoi'), gomulu: true)
               : GorusmeEkrani(key: ValueKey(secilenSohbet.value), sohbetId: secilenSohbet.value!, gomulu: true),
         ),
       ],
+    );
+  }
+
+  /// Listenin tepesinde sabit "Butoi" girişi: yapay zeka asistanıyla eğitim sohbeti.
+  Widget _butoiSatiri(Renkler r) {
+    final secili = context.genis && secilenSohbet.value == -1;
+    return Material(
+      color: secili ? r.vurguYumusak : Marka.mor.withValues(alpha: .06),
+      child: InkWell(
+        onTap: () {
+          if (context.genis) {
+            secilenSohbet.value = -1;
+            setState(() {});
+          } else {
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ButoiSohbetEkrani()));
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 10, 12, 10),
+          child: Row(
+            children: [
+              Stack(
+                children: [
+                  const Avatar('Butoi', boyut: 44, tohum: 'butoi-asistan'),
+                  Positioned(right: 0, bottom: 0, child: Nokta(Marka.mor, boyut: 13, halka: r.kart)),
+                ],
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Butoi',
+                            style: TextStyle(fontWeight: FontWeight.w700, color: r.metin, fontSize: 14.5),
+                          ),
+                        ),
+                        const Rozet('Yapay zeka', renk: Marka.mor, ikon: Simgeler.sparkle),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Soru sor, düzelt, öğret — asistanı burada eğitin',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: r.soluk, fontSize: 12.5),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

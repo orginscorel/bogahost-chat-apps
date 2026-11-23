@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../ortak/parcalar.dart';
 import '../../ortak/simgeler.dart';
 import '../../veri/json.dart';
+import '../../oturum.dart';
 import '../../veri/panel.dart';
 import '../kabuk.dart';
 import 'ortak.dart';
@@ -1036,11 +1037,80 @@ class _DenemeState extends State<_Deneme> {
 
 // ---------------------------------------------------------------- Eğitim sohbeti
 
+/// Sohbetler listesinin tepesindeki "Butoi" girişinden açılan tam sayfa eğitim sohbeti.
+class ButoiSohbetEkrani extends StatefulWidget {
+  const ButoiSohbetEkrani({super.key, this.gomulu = false});
+  final bool gomulu;
+  @override
+  State<ButoiSohbetEkrani> createState() => _ButoiSohbetEkraniState();
+}
+
+class _ButoiSohbetEkraniState extends State<ButoiSohbetEkrani> {
+  String _ad = 'Butoi';
+
+  @override
+  void initState() {
+    super.initState();
+    Panel.ai()
+        .then((v) {
+          if (mounted) setState(() => _ad = metin(harita(v['config'])['name'], 'Butoi'));
+        })
+        .catchError((_) {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: !widget.gomulu,
+        titleSpacing: widget.gomulu ? 16 : 0,
+        title: Row(
+          children: [
+            const Avatar('Butoi', boyut: 34, tohum: 'butoi-asistan'),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _ad,
+                    style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: r.metin),
+                  ),
+                  Text('Yapay zeka asistanı · eğitim sohbeti', style: TextStyle(fontSize: 12, color: r.soluk)),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          if (Uyg.yetki('settings.manage'))
+            IconButton(
+              tooltip: 'Asistan ayarları',
+              icon: const Icon(Simgeler.tune),
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const YapayZekaEkrani())),
+            ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+        child: LayoutBuilder(
+          builder: (c, kisit) => _Egitim(key: const ValueKey('butoi-sohbet'), botAdi: _ad, yenile: () {}, yukseklik: kisit.maxHeight - 120),
+        ),
+      ),
+    );
+  }
+}
+
 /// Butoi ile sohbet ederek eğitme: soru sor → yanlışsa Düzelt (ya da "Doğrusu: …"), doğruysa Doğru; "Soru: … | Cevap: …" tek seferde öğretir.
 class _Egitim extends StatefulWidget {
-  const _Egitim({super.key, required this.botAdi, required this.yenile});
+  const _Egitim({super.key, required this.botAdi, required this.yenile, this.yukseklik});
   final String botAdi;
   final VoidCallback yenile;
+
+  /// Tam sayfa kullanımda liste yüksekliği (null → 440).
+  final double? yukseklik;
   @override
   State<_Egitim> createState() => _EgitimState();
 }
@@ -1270,7 +1340,7 @@ class _EgitimState extends State<_Egitim> {
         Kutu(
           padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
           child: SizedBox(
-            height: 440,
+            height: (widget.yukseklik ?? 440).clamp(240, 2000).toDouble(),
             child: _yukleniyor
                 ? const Center(child: CircularProgressIndicator())
                 : _mesajlar.isEmpty

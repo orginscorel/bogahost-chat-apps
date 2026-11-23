@@ -2,6 +2,17 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.10',
+    'date': '2026-11-23',
+    'title': 'Butoi sohbetlerde',
+    'items': [
+      {
+        'type': 'new',
+        'text': 'Sohbetler listesinin en üstünde sabit "Butoi" girişi: yapay zeka asistanıyla eğitim sohbeti artık doğrudan sohbetlerden açılır (geniş ekranda sağ panelde).',
+      },
+    ],
+  },
+  {
     'version': '1.2.9',
     'date': '2026-11-23',
     'title': 'Butoi ve arama düzeltmeleri',
