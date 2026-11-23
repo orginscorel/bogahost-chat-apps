@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:boga_ortak/boga_ortak.dart';
 import 'package:dio/dio.dart' show CancelToken;
@@ -255,10 +256,13 @@ class _EkranIzleEkraniState extends State<EkranIzleEkrani> {
         if (html is String && html.isNotEmpty && (m['hv'] != _hv || urlDegisti || !_kareVar)) {
           _hv = m['hv'];
           _sonHtml = _temizle(html, _baseUrl);
-          await _htmlYukle();
-          if (!_kareVar) {
+          final ilk = !_kareVar;
+          if (ilk) {
+            await _htmlYukle(); // ilk kare: görünür olana kadar bekle
             _kareVar = true;
             degisti = true;
+          } else {
+            unawaited(_htmlYukle()); // sonraki kareler arka planda; yoklama durmaz
           }
         } else {
           // Adres değişti ama HTML gelmediyse bir sonraki turda tam kare iste.
@@ -302,12 +306,43 @@ class _EkranIzleEkraniState extends State<EkranIzleEkrani> {
     return h;
   }
 
+  bool _uygulaniyor = false, _bekleyenKare = false;
+  String? _yuklenenBase;
+
+  /// Kareyi web görünümüne uygular. İlk kare (ya da adres değişince) tam yükleme; sonrakiler mevcut sayfada
+  /// DOM değişimi (betiksiz HTML, aynı base) — tam yeniden yükleme her karede 5-10 sn sürüp uygulamayı kilitliyordu.
   Future<void> _htmlYukle() async {
-    final w = _web, html = _sonHtml;
-    if (w == null || html == null) return;
+    if (_uygulaniyor) {
+      _bekleyenKare = true; // uygulama sürerken gelen kareler birleşir, en son kare uygulanır
+      return;
+    }
+    _uygulaniyor = true;
     try {
-      await w.loadData(data: html, baseUrl: _baseUrl != null ? WebUri(_baseUrl!) : null, mimeType: 'text/html', encoding: 'utf-8');
-    } catch (_) {}
+      do {
+        _bekleyenKare = false;
+        final w = _web, html = _sonHtml;
+        if (w == null || html == null) break;
+        final tamYukle = !_kareVar || _yuklenenBase != _baseUrl;
+        try {
+          if (tamYukle) {
+            _yuklenenBase = _baseUrl;
+            await w
+                .loadData(data: html, baseUrl: _baseUrl != null ? WebUri(_baseUrl!) : null, mimeType: 'text/html', encoding: 'utf-8')
+                .timeout(const Duration(seconds: 8));
+          } else {
+            final js = jsonEncode(html);
+            await w
+                .evaluateJavascript(
+                  source:
+                      '(function(h){try{var d=new DOMParser().parseFromString(h,"text/html");document.replaceChild(document.adoptNode(d.documentElement),document.documentElement);}catch(e){document.documentElement.innerHTML=h;}window.scrollTo(${_gorX.round()},${_gorY.round()});})($js);',
+                )
+                .timeout(const Duration(seconds: 4));
+          }
+        } catch (_) {}
+      } while (_bekleyenKare && mounted);
+    } finally {
+      _uygulaniyor = false;
+    }
   }
 
   /// Görünümü geçerli konuma kaydırır (Kaydır açıkken temsilcinin, değilse ziyaretçinin konumu).
@@ -465,15 +500,27 @@ class _EkranIzleEkraniState extends State<EkranIzleEkrani> {
 
   Widget _cip(String etiket, IconData ikon, bool secili, ValueChanged<bool> degis) => Padding(
     padding: const EdgeInsets.only(right: 8),
-    child: FilterChip(
-      selected: secili,
-      showCheckmark: false,
-      avatar: Icon(ikon, size: 16, color: secili ? Marka.mor : Colors.white),
-      label: Text(etiket, style: TextStyle(color: secili ? Marka.mor : Colors.white)),
-      onSelected: degis,
-      selectedColor: Colors.white,
-      backgroundColor: Colors.white.withValues(alpha: .12),
-      side: BorderSide.none,
+    child: Material(
+      color: secili ? Colors.white : Colors.white.withValues(alpha: .14),
+      borderRadius: BorderRadius.circular(99),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(99),
+        onTap: () => degis(!secili),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(ikon, size: 16, color: secili ? Marka.mor : Colors.white),
+              const SizedBox(width: 6),
+              Text(
+                etiket,
+                style: TextStyle(color: secili ? Marka.mor : Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+        ),
+      ),
     ),
   );
 

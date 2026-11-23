@@ -110,8 +110,9 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState s) {
+    final onceArkaPlan = _arkaPlanda;
     _yasam = s;
-    if (s == AppLifecycleState.resumed) {
+    if (s == AppLifecycleState.resumed || (onceArkaPlan && s == AppLifecycleState.inactive)) {
       _yokla();
       _planla();
     }
@@ -119,8 +120,12 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
 
   /// Web paneliyle aynı uyarlanır yoklama: son 25 sn'de hareket varsa 0,9 sn; 3 dk'ya kadar 2,5 sn; sonra 6 sn;
   /// pencere arkadayken 10 sn. Her yoklama bitince yeniden planlanır (üst üste binmez).
+  /// Masaüstünde pencere odağı başka uygulamadayken (ör. temsilci tarayıcıda müşteriyi test ediyor) durum `inactive` olur;
+  /// bu arka plan değildir — yalnız gizli/duraklatılmış (paused/hidden) uygulamada yoklama seyrekleşir.
+  bool get _arkaPlanda => _yasam == AppLifecycleState.paused || _yasam == AppLifecycleState.hidden;
+
   Duration get _aralik {
-    if (_yasam != AppLifecycleState.resumed) return const Duration(seconds: 10);
+    if (_arkaPlanda) return const Duration(seconds: 10);
     final bosta = DateTime.now().difference(_sonEtkinlik);
     if (bosta.inSeconds < 25) return const Duration(milliseconds: 900);
     if (bosta.inMinutes < 3) return const Duration(milliseconds: 2500);

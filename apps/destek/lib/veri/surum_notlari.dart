@@ -2,6 +2,24 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.7',
+    'date': '2026-11-23',
+    'title': 'Ekran izleme, gecikme, davet, sohbet başlatma',
+    'items': [
+      {
+        'type': 'fix',
+        'text': 'Ekran izleme: kareler sayfayı baştan yüklemeden uygulanır (her karede 5-10 sn kilitlenme ve takılma giderildi); ilk kare sunucuda yoksa widget tam kareyi yeniden gönderir.',
+      },
+      {
+        'type': 'fix',
+        'text': 'Pencere odakta değilken (ör. tarayıcıda test ederken) görüşme yoklaması 10 sn\'ye düşüyordu; artık yalnız uygulama gizli/duraklatılmışken yavaşlar.',
+      },
+      {'type': 'fix', 'text': 'Ekran izleme üst çubuğundaki Yönlendir / Kaydır düğmeleri beyaz çıkıyordu.'},
+      {'type': 'fix', 'text': 'Ziyaretçiyi davet et: widget açıkken de davet kartı gösterilir (önce sessizce düşüyordu).'},
+      {'type': 'fix', 'text': 'Sohbet başlat: yazılan ilk mesaj artık sohbete düşer ve müşteride widget kendiliğinden açılır.'},
+    ],
+  },
+  {
     'version': '1.2.6',
     'date': '2026-11-23',
     'title': 'Kendi kendine öğrenen asistan',

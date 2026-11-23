@@ -1,3 +1,10 @@
+## 1.2.7
+
+- Ekran izleme: kareler web görünümünü baştan yüklemeden (DOM değişimiyle) uygulanır; yoklama kare yüklenmesini beklemez, kareler birleşir. Her karede 5-10 sn kilitlenme ve takılma giderildi. Widget, sunucu "need_html" derse ya da her 10 sn'de tam kareyi yeniden gönderir (ilk karenin boş gelmesi düzeltildi).
+- Görüşme yoklaması: masaüstünde pencere odakta değilken (inactive) artık yavaşlamaz; yalnız paused/hidden'da 10 sn.
+- Ekran izleme üst çubuğu Yönlendir / Kaydır düğmeleri kendi çizimiyle (tema beyaza çeviriyordu).
+- Sunucu: ziyaretçi daveti widget açıkken panel içinde kart olarak gösterilir; "Sohbet başlat" ilk mesajı temsilci mesajı olarak kaydeder (widget müşteride kendiliğinden açılır).
+
 ## 1.2.6
 
 - Yapay zeka asistanı artık dış servis (API anahtarı, model) kullanmaz: kendi kendine öğrenen iç motor, ziyaretçi sorusunu anahtar kelime / TF-IDF benzerliğiyle bilgi tabanı ve hazır cevaplarla eşleştirir.
