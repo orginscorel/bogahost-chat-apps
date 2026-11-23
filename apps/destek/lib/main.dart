@@ -78,10 +78,19 @@ class OlcekSarmal extends StatelessWidget {
             viewPadding: mq.viewPadding / f,
             viewInsets: mq.viewInsets / f,
           ),
+          // OverflowBox: çocuk, pencerenin sıkı kısıtı yerine küçültülmüş mantıksal boyutta (w/f × h/f) yerleşir;
+          // Transform sonra onu f kat büyütür. Bu olmadan içerik pencere boyutunda yerleşip taşıyordu.
           child: Transform.scale(
             scale: f,
             alignment: Alignment.topLeft,
-            child: SizedBox(width: w / f, height: h / f, child: child),
+            child: OverflowBox(
+              alignment: Alignment.topLeft,
+              minWidth: w / f,
+              maxWidth: w / f,
+              minHeight: h / f,
+              maxHeight: h / f,
+              child: SizedBox(width: w / f, height: h / f, child: child),
+            ),
           ),
         );
       },

@@ -17,7 +17,15 @@ void main() {
   });
 
   test('Mesaj türleri', () {
-    final m = Mesaj.coz({'id': 1, 'sender': 'visitor', 'name': 'Z', 'type': 'text', 'body': 'merhaba', 'at': '10:00', 'file': {'url': '/x.png', 'name': 'x.png', 'size': 10, 'image': true}});
+    final m = Mesaj.coz({
+      'id': 1,
+      'sender': 'visitor',
+      'name': 'Z',
+      'type': 'text',
+      'body': 'merhaba',
+      'at': '10:00',
+      'file': {'url': '/x.png', 'name': 'x.png', 'size': 10, 'image': true},
+    });
     expect(m.ziyaretci, isTrue);
     expect(m.ek?.gorsel, isTrue);
     expect(Mesaj.coz({'id': 2, 'sender': 'system', 'type': 'event', 'at': ''}).sistem, isTrue);
