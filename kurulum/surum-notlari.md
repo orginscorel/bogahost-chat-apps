@@ -1,3 +1,7 @@
+## 1.2.12
+
+- Sunucu: `app/Services/ButoiHizmet.php` (hizmet akışı), köprü `client_services/service_status/service_power/client_tickets/open_ticket`, imzalı kimlik (`includes/hooks/livechat_user_sig.php` + `bridge_secret.php`), `messages.ui`, `visitors.whmcs_verified_at`. Uygulama: kip uyarısı.
+
 ## 1.2.11
 
 - `lib/ortak/maskot.dart` ButoiMaskot (CustomPainter; dusunuyor/mutlu). Eğitim sohbeti: `_dusunerek` faz akışı, taslak (meta.draft) için Böyle öğren / Vazgeç, meta.steps düşünce izi. Sunucu: `AiService::yenidenYaz` kural tabanlı talimat motoru, `talimatMi`, taslak onayı (evet/vazgeç). Web: public/img/butoi.svg.

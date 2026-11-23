@@ -2,6 +2,24 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.12',
+    'date': '2026-11-24',
+    'title': 'Butoi müşteri hizmet akışı',
+    'items': [
+      {
+        'type': 'new',
+        'text': 'Butoi, giriş yapmış müşterinin hizmetlerini tanır: erişim sorununda hizmet seçtirir, durumu (BogaVM güç durumu dahil) sorgular, onayla başlat / yeniden başlat yapar, lisans önerisi verir, acil ticket açar, ticket durumunu söyler.',
+      },
+      {'type': 'improve', 'text': 'Yapay zeka ayarında kip "Yalnız öneri" iken uyarı: Butoi ziyaretçiye yazmaz.'},
+      {'type': 'fix', 'text': 'Sohbette uzun mesajlar ekrana sığmıyordu (iç içe Flexible); düzeltildi. Mesaj metni seçilebilir ve kopyalanabilir.'},
+      {
+        'type': 'improve',
+        'text': 'Butoi sohbeti tam ekranda kalan alanı doldurur; Düzelt kutusuna yazılan talimat ("daha kısa yaz") yanıt yerine yeniden yazma taslağı üretir, öğretilen yanıtın öncelik kazandığı doğrulanır.',
+      },
+      {'type': 'fix', 'text': '"Bota geri ver" artık widget\'ta da Butoi\'yi devreye alır.'},
+    ],
+  },
+  {
     'version': '1.2.11',
     'date': '2026-11-24',
     'title': 'Butoi maskotu ve konuşarak eğitim',

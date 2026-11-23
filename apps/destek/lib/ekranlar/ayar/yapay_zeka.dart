@@ -288,6 +288,14 @@ class _AyarFormuState extends State<_AyarFormu> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               anahtar('Asistan etkin', _etkin, (x) => setState(() => _etkin = x), alt: 'Kapalıyken öneri ve otomatik yanıt çalışmaz', ikon: Simgeler.sparkle),
+              if (_etkin && _kip == 'suggest')
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(
+                    '⚠️ Kip "Yalnız öneri": Butoi ziyaretçiye yazmaz, yalnız temsilciye öneri verir. Widget\'ta müşterilere yanıt vermesi için aşağıdan "Her zaman yanıtlar" seçin.',
+                    style: TextStyle(color: Marka.kehribar, fontSize: 12.5),
+                  ),
+                ),
               const SizedBox(height: 8),
               alan('Asistan adı', _ad, ipucu: 'Butoi'),
             ],
@@ -1475,41 +1483,52 @@ class _EgitimState extends State<_Egitim> {
           ],
         ),
         const SizedBox(height: 8),
-        Kutu(
-          padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-          child: SizedBox(
-            height: (widget.yukseklik ?? 440).clamp(240, 2000).toDouble(),
-            child: _yukleniyor
-                ? const Center(child: CircularProgressIndicator())
-                : _mesajlar.isEmpty && !_mesgul
-                ? Durum.bos('Henüz konuşma yok. Örneğin: "com alan adı ne kadar?"', ikon: Simgeler.chatText)
-                : ListView.builder(
-                    controller: _kaydirma,
-                    itemCount: _mesajlar.length + (_mesgul ? 1 : 0),
-                    itemBuilder: (c, i) => i == _mesajlar.length ? _yaziyor(r) : _balon(c, _mesajlar[i]),
-                  ),
+        // Tam ekran (Butoi sohbeti): liste kalan alanı doldurur; ayarlar sekmesinde sabit yükseklik
+        if (widget.yukseklik != null)
+          Expanded(
+            child: Kutu(padding: const EdgeInsets.fromLTRB(10, 8, 10, 8), child: _liste(r)),
+          )
+        else
+          Kutu(
+            padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+            child: SizedBox(height: 440, child: _liste(r)),
+          ),
+        const SizedBox(height: 8),
+        _girisSatiri(r),
+      ],
+    );
+  }
+
+  Widget _liste(Renkler r) {
+    return _yukleniyor
+        ? const Center(child: CircularProgressIndicator())
+        : _mesajlar.isEmpty && !_mesgul
+        ? Durum.bos('Henüz konuşma yok. Örneğin: "com alan adı ne kadar?"', ikon: Simgeler.chatText)
+        : ListView.builder(
+            controller: _kaydirma,
+            itemCount: _mesajlar.length + (_mesgul ? 1 : 0),
+            itemBuilder: (c, i) => i == _mesajlar.length ? _yaziyor(r) : _balon(c, _mesajlar[i]),
+          );
+  }
+
+  Widget _girisSatiri(Renkler r) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Expanded(
+          child: TextField(
+            controller: _metin,
+            minLines: 1,
+            maxLines: 4,
+            textInputAction: TextInputAction.send,
+            onSubmitted: (_) => _gonder(),
+            decoration: const InputDecoration(hintText: "Soru sorun, talimat verin (kısalt, fiyat ekle…) ya da 'Doğrusu: …'"),
           ),
         ),
-        const SizedBox(height: 8),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _metin,
-                minLines: 1,
-                maxLines: 4,
-                textInputAction: TextInputAction.send,
-                onSubmitted: (_) => _gonder(),
-                decoration: const InputDecoration(hintText: "Soru sorun, talimat verin (kısalt, fiyat ekle…) ya da 'Doğrusu: …'"),
-              ),
-            ),
-            const SizedBox(width: 8),
-            FilledButton(
-              onPressed: _mesgul ? null : _gonder,
-              child: _mesgul ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Simgeler.send, size: 18),
-            ),
-          ],
+        const SizedBox(width: 8),
+        FilledButton(
+          onPressed: _mesgul ? null : _gonder,
+          child: _mesgul ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Simgeler.send, size: 18),
         ),
       ],
     );
