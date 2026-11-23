@@ -44,6 +44,7 @@ Future<Uint8List> _opakPng(int boyut, void Function(Canvas c, double k) ciz) asy
     final crc = ByteData(4)..setUint32(0, _crc32([...t, ...g]));
     b.add(crc.buffer.asUint8List());
   }
+
   final ihdr = ByteData(13)
     ..setUint32(0, boyut)
     ..setUint32(4, boyut)
@@ -90,17 +91,29 @@ void _rozet(Canvas c, Offset m, double y, {Color halka = const Color(0xFF3624A6)
   final b = RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(m.dx, m.dy - y * .06), width: y * 1.14, height: y * .86), Radius.circular(y * .3));
   final beyaz = Paint()..color = Colors.white;
   c.drawRRect(b, beyaz);
-  c.drawPath(Path()..moveTo(m.dx - y * .22, b.bottom - y * .04)..lineTo(m.dx - y * .42, b.bottom + y * .3)..lineTo(m.dx + y * .1, b.bottom - y * .04)..close(), beyaz);
+  c.drawPath(
+    Path()
+      ..moveTo(m.dx - y * .22, b.bottom - y * .04)
+      ..lineTo(m.dx - y * .42, b.bottom + y * .3)
+      ..lineTo(m.dx + y * .1, b.bottom - y * .04)
+      ..close(),
+    beyaz,
+  );
   for (final x in [-.3, 0.0, .3]) {
     c.drawCircle(Offset(m.dx + x * y, m.dy - y * .06), y * .09, Paint()..color = Marka.yesil);
   }
 }
 
-/// Gerçek Bogahost amblemi (üç sunucu sütunu) + rozet; 1024 tuvalde.
+/// Kurumsal amblem (boynuzlu taç + üç sunucu sütunu) + sohbet rozeti; 1024 tuvalde. Posta uygulamalarıyla aynı
+/// yerleşim: 64'lük işaret alanındaki (10.5,10,34,36.4) logo ve (46.5,46.5) r=9.6 rozetin 16 katı.
 void _amblemRozet(Canvas c, {double olcek = 1}) {
-  final hedef = Rect.fromCenter(center: const Offset(482, 500), width: 520 * olcek, height: 520 * olcek);
-  BogahostLogo.amblemCiz(c, hedef, renk: Colors.white);
-  _rozet(c, Offset(512 + 250 * olcek, 512 + 220 * olcek), 112 * olcek);
+  c.save();
+  c.translate(512, 512);
+  c.scale(olcek);
+  c.translate(-512, -512);
+  BogaAmblem.ciz(c, const Rect.fromLTWH(168, 160, 544, 582.4), renk: Colors.white);
+  _rozet(c, const Offset(744, 744), 153.6, halka: const Color(0xFF4532BD));
+  c.restore();
 }
 
 /// Tam kare zemin + amblem (iOS, Android eski, Windows).
@@ -108,8 +121,25 @@ void _kare(Canvas c, double k, AcilisIsaret i, {double radius = 0}) {
   c.scale(k);
   const r = Rect.fromLTWH(0, 0, 1024, 1024);
   final rr = RRect.fromRectAndRadius(r, Radius.circular(radius));
-  c.drawRRect(rr, Paint()..shader = const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF7B6DF0), Marka.mor, Color(0xFF3624A6)], stops: [0, .5, 1]).createShader(r));
-  c.drawRRect(rr, Paint()..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.center, colors: [Colors.white.withValues(alpha: .18), Colors.white.withValues(alpha: 0)]).createShader(r));
+  c.drawRRect(
+    rr,
+    Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0xFF7B6DF0), Marka.mor, Color(0xFF3624A6)],
+        stops: [0, .5, 1],
+      ).createShader(r),
+  );
+  c.drawRRect(
+    rr,
+    Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.center,
+        colors: [Colors.white.withValues(alpha: .18), Colors.white.withValues(alpha: 0)],
+      ).createShader(r),
+  );
   _amblemRozet(c);
 }
 
@@ -118,13 +148,33 @@ void _mac(Canvas c, double k, AcilisIsaret i) {
   c.scale(k);
   const r = Rect.fromLTWH(100, 100, 824, 824);
   final rr = RRect.fromRectAndRadius(r, const Radius.circular(185));
-  c.drawRRect(rr.shift(const Offset(0, 10)), Paint()
-    ..color = Colors.black.withValues(alpha: .28)
-    ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18));
+  c.drawRRect(
+    rr.shift(const Offset(0, 10)),
+    Paint()
+      ..color = Colors.black.withValues(alpha: .28)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18),
+  );
   c.save();
   c.clipRRect(rr);
-  c.drawRect(r, Paint()..shader = const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF7B6DF0), Marka.mor, Color(0xFF3624A6)], stops: [0, .5, 1]).createShader(r));
-  c.drawRect(r, Paint()..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.center, colors: [Colors.white.withValues(alpha: .18), Colors.white.withValues(alpha: 0)]).createShader(r));
+  c.drawRect(
+    r,
+    Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0xFF7B6DF0), Marka.mor, Color(0xFF3624A6)],
+        stops: [0, .5, 1],
+      ).createShader(r),
+  );
+  c.drawRect(
+    r,
+    Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.center,
+        colors: [Colors.white.withValues(alpha: .18), Colors.white.withValues(alpha: 0)],
+      ).createShader(r),
+  );
   c.translate(100, 100);
   c.scale(824 / 1024);
   _amblemRozet(c);

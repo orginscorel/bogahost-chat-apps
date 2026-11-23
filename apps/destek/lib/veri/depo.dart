@@ -60,6 +60,10 @@ class Depo {
   static Future<void> favori(int id) => _post('chats/$id/favorite');
   static Future<void> arsivle(int id) => _post('chats/$id/archive');
   static Future<void> kacanCozuldu(int id) => _post('chats/$id/missed-resolve');
+
+  /// Sohbetten yasakla: scopes ip/ip_range/fingerprint/visitor/email/full, reason, duration 1h/1d/1w/1m/perm, subnet 24/16.
+  static Future<Map<String, dynamic>> sohbetYasakla(int id, Map<String, dynamic> g) async => harita(await _post('chats/$id/ban', g));
+  static Future<Map<String, dynamic>> sohbetYasakKaldir(int id) async => harita(await _post('chats/$id/unban'));
   static Future<void> transkriptEposta(int id, {String? eposta}) => _post('chats/$id/transcript/email', {'email': ?eposta});
   static Future<String?> transkriptBaglanti(int id) async =>
       metinYa(harita(await _get('chats/$id/transcript/link'))['url'] ?? harita(await _get('chats/$id/transcript/link'))['link']);

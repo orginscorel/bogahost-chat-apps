@@ -43,6 +43,11 @@ Future<bool> yasakEkleDiyalog(BuildContext context, {String tur = 'ip', String d
   );
 }
 
+/// Diğer ekranların kullandığı yardımcılar (tür adı).
+abstract final class YasaklarEkraniYardim {
+  static String turAdi(String t) => yasakTurleri.firstWhere((x) => x.$1 == t, orElse: () => ('', t)).$2;
+}
+
 /// Yasaklılar — web düzeni: özet sayaçlar, arama + tür süzgeci + durum; geniş ekranda tablo
 /// (Tür · Değer · Sebep · Durum · Ekleyen · Tarih · isabet), telefonda kartlar.
 class YasaklarEkrani extends StatefulWidget {

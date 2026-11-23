@@ -15,6 +15,7 @@ import '../veri/depo.dart';
 import '../veri/modeller.dart';
 import 'arama.dart';
 import 'ekran_izle.dart';
+import 'sohbet_ziyaretci.dart';
 import 'ziyaretci_detay.dart';
 
 /// Tek görüşme: mesaj akışı (2 sn yoklama), yanıt kutusu, hazır yanıtlar, ekler, eylemler, ziyaretçi bilgisi.
@@ -598,7 +599,7 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
               children: [
                 Expanded(child: govde),
                 Container(
-                  width: (MediaQuery.sizeOf(context).width * .24).clamp(300.0, 360.0),
+                  width: (MediaQuery.sizeOf(context).width * .26).clamp(340.0, 460.0),
                   decoration: BoxDecoration(
                     border: Border(left: BorderSide(color: r.kenar)),
                   ),
@@ -607,7 +608,7 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
               ],
             )
           : govde,
-      endDrawer: genis ? null : Drawer(width: 320, child: _bilgiPaneli(r)),
+      endDrawer: genis ? null : Drawer(width: 360, child: _bilgiPaneli(r)),
     );
     if (!genis && _bilgiAcik) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1048,83 +1049,16 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
     );
   }
 
-  Widget _bilgiPaneli(Renkler r) {
-    final s = _son;
-    final ilk = widget.ilk;
-    return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Row(
-            children: [
-              Text('Ziyaretçi', style: gosterim(17, renk: r.metin)),
-              const Spacer(),
-              if (!context.genis) IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Simgeler.close)),
-            ],
-          ),
-          const SizedBox(height: 8),
-          _satir('Ad', ilk?.ziyaretci ?? '—', r),
-          if (ilk?.eposta != null) _satir('E-posta', ilk!.eposta!, r, kopyalanir: true),
-          if (ilk?.ulke != null) _satir('Ülke', '${bayrak(ilk!.ulke)} ${ilk.ulke}', r),
-          if (ilk?.bolum != null) _satir('Departman', ilk!.bolum!, r),
-          if (ilk?.temsilci != null) _satir('Temsilci', ilk!.temsilci!, r),
-          if (s?.dil != null) _satir('Dil', s!.dil!, r),
-          if (s?.url != null) _satir('Şu an', s!.url!, r, kopyalanir: true),
-          if (s?.puan != null) _satir('Değerlendirme', '${'★' * s!.puan!}${s.puanYorum == null ? '' : ' · ${s.puanYorum}'}', r),
-          _satir('Sohbet', '#$_id', r),
-          if (s != null && s.sayfalar.isNotEmpty) ...[
-            const Baslik('Gezinme'),
-            for (final p in s.sayfalar.take(15))
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: InkWell(
-                  onTap: () => disAc(p.url),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        p.baslik ?? kisaUrl(p.url),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: r.metin, fontSize: 13, fontWeight: FontWeight.w500),
-                      ),
-                      Text(
-                        '${kisaUrl(p.url, en: 42)} · ${p.zaman}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: r.silik, fontSize: 11.5),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _satir(String ad, String deger, Renkler r, {bool kopyalanir = false}) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 5),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 92,
-          child: Text(ad, style: TextStyle(color: r.silik, fontSize: 12.5)),
-        ),
-        Expanded(
-          child: SelectableText(deger, style: TextStyle(color: r.metin, fontSize: 13.5)),
-        ),
-        if (kopyalanir)
-          IconButton(
-            visualDensity: VisualDensity.compact,
-            iconSize: 16,
-            onPressed: () => panoyaKopyala(deger, ad: ad),
-            icon: const Icon(Simgeler.copy),
-          ),
-      ],
-    ),
+  Widget _bilgiPaneli(Renkler r) => SohbetZiyaretciPaneli(
+    key: ValueKey('zb$_id'),
+    sohbetId: _id,
+    kapat: () {
+      if (context.genis) {
+        setState(() => _bilgiAcik = false);
+      } else {
+        Navigator.pop(context);
+      }
+    },
   );
 }
 

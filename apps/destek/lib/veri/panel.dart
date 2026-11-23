@@ -105,6 +105,9 @@ class Panel {
 
   // ---- Ziyaretçi detayı / CRM / ekran
   static Future<Map<String, dynamic>> ziyaretci(int oturum) => _get('visitors/$oturum');
+
+  /// Sohbet ekranı sağ blok: ziyaretçi + ağ + CRM + yasak + gezinti + olaylar (web paneli kapsamı).
+  static Future<Map<String, dynamic>> sohbetZiyaretci(int sohbet) => _get('chats/$sohbet/visitor');
   static Future<Map<String, dynamic>> ekranAl(int oturum, {Object? hv}) => _get('visitors/$oturum/screen', q: {'hv': ?hv});
   static Future<Map<String, dynamic>> ekranIste(int oturum, {String kip = 'consent'}) => _post('visitors/$oturum/screen/request', {'mode': kip});
   static Future<Map<String, dynamic>> ekranIsaret(int oturum, {double? x, double? y, String? etiket}) =>

@@ -4,6 +4,9 @@
 - Geniş ekranda hiçbir ekran üst çubuktaki durum / zil / tema / profil nesnelerini yinelemez (kabuk içi işaretleme ile; sohbetler sayfası dahil).
 - Sohbetler: sol listede süzgeç çipleri (Açık/Bekleyen/Kaçan/Çevrimdışı/Kapalı) artık sarılır, hepsi görünür; liste geniş ekranda 480 px'e kadar; mesaj sütunu ve yazım kutusu en çok 1180 px ortalanır (uçsuz bucaksız genişlik yok).
 - Sayfa içeriği büyük ekranda daha geniş: genel 1600 px, ziyaretçi tablosu 1900 px, ayar sayfaları 1400 px.
+- Sohbet ekranı sağ blok (Ziyaretçi bilgileri) web paneliyle aynı kapsamda yeniden yazıldı: bayrak + ad, e-posta/telefon, ziyaret/sohbet sayıları, WHMCS ID (müşteri kaydına bağlantı), müşteri adayı durumu; **Ziyaretçiyi yasakla** (IP · IP bloğu /24 /16 · cihaz parmak izi · ziyaretçi kimliği · e-posta · tam yasak; sebep + süre) ve **Tüm yasakları kaldır** / tek tek kaldır; atama; şu anki sayfa + yazıyor; iletişim & kimlik (kalıcı kimlik, sohbet dili); ağ & cihaz (IP, port, işletim sistemi, tarayıcı, cihaz, ekran, dil, saat dilimi + ziyaretçinin yerel saati, parmak izi, tarayıcı kimliği); konum; oturum (başlangıç, son hareket, sayfa sayısı); kaynak + UTM; bu sohbet (departman, temsilci, katılımcılar, değerlendirme); sayfa gezinti geçmişi (50); olay günlüğü; geçmiş görüşmeler (tıklayınca açılır); CRM detayı ve ekran izleme kısayolları. Panel geniş ekranda 340–460 px.
+- Uygulama simgesi posta uygulamalarıyla aynı aileye döndü: kurumsal amblem (boynuzlu taç + üç sunucu sütunu) + yeşil sohbet rozeti (packages/boga_ortak BogaAmblem; uygulama içi logo boğa başı olarak kalır).
+- Sunucu: `panel/chats/{id}/visitor` ucu ve `chats/{id}/ban` / `unban` rotaları uygulama API'sine eklendi (yedek /root/backups/chat-sohbet-ziyaretci-20261123).
 
 ## 1.2.1
 
