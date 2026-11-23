@@ -252,10 +252,25 @@ class _SecimListesiState extends State<SecimListesi> {
       children: [
         for (final g in widget.gruplar.entries) ...[
           Padding(
-            padding: const EdgeInsets.fromLTRB(4, 12, 4, 4),
-            child: Text(
-              g.key,
-              style: TextStyle(fontWeight: FontWeight.w600, color: r.soluk, fontSize: 12.5),
+            padding: const EdgeInsets.fromLTRB(4, 12, 4, 0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    g.key,
+                    style: TextStyle(fontWeight: FontWeight.w600, color: r.soluk, fontSize: 12.5),
+                  ),
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(visualDensity: VisualDensity.compact, padding: const EdgeInsets.symmetric(horizontal: 8)),
+                  onPressed: () {
+                    final hepsi = g.value.keys.every(_s.contains);
+                    setState(() => hepsi ? _s.removeAll(g.value.keys) : _s.addAll(g.value.keys));
+                    widget.onChanged(_s);
+                  },
+                  child: Text(g.value.keys.every(_s.contains) ? 'Temizle' : 'Tümünü seç', style: const TextStyle(fontSize: 12)),
+                ),
+              ],
             ),
           ),
           for (final p in g.value.entries)

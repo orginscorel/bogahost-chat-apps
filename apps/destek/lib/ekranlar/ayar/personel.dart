@@ -64,7 +64,7 @@ class PersonelEkrani extends StatelessWidget {
     final gruplar = harita(roller['groups']).map((k, x) => MapEntry(k, harita(x).map((a, b) => MapEntry(a, metin(b, a)))));
     final au = harita(v['agentUser']);
     final ozel = au['permissions'] is List;
-    final secili = ozel ? metinler(au['permissions']).toSet() : metinler(harita(au['role_model'])['permissions']).toSet();
+    final secili = ozel ? yetkiKumesi(au['permissions'], gruplar) : yetkiKumesi(harita(au['role_model'])['permissions'], gruplar);
     bool rolKullan = !ozel;
     Set<String> s = secili;
     await formDiyalog(
@@ -211,6 +211,15 @@ class PersonelEkrani extends StatelessWidget {
   }
 }
 
+/// Rol yetkileri: `*` (tüm yetkiler) kataloğun tamamına açılır; aksi halde kutucuklar boş görünüyordu.
+Set<String> yetkiKumesi(dynamic perms, Map<String, Map<String, String>> gruplar) {
+  final l = metinler(perms);
+  if (l.contains('*')) return {for (final g in gruplar.values) ...g.keys};
+  return l.toSet();
+}
+
+int yetkiSayisi(dynamic perms, Map<String, Map<String, String>> gruplar) => yetkiKumesi(perms, gruplar).length;
+
 /// Roller: etiket + yetki seti; sistem rolleri silinemez.
 class RollerEkrani extends StatelessWidget {
   const RollerEkrani({super.key});
@@ -218,7 +227,8 @@ class RollerEkrani extends StatelessWidget {
   Future<void> _form(BuildContext context, Map<String, dynamic> v, VoidCallback yenile, {Map<String, dynamic>? rol}) async {
     final gruplar = harita(v['groups']).map((k, x) => MapEntry(k, harita(x).map((a, b) => MapEntry(a, metin(b, a)))));
     final etiket = TextEditingController(text: metin(rol?['label']));
-    Set<String> s = metinler(rol?['permissions']).toSet();
+    Set<String> s = yetkiKumesi(rol?['permissions'], gruplar);
+    final tamYetkiliydi = metinler(rol?['permissions']).contains('*');
     await formDiyalog(
       context,
       rol == null ? 'Rol ekle' : 'Rolü düzenle',
@@ -227,7 +237,12 @@ class RollerEkrani extends StatelessWidget {
         SecimListesi(gruplar: gruplar, secili: s, onChanged: (x) => s = x),
       ],
       kaydetF: () {
-        final g = {'label': etiket.text.trim(), 'permissions': s.toList()};
+        // Rol tüm yetkilere sahipti ve hâlâ hepsi seçiliyse '*' olarak kalsın (ileride eklenen yetkiler de dahil olsun).
+        final hepsi = {for (final g in gruplar.values) ...g.keys};
+        final g = {
+          'label': etiket.text.trim(),
+          'permissions': tamYetkiliydi && s.containsAll(hepsi) ? ['*'] : s.toList(),
+        };
         return rol == null ? Panel.rolEkle(g) : Panel.rolGuncelle(tamsayi(rol['id']), g);
       },
     );
@@ -285,7 +300,7 @@ class RollerEkrani extends StatelessWidget {
                               style: TextStyle(fontWeight: FontWeight.w600, color: r.metin),
                             ),
                             Text(
-                              '${metin(x['name'])} · ${metinler(x['permissions']).length} yetki · ${tamsayi(x['users_count'])} kişi',
+                              '${metin(x['name'])} · ${metinler(x['permissions']).contains('*') ? 'tüm' : metinler(x['permissions']).length} yetki · ${tamsayi(x['users_count'])} kişi',
                               style: TextStyle(color: r.silik, fontSize: 12),
                             ),
                           ],

@@ -2,6 +2,18 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.8',
+    'date': '2026-11-23',
+    'title': 'Rol yetkileri',
+    'items': [
+      {
+        'type': 'fix',
+        'text': 'Roller ve yetkiler: tüm yetkilere sahip roller (Yönetici, Süper Yönetici) ve bu rollerdeki personelde kutucuklar boş görünüyordu; artık hepsi işaretli gelir ve kaydedince "tüm yetkiler" korunur.',
+      },
+      {'type': 'improve', 'text': 'Yetki listesinde her grup için "Tümünü seç / Temizle".'},
+    ],
+  },
+  {
     'version': '1.2.7',
     'date': '2026-11-23',
     'title': 'Ekran izleme, gecikme, davet, sohbet başlatma',

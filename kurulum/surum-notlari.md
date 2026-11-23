@@ -1,3 +1,7 @@
+## 1.2.8
+
+- Roller ve yetkiler: `*` (tüm yetkiler) içeren roller ve bu rollerdeki personelin yetki ekranında kutucuklar boş görünüyordu; `*` kataloğun tamamına açılır, hepsi seçili kaldıysa kaydedilirken `*` olarak korunur. Rol listesinde "tüm yetki" yazar. Grup başlığında Tümünü seç / Temizle.
+
 ## 1.2.7
 
 - Ekran izleme: kareler web görünümünü baştan yüklemeden (DOM değişimiyle) uygulanır; yoklama kare yüklenmesini beklemez, kareler birleşir. Her karede 5-10 sn kilitlenme ve takılma giderildi. Widget, sunucu "need_html" derse ya da her 10 sn'de tam kareyi yeniden gönderir (ilk karenin boş gelmesi düzeltildi).
