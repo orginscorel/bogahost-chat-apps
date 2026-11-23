@@ -10,6 +10,7 @@ const uygulamaNotlari = <Map<String, dynamic>>[
       {'type': 'fix', 'text': 'Geniş ekranda üst çubuk nesneleri (durum, zil, tema, profil) ekranlarda bir daha yinelenmez.'},
       {'type': 'improve', 'text': 'Sohbetler: süzgeç çipleri sarılır ve hepsi görünür; mesaj sütunu ortalanır (en çok 1180 px).'},
       {'type': 'improve', 'text': 'Sayfa içeriği büyük ekranda daha geniş (1600 / ziyaretçiler 1900 px).'},
+      {'type': 'fix', 'text': 'Uygulama simgesi posta uygulamalarıyla aynı aileye döndü (kurumsal amblem + sohbet rozeti).'},
       {
         'type': 'new',
         'text': 'Sohbet sağ bloğu web paneliyle aynı kapsamda: kimlik, WHMCS, IP/port/parmak izi, cihaz, yerel saat, kaynak, gezinti, olay günlüğü, geçmiş görüşmeler, atama; ziyaretçiyi yasakla / yasakları kaldır.',
