@@ -2,6 +2,19 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.11',
+    'date': '2026-11-24',
+    'title': 'Butoi maskotu ve konuşarak eğitim',
+    'items': [
+      {'type': 'new', 'text': 'Butoi maskotu (boğa başlı küçük robot) sohbet listesinde, başlıkta ve baloncuklarda; düşünürken hareket eder.'},
+      {
+        'type': 'new',
+        'text': 'Konuşarak düzeltme: "kısalt", "fiyatı ekle", "resmi ol", "madde madde yaz", "\'X\' yerine \'Y\' yaz" gibi talimatlarla Butoi yanıtını yeniden yazar, Evet / Böyle öğren deyince öğrenir.',
+      },
+      {'type': 'improve', 'text': 'Eğitim sohbetinde düşünüyor › arıyor › yanıtlıyor akışı ve "Nasıl düşündüm?" düşünce izi.'},
+    ],
+  },
+  {
     'version': '1.2.10',
     'date': '2026-11-23',
     'title': 'Butoi sohbetlerde',

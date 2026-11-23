@@ -1,3 +1,7 @@
+## 1.2.11
+
+- `lib/ortak/maskot.dart` ButoiMaskot (CustomPainter; dusunuyor/mutlu). Eğitim sohbeti: `_dusunerek` faz akışı, taslak (meta.draft) için Böyle öğren / Vazgeç, meta.steps düşünce izi. Sunucu: `AiService::yenidenYaz` kural tabanlı talimat motoru, `talimatMi`, taslak onayı (evet/vazgeç). Web: public/img/butoi.svg.
+
 ## 1.2.10
 
 - Sohbetler listesinin tepesinde sabit Butoi girişi (`_butoiSatiri`, secilenSohbet = -1 → `ButoiSohbetEkrani` gömülü). Web: chats listesinin tepesinde admin/ai#train bağlantısı.

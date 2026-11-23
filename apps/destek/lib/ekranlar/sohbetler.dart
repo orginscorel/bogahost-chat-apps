@@ -9,6 +9,7 @@ import '../ortak/yardimci.dart';
 import '../oturum.dart';
 import '../veri/depo.dart';
 import '../veri/modeller.dart';
+import '../ortak/maskot.dart';
 import 'ayar/yapay_zeka.dart';
 import 'gorusme.dart';
 import 'kabuk.dart';
@@ -282,8 +283,8 @@ class _SohbetlerEkraniState extends State<SohbetlerEkrani> {
             children: [
               Stack(
                 children: [
-                  const Avatar('Butoi', boyut: 44, tohum: 'butoi-asistan'),
-                  Positioned(right: 0, bottom: 0, child: Nokta(Marka.mor, boyut: 13, halka: r.kart)),
+                  const ButoiMaskot(boyut: 44),
+                  Positioned(right: 0, bottom: 0, child: Nokta(Marka.zumrut, boyut: 13, halka: r.kart)),
                 ],
               ),
               const SizedBox(width: 12),
@@ -304,7 +305,7 @@ class _SohbetlerEkraniState extends State<SohbetlerEkrani> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Soru sor, düzelt, öğret — asistanı burada eğitin',
+                      'Soru sor, konuşarak düzelt, öğret — asistanı burada eğitin',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(color: r.soluk, fontSize: 12.5),

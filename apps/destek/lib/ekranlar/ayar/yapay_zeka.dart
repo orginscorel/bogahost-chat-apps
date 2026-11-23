@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:boga_ortak/boga_ortak.dart';
 import 'package:flutter/material.dart';
 
 import '../../ortak/parcalar.dart';
 import '../../ortak/simgeler.dart';
 import '../../veri/json.dart';
+import '../../ortak/maskot.dart';
 import '../../oturum.dart';
 import '../../veri/panel.dart';
 import '../kabuk.dart';
@@ -1067,7 +1070,7 @@ class _ButoiSohbetEkraniState extends State<ButoiSohbetEkrani> {
         titleSpacing: widget.gomulu ? 16 : 0,
         title: Row(
           children: [
-            const Avatar('Butoi', boyut: 34, tohum: 'butoi-asistan'),
+            const ButoiMaskot(boyut: 36),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -1123,6 +1126,42 @@ class _EgitimState extends State<_Egitim> {
   bool _yukleniyor = true;
   bool _mesgul = false;
   int? _duzeltId;
+  String _faz = 'düşünüyor';
+  Timer? _fazSayac;
+  final Set<int> _acikAdimlar = {};
+
+  static final _talimat = RegExp(
+    r'kısalt|uzat|resmi|samimi|ekle|çıkar|kaldır|yerine|madde|hitap|emoji|şöyle|böyle|değiştir|düzenle|başına|sonuna|kapanış|liste',
+    caseSensitive: false,
+  );
+
+  /// Görünür düşünme: düşünüyor → arıyor/uyguluyor → yazıyor; yanıt erken gelse de en az ~1,3 sn akış gösterilir.
+  Future<Map<String, dynamic>?> _dusunerek(String metin, Future<Map<String, dynamic>> Function() f) async {
+    final t0 = DateTime.now();
+    setState(() {
+      _mesgul = true;
+      _faz = 'düşünüyor';
+    });
+    _sonaKaydir();
+    _fazSayac?.cancel();
+    _fazSayac = Timer(const Duration(milliseconds: 450), () {
+      if (!mounted) return;
+      setState(
+        () => _faz = RegExp(r'^(evet|tamam|vazgeç|hayır)', caseSensitive: false).hasMatch(metin)
+            ? 'kaydediyor'
+            : (_talimat.hasMatch(metin) ? 'talimatı uyguluyor' : 'bilgi tabanında arıyor'),
+      );
+      _fazSayac = Timer(const Duration(milliseconds: 500), () {
+        if (mounted) setState(() => _faz = 'yanıtı yazıyor');
+      });
+    });
+    final v = await islem(f);
+    final kalan = 1300 - DateTime.now().difference(t0).inMilliseconds;
+    if (kalan > 0) await Future<void>.delayed(Duration(milliseconds: kalan));
+    _fazSayac?.cancel();
+    if (mounted) setState(() => _mesgul = false);
+    return v;
+  }
 
   @override
   void initState() {
@@ -1132,6 +1171,7 @@ class _EgitimState extends State<_Egitim> {
 
   @override
   void dispose() {
+    _fazSayac?.cancel();
     _metin.dispose();
     _duzelt.dispose();
     _kaydirma.dispose();
@@ -1163,14 +1203,15 @@ class _EgitimState extends State<_Egitim> {
   Future<void> _gonder() async {
     final t = _metin.text.trim();
     if (t.isEmpty || _mesgul) return;
-    setState(() {
-      _mesgul = true;
-      _duzeltId = null;
-    });
     _metin.clear();
-    final v = await islem(() => Panel.aiEgitimMesaj(t));
+    await _gonderMetin(t);
+  }
+
+  Future<void> _gonderMetin(String t) async {
+    if (_mesgul) return;
+    setState(() => _duzeltId = null);
+    final v = await _dusunerek(t, () => Panel.aiEgitimMesaj(t));
     if (!mounted) return;
-    setState(() => _mesgul = false);
     if (v == null) {
       _metin.text = t;
       return;
@@ -1179,14 +1220,22 @@ class _EgitimState extends State<_Egitim> {
     widget.yenile();
   }
 
+  /// Taslağı onayla: "Böyle öğren".
+  Future<void> _taslagiOgren(Map<String, dynamic> m) async {
+    final meta = harita(m['meta']);
+    final v = await _dusunerek('evet', () => Panel.aiEgitimOgret(metin(meta['question']), metin(meta['answer']), logId: tamsayiYa(m['log_id'])));
+    if (!mounted || v == null) return;
+    setState(() => (m['meta'] as Map?)?['draft'] = false);
+    _ekle(v);
+    widget.yenile();
+  }
+
   Future<void> _ogret(Map<String, dynamic> m) async {
     final yanit = _duzelt.text.trim();
     if (yanit.isEmpty || _mesgul) return;
-    setState(() => _mesgul = true);
-    final v = await islem(() => Panel.aiEgitimOgret(metin(harita(m['meta'])['question']), yanit, logId: tamsayiYa(m['log_id'])));
+    final v = await _dusunerek('evet', () => Panel.aiEgitimOgret(metin(harita(m['meta'])['question']), yanit, logId: tamsayiYa(m['log_id'])));
     if (!mounted) return;
     setState(() {
-      _mesgul = false;
       if (v != null && mantik(v['ok'])) _duzeltId = null;
     });
     _ekle(v);
@@ -1226,95 +1275,165 @@ class _EgitimState extends State<_Egitim> {
     final skor = tamsayi(meta['score']);
     final kaynaklar = haritalar(meta['sources']);
     final duzeltiliyor = _duzeltId == tamsayi(m['id']);
+    final taslak = mantik(meta['draft']);
+    final adimlar = metinler(meta['steps']);
+    final id = tamsayi(m['id']);
     final renkler = Theme.of(context).colorScheme;
-    return Align(
-      alignment: kullanici ? Alignment.centerRight : Alignment.centerLeft,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 560),
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-          decoration: BoxDecoration(
-            color: kullanici ? Marka.mor : renkler.surfaceContainerHighest,
-            borderRadius: BorderRadius.only(
-              topLeft: const Radius.circular(16),
-              topRight: const Radius.circular(16),
-              bottomLeft: Radius.circular(kullanici ? 16 : 4),
-              bottomRight: Radius.circular(kullanici ? 4 : 16),
-            ),
+    final balon = ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 560),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+        decoration: BoxDecoration(
+          color: kullanici ? Marka.mor : renkler.surfaceContainerHighest,
+          border: taslak ? Border.all(color: Marka.lavanta, width: 1.5) : null,
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(16),
+            topRight: const Radius.circular(16),
+            bottomLeft: Radius.circular(kullanici ? 16 : 4),
+            bottomRight: Radius.circular(kullanici ? 4 : 16),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                kullanici ? 'Siz' : widget.botAdi,
-                style: TextStyle(color: kullanici ? Colors.white70 : r.silik, fontSize: 10.5, fontWeight: FontWeight.w600, letterSpacing: .4),
-              ),
-              const SizedBox(height: 2),
-              SelectableText(metin(m['text']), style: TextStyle(color: kullanici ? Colors.white : r.metin, fontSize: 14, height: 1.4)),
-              if (!kullanici && soru != null && !mantik(meta['taught'])) ...[
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    Rozet('%$skor eşleşme', renk: _skorRengi(skor)),
-                    for (final k in kaynaklar.take(3)) Rozet('${metin(k['title'], '#${tamsayi(k['id'])}')} · %${tamsayi(k['score'])}', renk: Marka.grafitAcik),
-                    if (mantik(meta['ok']) && meta['intent'] == null && !mantik(meta['approved']))
-                      ActionChip(
-                        avatar: const Icon(Simgeler.checkCircle, size: 16, color: Marka.zumrut),
-                        label: const Text('Doğru'),
-                        visualDensity: VisualDensity.compact,
-                        onPressed: () => _dogru(m),
-                      ),
-                    if (mantik(meta['approved'])) const Rozet('Pekiştirildi', renk: Marka.zumrut, ikon: Simgeler.check),
-                    if (!duzeltiliyor)
-                      ActionChip(
-                        avatar: const Icon(Simgeler.edit, size: 16),
-                        label: const Text('Düzelt'),
-                        visualDensity: VisualDensity.compact,
-                        onPressed: () => setState(() {
-                          _duzeltId = tamsayi(m['id']);
-                          _duzelt.text = mantik(meta['ok']) ? metin(m['text']) : '';
-                        }),
-                      ),
-                  ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              kullanici ? 'Siz' : (taslak ? '${widget.botAdi} · taslak' : widget.botAdi),
+              style: TextStyle(color: kullanici ? Colors.white70 : r.silik, fontSize: 10.5, fontWeight: FontWeight.w600, letterSpacing: .4),
+            ),
+            const SizedBox(height: 2),
+            SelectableText(metin(m['text']), style: TextStyle(color: kullanici ? Colors.white : r.metin, fontSize: 14, height: 1.4)),
+            if (!kullanici && adimlar.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              InkWell(
+                onTap: () => setState(() => _acikAdimlar.contains(id) ? _acikAdimlar.remove(id) : _acikAdimlar.add(id)),
+                child: Text(
+                  _acikAdimlar.contains(id) ? 'Düşünce izini gizle' : 'Nasıl düşündüm?',
+                  style: TextStyle(color: Marka.morAcik, fontSize: 11.5, decoration: TextDecoration.underline),
                 ),
-              ],
-              if (duzeltiliyor) ...[
-                const SizedBox(height: 8),
-                Text('Soru: $soru', style: TextStyle(color: r.soluk, fontSize: 12)),
-                const SizedBox(height: 6),
-                TextField(
-                  controller: _duzelt,
-                  minLines: 2,
-                  maxLines: 6,
-                  autofocus: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Doğru yanıt',
-                    hintText: '{name} ve {email} yer tutucuları kullanılabilir',
-                    alignLabelWithHint: true,
+              ),
+              if (_acikAdimlar.contains(id))
+                Container(
+                  margin: const EdgeInsets.only(top: 4),
+                  padding: const EdgeInsets.only(left: 8),
+                  decoration: BoxDecoration(
+                    border: Border(left: BorderSide(color: Marka.mor.withValues(alpha: .4), width: 2)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (var i = 0; i < adimlar.length; i++) Text('${i + 1}. ${adimlar[i]}', style: TextStyle(color: r.soluk, fontSize: 11.5, height: 1.35)),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(onPressed: () => setState(() => _duzeltId = null), child: const Text('Vazgeç')),
-                    const SizedBox(width: 8),
-                    FilledButton.icon(
-                      onPressed: _mesgul ? null : () => _ogret(m),
-                      icon: const Icon(Simgeler.autoFixHigh, size: 18),
-                      label: const Text('Öğret'),
+            ],
+            if (!kullanici && taslak) ...[
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  FilledButton.icon(
+                    onPressed: _mesgul ? null : () => _taslagiOgren(m),
+                    icon: const Icon(Simgeler.check, size: 16),
+                    label: const Text('Böyle öğren'),
+                    style: FilledButton.styleFrom(visualDensity: VisualDensity.compact),
+                  ),
+                  TextButton(onPressed: _mesgul ? null : () => _gonderMetin('vazgeç'), child: const Text('Vazgeç')),
+                  Text('ya da yeni bir talimat yazın', style: TextStyle(color: r.silik, fontSize: 11.5)),
+                ],
+              ),
+            ],
+            if (!kullanici && soru != null && !mantik(meta['taught']) && !taslak && !mantik(meta['help'])) ...[
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Rozet('%$skor eşleşme', renk: _skorRengi(skor)),
+                  for (final k in kaynaklar.take(3)) Rozet('${metin(k['title'], '#${tamsayi(k['id'])}')} · %${tamsayi(k['score'])}', renk: Marka.grafitAcik),
+                  if (mantik(meta['ok']) && meta['intent'] == null && !mantik(meta['approved']))
+                    ActionChip(
+                      avatar: const Icon(Simgeler.checkCircle, size: 16, color: Marka.zumrut),
+                      label: const Text('Doğru'),
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () => _dogru(m),
                     ),
-                  ],
+                  if (mantik(meta['approved'])) const Rozet('Pekiştirildi', renk: Marka.zumrut, ikon: Simgeler.check),
+                  if (!duzeltiliyor)
+                    ActionChip(
+                      avatar: const Icon(Simgeler.edit, size: 16),
+                      label: const Text('Düzelt'),
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () => setState(() {
+                        _duzeltId = tamsayi(m['id']);
+                        _duzelt.text = mantik(meta['ok']) ? metin(m['text']) : '';
+                      }),
+                    ),
+                ],
+              ),
+            ],
+            if (duzeltiliyor) ...[
+              const SizedBox(height: 8),
+              Text('Soru: $soru', style: TextStyle(color: r.soluk, fontSize: 12)),
+              const SizedBox(height: 6),
+              TextField(
+                controller: _duzelt,
+                minLines: 2,
+                maxLines: 6,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  labelText: 'Doğru yanıt',
+                  hintText: '{name} ve {email} yer tutucuları kullanılabilir',
+                  alignLabelWithHint: true,
                 ),
-              ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(onPressed: () => setState(() => _duzeltId = null), child: const Text('Vazgeç')),
+                  const SizedBox(width: 8),
+                  FilledButton.icon(onPressed: _mesgul ? null : () => _ogret(m), icon: const Icon(Simgeler.autoFixHigh, size: 18), label: const Text('Öğret')),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+    if (kullanici) return Align(alignment: Alignment.centerRight, child: balon);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        const Padding(padding: EdgeInsets.only(bottom: 6, right: 6), child: ButoiMaskot(boyut: 28)),
+        Flexible(child: balon),
+      ],
+    );
+  }
+
+  Widget _yaziyor(Renkler r) {
+    final renkler = Theme.of(context).colorScheme;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        const Padding(padding: EdgeInsets.only(bottom: 6, right: 6), child: ButoiMaskot(boyut: 28, dusunuyor: true)),
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+          decoration: BoxDecoration(color: renkler.surfaceContainerHighest, borderRadius: BorderRadius.circular(16)),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(_faz, style: TextStyle(color: r.soluk, fontSize: 13)),
+              const SizedBox(width: 6),
+              const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 1.8)),
             ],
           ),
         ),
-      ),
+      ],
     );
   }
 
@@ -1327,10 +1446,29 @@ class _EgitimState extends State<_Egitim> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Padding(
+              padding: const EdgeInsets.only(right: 10, top: 2),
+              child: ButoiMaskot(boyut: 44, dusunuyor: _mesgul),
+            ),
             Expanded(
-              child: Text(
-                'Soru sorun; yanıt yanlışsa Düzelt (ya da "Doğrusu: …"), doğruysa Doğru. "Soru: … | Cevap: …" tek seferde öğretir. Öğretilenler hemen etkinleşir.',
-                style: TextStyle(color: r.soluk, fontSize: 12.5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        widget.botAdi,
+                        style: TextStyle(color: r.metin, fontSize: 14.5, fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(_mesgul ? '$_faz…' : '● hazır', style: TextStyle(color: _mesgul ? r.soluk : Marka.zumrut, fontSize: 12)),
+                    ],
+                  ),
+                  Text(
+                    'Soru sorun. Yanıtı beğenmediyseniz konuşarak düzeltin: "kısalt", "fiyatı ekle", "resmi ol", "madde madde yaz", "\'X\' yerine \'Y\' yaz"… Butoi yeniden yazar, Evet deyince öğrenir. Tam yanıt için "Doğrusu: …".',
+                    style: TextStyle(color: r.soluk, fontSize: 12),
+                  ),
+                ],
               ),
             ),
             if (_mesajlar.isNotEmpty) IconButton(tooltip: 'Sohbeti temizle', onPressed: _temizle, icon: const Icon(Simgeler.deleteSweep, size: 20)),
@@ -1343,17 +1481,12 @@ class _EgitimState extends State<_Egitim> {
             height: (widget.yukseklik ?? 440).clamp(240, 2000).toDouble(),
             child: _yukleniyor
                 ? const Center(child: CircularProgressIndicator())
-                : _mesajlar.isEmpty
+                : _mesajlar.isEmpty && !_mesgul
                 ? Durum.bos('Henüz konuşma yok. Örneğin: "com alan adı ne kadar?"', ikon: Simgeler.chatText)
                 : ListView.builder(
                     controller: _kaydirma,
                     itemCount: _mesajlar.length + (_mesgul ? 1 : 0),
-                    itemBuilder: (c, i) => i == _mesajlar.length
-                        ? Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Text('${widget.botAdi} yazıyor…', style: TextStyle(color: r.silik, fontSize: 12)),
-                          )
-                        : _balon(c, _mesajlar[i]),
+                    itemBuilder: (c, i) => i == _mesajlar.length ? _yaziyor(r) : _balon(c, _mesajlar[i]),
                   ),
           ),
         ),
@@ -1368,7 +1501,7 @@ class _EgitimState extends State<_Egitim> {
                 maxLines: 4,
                 textInputAction: TextInputAction.send,
                 onSubmitted: (_) => _gonder(),
-                decoration: const InputDecoration(hintText: "Soru sorun ya da 'Doğrusu: …' ile öğretin"),
+                decoration: const InputDecoration(hintText: "Soru sorun, talimat verin (kısalt, fiyat ekle…) ya da 'Doğrusu: …'"),
               ),
             ),
             const SizedBox(width: 8),
