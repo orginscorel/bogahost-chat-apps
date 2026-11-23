@@ -2,6 +2,31 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.13',
+    'date': '2026-11-24',
+    'title': 'Butoi RAG öğrenme yapısı',
+    'items': [
+      {
+        'type': 'new',
+        'text': 'Konuşarak düzeltme genişledi: "cevabını geliştir", "daha profesyonel", "beğenmedim başka türlü yaz" gibi genel talimatlar anlaşılır; anlaşılmayan talimatta 3 alternatif sunulur, numarası seçilir.',
+      },
+      {'type': 'new', 'text': 'Eğitim sohbetinde "kural: …" (konuya bağlı) / "genel kural: …" (her yanıt) ve "bilgi ekle: soru = yanıt" komutları.'},
+      {
+        'type': 'improve',
+        'text': 'Sunucu: parçalı RAG arama (BM25 + TF-IDF + eş anlam), bilgi bankası makalelerinde ilgili bölüm + kaynak bağlantısı, takip sorusu bağlamı, araç katmanı (kimlik / onay / bütçe), KVKK maskeleme, kota.',
+      },
+      {
+        'type': 'new',
+        'text':
+            'Öğrenme kuyruğu: kapanmış ticketlerden her gece onay bekleyen bilgi taslakları ("Ticketten" etiketi, kişisel veri uyarısı). Otomatik yayın yok.',
+      },
+      {
+        'type': 'fix',
+        'text': 'Selam gibi kısa sorularda "Böyle öğren" tamamlanmıyordu; öğretilen selamlama yanıtı artık hemen devreye giriyor. Tur sınırında Butoi sessiz kalmak yerine açıkça devrediyor.',
+      },
+    ],
+  },
+  {
     'version': '1.2.12',
     'date': '2026-11-24',
     'title': 'Butoi müşteri hizmet akışı',

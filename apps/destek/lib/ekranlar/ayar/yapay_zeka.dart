@@ -1139,7 +1139,7 @@ class _EgitimState extends State<_Egitim> {
   final Set<int> _acikAdimlar = {};
 
   static final _talimat = RegExp(
-    r'kısalt|uzat|resmi|samimi|ekle|çıkar|kaldır|yerine|madde|hitap|emoji|şöyle|böyle|değiştir|düzenle|başına|sonuna|kapanış|liste',
+    r'kısalt|uzat|resmi|samimi|ekle|çıkar|kaldır|yerine|madde|hitap|emoji|şöyle|böyle|değiştir|düzenle|düzelt|başına|sonuna|kapanış|liste|geliştir|iyileştir|güzelleştir|zenginleştir|detaylandır|açıkla|daha iyi|daha net|daha profesyonel|beğenmedim|başka türlü|farklı|alternatif|cevabı|yanıtı|^kural|^bilgi',
     caseSensitive: false,
   );
 

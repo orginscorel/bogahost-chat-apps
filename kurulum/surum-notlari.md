@@ -1,3 +1,7 @@
+## 1.2.13
+
+- Sunucu: `AiAraclar` (araç katmanı, `ai_tool_calls`), `AiKoruma` (maskeleme, kota), RAG parçalı dizin (`parcala`, BM25, `config/ai_esanlam.php`, `yanitMetni`), `ai:ogren` komutu (04:40 cron) + köprü `closed_tickets_since`, `ai_knowledge.url/origin/pii_checked`, type=rule kurallar, `intent_replies`. Widget: `ui.kind=sources` kaynak satırı. Uygulama: `_talimat` sözlüğü genişledi.
+
 ## 1.2.12
 
 - Sunucu: `app/Services/ButoiHizmet.php` (hizmet akışı), köprü `client_services/service_status/service_power/client_tickets/open_ticket`, imzalı kimlik (`includes/hooks/livechat_user_sig.php` + `bridge_secret.php`), `messages.ui`, `visitors.whmcs_verified_at`. Uygulama: kip uyarısı.
