@@ -139,4 +139,16 @@ class Panel {
   static Future<Map<String, dynamic>> ekranKaydir(int oturum, int? sx, int? sy) => _post('visitors/$oturum/screen/scroll', {'sx': sx, 'sy': sy});
   static Future<Map<String, dynamic>> aramaYoklaHizli(int sohbet, {CancelToken? iptal}) async =>
       harita(await Uyg.api.get('${Uyg.apiKok}/chats/$sohbet/call/poll', zamanAsimi: const Duration(seconds: 5), iptal: iptal));
+
+  // ---- Yapay zeka asistanı (ayarlar, bilgi tabanı, günlük, deneme)
+  static Future<Map<String, dynamic>> ai() => _get('ai');
+  static Future<Map<String, dynamic>> aiKaydet(Map<String, dynamic> g) => _post('ai', g);
+  static Future<Map<String, dynamic>> aiDene(String q) => _post('ai/test', {'q': q});
+  static Future<Map<String, dynamic>> aiBilgiler({String durum = 'active', String q = ''}) => _get('ai/knowledge', q: {'status': durum, 'q': q});
+  static Future<Map<String, dynamic>> aiBilgiEkle(Map<String, dynamic> g) => _post('ai/knowledge', g);
+  static Future<Map<String, dynamic>> aiBilgiGuncelle(int id, Map<String, dynamic> g) => _put('ai/knowledge/$id', g);
+  static Future<Map<String, dynamic>> aiBilgiSil(int id) => _del('ai/knowledge/$id');
+  static Future<Map<String, dynamic>> aiBilgiIncele(List<int> ids, String durum) => _post('ai/knowledge/review', {'ids': ids, 'status': durum});
+  static Future<Map<String, dynamic>> aiGunluk() => _get('ai/logs');
+  static Future<Map<String, dynamic>> aiGecmistenOgren({int gun = 365, int enCok = 1000}) => _post('ai/learn-history', {'days': gun, 'max': enCok});
 }

@@ -114,6 +114,17 @@ class Depo {
     throw ApiHata(d, v is Map && v['error'] is String ? '${v['error']}' : 'Dosya gönderilemedi (HTTP $d).');
   }
 
+  // ---- Yapay zeka asistanı
+  /// Yanıt önerisi: {ok, text, log_id, error, sources}. Hata durumunda istisna yerine harita döner (ok:false).
+  static Future<Map<String, dynamic>> aiOner(int id) async => harita(await Uyg.api.post(_y('chats/$id/ai/suggest')));
+
+  /// Öneri ile gönderilen metni bildirir (öğrenme / düzeltme kaydı).
+  static Future<Map<String, dynamic>> aiGeriBildirim(int id, {int? logId, required String oneri, required String gonderilen}) async =>
+      harita(await _post('chats/$id/ai/feedback', {'log_id': logId, 'suggestion': oneri, 'final': gonderilen}));
+
+  /// bot:false → temsilci devralır; bot:true → sohbet bota geri verilir.
+  static Future<Map<String, dynamic>> aiDevir(int id, {required bool bot}) async => harita(await _post('chats/$id/ai/handoff', {'bot': bot}));
+
   // ---- Ziyaretçiler
   static Future<List<Ziyaretci>> canliZiyaretciler() async => haritalar(harita(await _get('visitors/live'))['visitors']).map(Ziyaretci.coz).toList();
   static Future<Map<String, dynamic>> davetEt(int oturum, {String? mesaj}) async => harita(await _post('visitors/$oturum/invite', {'message': ?mesaj}));

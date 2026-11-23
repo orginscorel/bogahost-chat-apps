@@ -1,3 +1,13 @@
+## 1.2.6
+
+- Yapay zeka asistanı artık dış servis (API anahtarı, model) kullanmaz: kendi kendine öğrenen iç motor, ziyaretçi sorusunu anahtar kelime / TF-IDF benzerliğiyle bilgi tabanı ve hazır cevaplarla eşleştirir.
+- Öğrenme: ekibin yanıtlarından, temsilci düzeltmelerinden ve kapanan görüşmelerden soru → yanıt çiftleri çıkarır; onaylı ya da "onaysız etkinleştir" açıksa doğrudan; aynı soru tekrar sayısı kadar görülürse kendiliğinden etkinleşir. "Geçmişten öğren" (gün / en çok görüşme) eski görüşmeleri tarar.
+- Sohbet yazım kutusunda "Yanıt öner": eşleşen yanıtı taslak olarak koyar ("Öneri eklendi (%NN eşleşme)"); temsilci düzenleyip gönderir, fark öğrenme için sunucuya bildirilir.
+- İsteğe bağlı otomatik yanıt: kip (yalnız öneri · temsilci yokken · her zaman), öneri eşiği ve otomatik yanıt eşiği (%5-100), devir cümlesi, devir kelimeleri, en çok bot turu, karşılama.
+- Ayarlar › Yapay zeka asistanı (settings.manage): 30 günlük özet (öğrenilen, hazır cevaplar, ortalama eşleşme, otomatik yanıt, öneri kabul); bilgi tabanı (görülme sayısı, ağırlık); onay bekleyenler; günlük (eşleşme oranı, sonuç); deneme (eşleşme oranı, otomatik yanıtlanır / devredilir, kaynaklar).
+- Görüşmede bot göstergesi: "Asistan yanıtlıyor" + Devral, devredilmişse "Bota geri ver".
+- Düzeltme: açılışta "sunucuya ulaşılamıyor" hatası giderildi (HTTP/2 bağdaştırıcısı gzip yanıtı açamıyordu).
+
 ## 1.2.5
 
 - Sohbet yoklaması web paneliyle aynı uyarlanır düzene geçti: hareket varken 0,9 sn, 3 dk'ya kadar 2,5 sn, sonra 6 sn, pencere arkadayken 10 sn; yoklama 8 sn alma zaman aşımı ve ekran kapanınca iptal ile çalışır (takılan tek istek görüşmeyi dondurmuyor).

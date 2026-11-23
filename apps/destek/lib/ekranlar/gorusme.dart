@@ -60,6 +60,10 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
   List<HazirYanit> _oneriler = [];
   bool _bilgiAcik = false;
   double? _yuklemeOrani;
+  bool _aiBekliyor = false;
+
+  /// Son yapay zeka önerisi: gönderimde öneri ↔ gönderilen farkı öğrenme için bildirilir.
+  ({int? logId, String text})? _aiSon;
 
   int get _id => widget.sohbetId;
   int get _sonId => _mesajlar.isEmpty ? 0 : _mesajlar.last.id;
@@ -73,6 +77,9 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
   bool get _kacan => _detay == null ? widget.ilk?.kacan == true : _detay!['missed'] == true;
   bool get _ceviriAcik => _detay?['translate_on'] == true;
   Object? get _whmcsId => _detay == null ? null : (_detay!['visitor'] is Map ? (_detay!['visitor'] as Map)['whmcs_id'] : null);
+  Map<String, dynamic> get _meta => _detay?['meta'] is Map ? Map<String, dynamic>.from(_detay!['meta'] as Map) : const {};
+  int get _aiTur => _meta['ai_turns'] is num ? (_meta['ai_turns'] as num).toInt() : int.tryParse('${_meta['ai_turns'] ?? ''}') ?? 0;
+  bool get _aiDevredildi => _meta['ai_handoff'] == true || _meta['ai_handoff'] == 1 || _meta['ai_handoff'] == '1';
   Map<String, dynamic>? get _talep => _son?.iletisimTalebi is Map ? Map<String, dynamic>.from(_son!.iletisimTalebi as Map) : null;
 
   /// Ziyaretçi sekmesi kapalıysa arama bağlanamaz; yine de kullanıcıya bırak (sekme yeni açılmış olabilir).
@@ -255,6 +262,11 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
       } else {
         final m = await Depo.yanitla(_id, t, icNot: _icNot);
         if (mounted) setState(() => _mesajEkle(m));
+        final ai = _aiSon;
+        if (ai != null && !_icNot) {
+          Depo.aiGeriBildirim(_id, logId: ai.logId, oneri: ai.text, gonderilen: t).catchError((_) => <String, dynamic>{});
+          _aiSon = null;
+        }
       }
       _kutu.clear();
       _altaKay();
@@ -266,6 +278,64 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
       if (mounted) setState(() => _gonderiyor = false);
       _odak.requestFocus();
     }
+  }
+
+  /// Yapay zeka yanıt önerisi: taslağı yazım kutusuna koyar; temsilci düzenleyip gönderir.
+  Future<void> _aiOner() async {
+    if (_aiBekliyor) return;
+    setState(() => _aiBekliyor = true);
+    try {
+      final v = await Depo.aiOner(_id);
+      if (!mounted) return;
+      final t = v['text'] is String ? v['text'] as String : '';
+      if (v['ok'] == true && t.trim().isNotEmpty) {
+        _kutu.text = t;
+        _kutu.selection = TextSelection.collapsed(offset: t.length);
+        _aiSon = (logId: v['log_id'] is num ? (v['log_id'] as num).toInt() : int.tryParse('${v['log_id'] ?? ''}'), text: t);
+        _odak.requestFocus();
+        final skor = v['score'] is num ? (v['score'] as num).round() : int.tryParse('${v['score'] ?? ''}');
+        bildir(skor == null ? 'Öneri eklendi' : 'Öneri eklendi (%$skor eşleşme)', tur: MesajTur.basari);
+      } else {
+        bildir('Öneri alınamadı', mesaj: v['error'] is String ? v['error'] as String : null, tur: MesajTur.uyari);
+      }
+    } catch (e) {
+      bildir('Öneri alınamadı', mesaj: hataMetni(e), tur: MesajTur.uyari);
+    } finally {
+      if (mounted) setState(() => _aiBekliyor = false);
+    }
+  }
+
+  /// bot:false → temsilci devralır; bot:true → bota geri verilir.
+  Future<void> _aiDevir(bool bot) async {
+    final v = await islem(() => Depo.aiDevir(_id, bot: bot));
+    if (v == null) return;
+    await _detayYukle();
+  }
+
+  Widget _aiSeridi(Renkler r) {
+    final devredildi = _aiDevredildi;
+    final renk = devredildi ? Marka.grafitAcik : Marka.mor;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        children: [
+          const SizedBox(width: 8),
+          Icon(Simgeler.sparkle, size: 14, color: renk),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              devredildi ? 'Asistan devredildi' : '🤖 Asistan yanıtlıyor',
+              style: TextStyle(color: renk, fontSize: 12, fontWeight: FontWeight.w500),
+            ),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(visualDensity: VisualDensity.compact, textStyle: const TextStyle(fontSize: 12.5)),
+            onPressed: () => _aiDevir(devredildi),
+            child: Text(devredildi ? 'Bota geri ver' : 'Devral'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _dosyaSec({bool gorsel = false}) async {
@@ -1317,6 +1387,7 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (_aiDevredildi || _aiTur > 0) _aiSeridi(r),
             if (kipRengi != null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 4),
@@ -1401,6 +1472,13 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
                         ),
                       ),
                   ],
+                ),
+                IconButton(
+                  tooltip: 'Yapay zeka yanıt önerisi',
+                  onPressed: _aiBekliyor ? null : _aiOner,
+                  icon: _aiBekliyor
+                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Icon(Simgeler.sparkle, color: Marka.mor),
                 ),
                 Expanded(
                   child: Shortcuts(

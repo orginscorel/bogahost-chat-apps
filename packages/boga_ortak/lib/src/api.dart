@@ -103,8 +103,6 @@ class BogaApi {
         headers: {
           'User-Agent': 'BogaMail-${uygulama == 'posta' ? 'Posta' : 'Yonetim'}/$surum ($platform)',
           'Accept': 'application/json',
-          // h2 bağdaştırıcısı gzip'i kendiliğinden istemez; JSON yanıtlar sıkıştırılsın.
-          'Accept-Encoding': 'gzip',
         },
         validateStatus: (_) => true,
       ),

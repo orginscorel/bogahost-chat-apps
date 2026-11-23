@@ -25,6 +25,7 @@ import 'ayar/surum.dart';
 import 'ayar/tetikleyiciler.dart';
 import 'ayar/whatsapp.dart';
 import 'ayar/widget_ayar.dart';
+import 'ayar/yapay_zeka.dart';
 import 'ayar/yasaklar.dart';
 import 'kabuk.dart';
 
@@ -80,6 +81,8 @@ class _AyarlarEkraniState extends State<AyarlarEkrani> {
         _Oge('Tetikleyiciler', 'Otomasyon kuralları ve puanlama', Simgeler.bolt, Marka.kehribar, () => _git(const TetikleyicilerEkrani())),
       if (Uyg.yetki('canned.manage'))
         _Oge('Hazır yanıtlar', 'Kısayollu şablon mesajlar', Simgeler.chatText, Marka.mavi, () => _git(const HazirYanitlarEkrani())),
+      if (Uyg.yetki('settings.manage'))
+        _Oge('Yapay zeka asistanı', 'Öneri, otomatik yanıt, bilgi tabanı, öğrenme', Simgeler.sparkle, Marka.mor, () => _git(const YapayZekaEkrani())),
       if (Uyg.yetki('departments.manage'))
         _Oge('Bölümler', 'Departmanlar, otomatik yanıtlar', Simgeler.accountTree, Marka.lavanta, () => _git(const BolumlerEkrani())),
     ];

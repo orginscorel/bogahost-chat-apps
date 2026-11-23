@@ -2,6 +2,28 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.6',
+    'date': '2026-11-23',
+    'title': 'Kendi kendine öğrenen asistan',
+    'items': [
+      {'type': 'new', 'text': 'Yapay zeka asistanı dış servis kullanmadan çalışır: bilgi tabanı ve hazır cevaplardan eşleştirir.'},
+      {
+        'type': 'new',
+        'text': 'Ekibin yanıtlarından, temsilci düzeltmelerinden ve kapanan görüşmelerden öğrenir; "Geçmişten öğren" ile eski görüşmeler taranır.',
+      },
+      {'type': 'new', 'text': 'Sohbette "Yanıt öner": eşleşme oranıyla birlikte taslak önerir, temsilci düzenleyip gönderir.'},
+      {
+        'type': 'new',
+        'text': 'İsteğe bağlı otomatik yanıt (temsilci yokken / her zaman): öneri ve otomatik yanıt eşikleri ayarlanabilir; eşik altında temsilciye devreder.',
+      },
+      {
+        'type': 'improve',
+        'text': 'Ayarlar › Yapay zeka asistanı: bilgi tabanı, onay bekleyen öğrenilenler, günlük ve deneme (eşleşme oranı, kaynaklar); bot devrede göstergesi ve Devral / Bota geri ver.',
+      },
+      {'type': 'fix', 'text': 'Açılışta "sunucuya ulaşılamıyor" hatası düzeltildi (HTTP/2 bağdaştırıcısı gzip yanıtı açamıyordu).'},
+    ],
+  },
+  {
     'version': '1.2.5',
     'date': '2026-11-23',
     'title': 'Hız, yapıştırma, talep formu, PDF, iptal talebi, ekran kaydırma',
