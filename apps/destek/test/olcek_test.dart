@@ -9,7 +9,7 @@ void main() {
     t.view.physicalSize = const Size(2560, 1440);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.resetPhysicalSize);
-    arayuzOlcegi.value = 0; // otomatik: 2560 ≥ 2300 → 1.35
+    arayuzOlcegi.value = 0; // otomatik: 2560 ≥ 2300 → 1.2
     final anahtar = GlobalKey();
     await t.pumpWidget(
       MaterialApp(
@@ -18,9 +18,9 @@ void main() {
       ),
     );
     final boyut = t.getSize(find.byKey(anahtar));
-    expect(boyut.width, closeTo(2560 / 1.35, .5));
-    expect(boyut.height, closeTo(1440 / 1.35, .5));
-    expect(MediaQuery.sizeOf(anahtar.currentContext!).width, closeTo(2560 / 1.35, .5));
+    expect(boyut.width, closeTo(2560 / 1.2, .5));
+    expect(boyut.height, closeTo(1440 / 1.2, .5));
+    expect(MediaQuery.sizeOf(anahtar.currentContext!).width, closeTo(2560 / 1.2, .5));
     // Ekrana çizilen alan tam pencere: sağ alt köşe (2559,1439) içerikte
     final rb = anahtar.currentContext!.findRenderObject()! as RenderBox;
     final sagAlt = rb.localToGlobal(Offset(rb.size.width, rb.size.height));

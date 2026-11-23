@@ -450,11 +450,14 @@ class YanMenu extends StatefulWidget {
 
 class _YanMenuState extends State<YanMenu> {
   bool _hover = false;
-  static const _zemin = Color(0xFF12151D), _kenar = Color(0xFF1F2430);
+  // Uygulamanın ilk renk stili: tema kartı zemini + kenar (açık/koyu temaya uyar), vurgu mor.
+  late Color _zemin, _kenar;
 
   @override
   Widget build(BuildContext context) {
     final r = context.r;
+    _zemin = r.kart;
+    _kenar = r.kenar;
     return ValueListenableBuilder<bool>(
       valueListenable: menuSabit,
       builder: (_, sabit, _) {
@@ -466,7 +469,7 @@ class _YanMenuState extends State<YanMenu> {
             duration: const Duration(milliseconds: 160),
             curve: Curves.easeOut,
             width: acik ? 248 : 74,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: _zemin,
               border: Border(right: BorderSide(color: _kenar)),
             ),
@@ -475,7 +478,7 @@ class _YanMenuState extends State<YanMenu> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _logo(acik),
+                  _logo(acik, r),
                   Expanded(
                     child: ValueListenableBuilder<Map<Bolum, int>>(
                       valueListenable: rozetler,
@@ -485,7 +488,7 @@ class _YanMenuState extends State<YanMenu> {
                           padding: const EdgeInsets.fromLTRB(0, 4, 0, 8),
                           children: [
                             for (final (gi, g) in widget.gruplar.indexed) ...[
-                              _grupBasligi(g.ad, acik, ilk: gi == 0),
+                              _grupBasligi(g.ad, acik, r, ilk: gi == 0),
                               for (final m in g.ogeler) _oge(m, acik, roz[m.bolum] ?? 0, m.bolum == Bolum.acil && o != null && (o.acil || o.saldiri), r),
                             ],
                           ],
@@ -503,7 +506,7 @@ class _YanMenuState extends State<YanMenu> {
     );
   }
 
-  Widget _logo(bool acik) => SizedBox(
+  Widget _logo(bool acik, Renkler r) => SizedBox(
     height: 64,
     child: Row(
       children: [
@@ -519,7 +522,7 @@ class _YanMenuState extends State<YanMenu> {
         ),
         if (acik) ...[
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -529,14 +532,14 @@ class _YanMenuState extends State<YanMenu> {
                   maxLines: 1,
                   overflow: TextOverflow.clip,
                   softWrap: false,
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14.5),
+                  style: TextStyle(color: r.metin, fontWeight: FontWeight.w700, fontSize: 14.5),
                 ),
                 Text(
                   'Canlı Destek',
                   maxLines: 1,
                   overflow: TextOverflow.clip,
                   softWrap: false,
-                  style: TextStyle(color: Colors.white54, fontSize: 11),
+                  style: TextStyle(color: r.soluk, fontSize: 11),
                 ),
               ],
             ),
@@ -546,7 +549,7 @@ class _YanMenuState extends State<YanMenu> {
     ),
   );
 
-  Widget _grupBasligi(String ad, bool acik, {bool ilk = false}) => acik
+  Widget _grupBasligi(String ad, bool acik, Renkler r, {bool ilk = false}) => acik
       ? Padding(
           padding: EdgeInsets.fromLTRB(22, ilk ? 6 : 16, 12, 6),
           child: Text(
@@ -554,13 +557,13 @@ class _YanMenuState extends State<YanMenu> {
             maxLines: 1,
             overflow: TextOverflow.clip,
             softWrap: false,
-            style: const TextStyle(color: Colors.white38, fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: .8),
+            style: TextStyle(color: r.silik, fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: .8),
           ),
         )
       : ilk
       ? const SizedBox(height: 6)
-      : const Padding(
-          padding: EdgeInsets.fromLTRB(22, 8, 22, 8),
+      : Padding(
+          padding: const EdgeInsets.fromLTRB(22, 8, 22, 8),
           child: Divider(height: 1, color: _kenar),
         );
 
@@ -581,9 +584,9 @@ class _YanMenuState extends State<YanMenu> {
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    Icon(secili ? simgeDolu(m.ikon) : m.ikon, size: 21, color: secili ? Colors.white : Colors.white70),
+                    Icon(secili ? simgeDolu(m.ikon) : m.ikon, size: 21, color: secili ? r.vurgu : r.soluk),
                     if (!acik && rozet > 0) Positioned(right: -10, top: -7, child: _rozet(rozet, rozetRengi, kucuk: true)),
-                    if (uyari) const Positioned(right: -4, top: -3, child: Nokta(Marka.gul, boyut: 8, halka: _zemin)),
+                    if (uyari) Positioned(right: -4, top: -3, child: Nokta(Marka.gul, boyut: 8, halka: _zemin)),
                   ],
                 ),
               ),
@@ -595,7 +598,7 @@ class _YanMenuState extends State<YanMenu> {
                   maxLines: 1,
                   overflow: TextOverflow.clip,
                   softWrap: false,
-                  style: TextStyle(color: secili ? Colors.white : Colors.white70, fontSize: 13.5, fontWeight: secili ? FontWeight.w600 : FontWeight.w500),
+                  style: TextStyle(color: secili ? r.vurgu : r.metin, fontSize: 13.5, fontWeight: secili ? FontWeight.w600 : FontWeight.w500),
                 ),
               ),
               if (rozet > 0) _rozet(rozet, rozetRengi),
@@ -623,7 +626,7 @@ class _YanMenuState extends State<YanMenu> {
   Widget _alt(bool acik, bool sabit, Renkler r) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      const Divider(height: 1, color: _kenar),
+      Divider(height: 1, color: _kenar),
       Padding(
         padding: const EdgeInsets.fromLTRB(10, 6, 10, 0),
         child: _MenuSatiri(
@@ -633,7 +636,7 @@ class _YanMenuState extends State<YanMenu> {
           yukseklik: 36,
           child: Row(
             children: [
-              SizedBox(width: 54, child: Icon(sabit ? Simgeler.chevronLeft : Simgeler.chevronRight, size: 18, color: Colors.white54)),
+              SizedBox(width: 54, child: Icon(sabit ? Simgeler.chevronLeft : Simgeler.chevronRight, size: 18, color: r.soluk)),
               if (acik)
                 Expanded(
                   child: Text(
@@ -641,7 +644,7 @@ class _YanMenuState extends State<YanMenu> {
                     maxLines: 1,
                     softWrap: false,
                     overflow: TextOverflow.clip,
-                    style: const TextStyle(color: Colors.white54, fontSize: 12),
+                    style: TextStyle(color: r.soluk, fontSize: 12),
                   ),
                 ),
             ],
@@ -660,7 +663,7 @@ class _YanMenuState extends State<YanMenu> {
                 maxLines: 1,
                 softWrap: false,
                 overflow: TextOverflow.clip,
-                style: const TextStyle(color: Colors.white38, fontSize: 10.5),
+                style: TextStyle(color: r.silik, fontSize: 10.5),
               ),
             ),
           ),
@@ -708,7 +711,7 @@ class _YanMenuState extends State<YanMenu> {
                                 maxLines: 1,
                                 softWrap: false,
                                 overflow: TextOverflow.clip,
-                                style: const TextStyle(color: Colors.white54, fontSize: 11),
+                                style: TextStyle(color: r.soluk, fontSize: 11),
                               ),
                             ],
                           ),
@@ -719,7 +722,7 @@ class _YanMenuState extends State<YanMenu> {
                           onPressed: () async {
                             if (await onayla(context, 'Oturum kapatılsın mı?', evet: 'Çıkış')) Uyg.cikis();
                           },
-                          icon: const Icon(Simgeler.logout, size: 18, color: Colors.white54),
+                          icon: Icon(Simgeler.logout, size: 18, color: r.soluk),
                         ),
                       ],
                     ],
@@ -758,7 +761,7 @@ class _MenuSatiriState extends State<_MenuSatiri> {
           duration: const Duration(milliseconds: 120),
           height: widget.yukseklik,
           decoration: BoxDecoration(
-            color: widget.secili ? r.vurgu.withValues(alpha: .24) : (_h ? Colors.white.withValues(alpha: .07) : Colors.transparent),
+            color: widget.secili ? r.vurguYumusak : (_h ? r.metin.withValues(alpha: .05) : Colors.transparent),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Stack(

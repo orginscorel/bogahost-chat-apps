@@ -1,3 +1,9 @@
+## 1.2.4
+
+- Yan menü uygulamanın ilk renk stiline döndü: tema kartı zemini + kenar (açık/koyu temaya uyar), seçili öğe yumuşak mor zemin + mor simge/yazı; koyu sabit (#12151D) zemin kaldırıldı.
+- Büyük monitörde otomatik ölçek yumuşatıldı: 1500 px üstü %106, 1900 üstü %112, 2300 üstü %120 (önceki %112/%125/%135 fazla büyütüyordu).
+- Ölçekli arayüzde logo yazı görseli yüksek örnekleme ile çizilir (pikselli görünüm giderildi).
+
 ## 1.2.3
 
 - KPI kartları (pano, ziyaretçiler, bildirimler, raporlar, geçmiş): içerik sığmazsa taşmak yerine orantılı küçülür; büyük kart düzeni sıkılaştırıldı (36 px rozet, 26 px değer), pano hücresi 132 px. Yazı ölçeği 1.6'ya kadar taşma testi eklendi.

@@ -57,7 +57,11 @@ class BogahostLogo {
     c.scale(k);
     final y = _yazi;
     if (y != null && yaziT > 0) {
-      final boya = Paint()..colorFilter = ColorFilter.mode(renk, BlendMode.srcIn);
+      // Yüksek örnekleme: büyütülmüş (ölçekli) arayüzde yazı görseli pikselli görünmesin.
+      final boya = Paint()
+        ..colorFilter = ColorFilter.mode(renk, BlendMode.srcIn)
+        ..filterQuality = FilterQuality.high
+        ..isAntiAlias = true;
       // Soldan sağa beliren pencere; boğa başı bölgesi görselden alınmaz (vektör çizilir).
       final gorunen = kutu.width * yaziT;
       for (final parca in [Rect.fromLTRB(0, 0, amblemKutusu.left, kutu.height), Rect.fromLTRB(amblemKutusu.right, 0, kutu.width, kutu.height)]) {
@@ -86,7 +90,7 @@ class BogahostLogoGorunumu extends StatelessWidget {
       width: genislik,
       height: genislik * BogahostLogo.kutu.height / BogahostLogo.kutu.width,
       color: r,
-      filterQuality: FilterQuality.medium,
+      filterQuality: FilterQuality.high,
     );
   }
 }

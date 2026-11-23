@@ -16,11 +16,11 @@ final arayuzOlcegi = ValueNotifier<double>(0);
 
 /// Otomatik ölçek: geniş pencerelerde kademeli büyütme.
 double otomatikOlcek(double genislik) => genislik >= 2300
-    ? 1.35
+    ? 1.2
     : genislik >= 1900
-    ? 1.25
-    : genislik >= 1500
     ? 1.12
+    : genislik >= 1500
+    ? 1.06
     : 1.0;
 
 String olcekAdi(double v) => v <= 0 ? 'Otomatik' : '%${(v * 100).round()}';

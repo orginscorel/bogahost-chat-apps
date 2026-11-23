@@ -2,6 +2,16 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.4',
+    'date': '2026-11-23',
+    'title': 'Yan menü ilk renk stili, yumuşak ölçek',
+    'items': [
+      {'type': 'improve', 'text': 'Yan menü tema renklerinde (ilk stil): açık/koyu temaya uyar, seçili öğe mor.'},
+      {'type': 'improve', 'text': 'Büyük monitörde otomatik ölçek daha yumuşak (%106 / %112 / %120).'},
+      {'type': 'fix', 'text': 'Ölçekli arayüzde logo yazısı pikselli görünmüyor (yüksek örnekleme).'},
+    ],
+  },
+  {
     'version': '1.2.3',
     'date': '2026-11-23',
     'title': 'KPI taşması, Regular simgeler, tablo sütunları',
