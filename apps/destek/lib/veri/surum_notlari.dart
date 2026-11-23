@@ -2,6 +2,15 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.2',
+    'date': '2026-11-23',
+    'title': 'Büyük monitörde otomatik büyütme',
+    'items': [
+      {'type': 'new', 'text': 'Görünüm boyutu: geniş pencerede arayüz otomatik büyür; Ayarlar > Görünüm boyutu ile Oto / 100 / 120 / 140.'},
+      {'type': 'fix', 'text': 'Geniş ekranda üst çubuk nesneleri (durum, zil, tema, profil) ekranlarda bir daha yinelenmez.'},
+    ],
+  },
+  {
     'version': '1.2.1',
     'date': '2026-11-23',
     'title': 'Üst çubuk, sağdan paneller, gerçek logo, ekran izleme seçici',

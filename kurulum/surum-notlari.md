@@ -1,3 +1,8 @@
+## 1.2.2
+
+- Görünüm boyutu: büyük monitörlerde arayüz otomatik büyür (1500 px üstü %112, 1900 üstü %125, 2300 üstü %135); Ayarlar > Görünüm boyutu ile Oto / 100 / 120 / 140 seçilebilir. Yazı, ikon, düğme ve boşluklar birlikte ölçeklenir.
+- Geniş ekranda hiçbir ekran üst çubuktaki durum / zil / tema / profil nesnelerini yinelemez (kabuk içi işaretleme ile; sohbetler sayfası dahil).
+
 ## 1.2.1
 
 Üst çubuk, sağdan paneller, gerçek logo, ekran izleme seçici, davet düzeltmesi.

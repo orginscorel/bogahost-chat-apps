@@ -18,9 +18,16 @@ Widget ortala(Widget child, {double enCok = sayfaEnCok}) => Align(
   ),
 );
 
-/// Ekran kabuğun içinde kök olarak mı duruyor? (Geniş ekran + geri gidilecek rota yok.) Öyleyse ekran kendi
-/// AppBar'ını çizmez; başlık ve ortak düğmeler kabuğun üst çubuğundadır.
-bool kabukGomulu(BuildContext c) => c.genis && !Navigator.of(c).canPop();
+/// Kabuğun geniş ekran düzeninde gömülü bölüm içeriğini işaretler (üst çubuk + yan menü zaten var).
+class KabukIci extends InheritedWidget {
+  const KabukIci({super.key, required super.child});
+  @override
+  bool updateShouldNotify(KabukIci o) => false;
+}
+
+/// Ekran kabuğun içinde gömülü mü? Öyleyse ekran kendi AppBar'ını çizmez; başlık ve ortak düğmeler kabuğun üst
+/// çubuğundadır. İtilmiş rotalar ve sağdan açılan paneller kabuk alt ağacında olmadığından gömülü sayılmaz.
+bool kabukGomulu(BuildContext c) => c.dependOnInheritedWidgetOfExactType<KabukIci>() != null;
 
 /// Detay / CRM / profil gibi ekranlar: geniş ekranda sağdan kayan panel, telefonda tam sayfa rota.
 Future<T?> yanPanelAc<T>(BuildContext context, Widget child, {double genislik = 580}) {

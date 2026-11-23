@@ -201,7 +201,8 @@ Future<void> bildirimAc(Bildirim b) async {
 
 /// Ekran AppBar'ına eklenen ortak eylemler. Geniş ekranda (kabuk içinde) üst çubuk zaten arama / durum / zil /
 /// tema / profil taşır, ekranlar hiçbir şey eklemez; telefonda ve itilmiş rotalarda durum noktası + zil.
-List<Widget> kabukEylemleri(BuildContext context) => kabukGomulu(context) ? const [] : const [MusaitlikDugmesi(kisa: true), ZilDugmesi(), SizedBox(width: 4)];
+List<Widget> kabukEylemleri(BuildContext context) =>
+    kabukGomulu(context) || context.genis ? const [] : const [MusaitlikDugmesi(kisa: true), ZilDugmesi(), SizedBox(width: 4)];
 
 /// Ekranın AppBar'ı: kabuk içinde gömülüyken yok (başlık üst çubukta); `alt` varsa yalnız o gösterilir.
 PreferredSizeWidget? ekranBasligi(BuildContext context, String baslik, {List<Widget> eylemler = const [], PreferredSizeWidget? alt}) {
@@ -386,7 +387,7 @@ class _KabukState extends State<Kabuk> with WidgetsBindingObserver {
               child: Column(
                 children: [
                   UstCubuk(baslik: aktif.ad, ikon: aktif.ikon),
-                  Expanded(child: govde),
+                  Expanded(child: KabukIci(child: govde)),
                 ],
               ),
             ),

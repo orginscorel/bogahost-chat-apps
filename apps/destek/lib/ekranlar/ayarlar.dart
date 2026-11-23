@@ -205,6 +205,27 @@ class _AyarlarEkraniState extends State<AyarlarEkrani> {
                         ),
                       ),
                     ),
+                    ValueListenableBuilder<double>(
+                      valueListenable: arayuzOlcegi,
+                      builder: (_, v, _) => ListTile(
+                        leading: _ikon(Simgeler.search, Marka.gok),
+                        title: const Text('Görünüm boyutu'),
+                        subtitle: Text('Büyük monitörde yazı ve düğmeler birlikte büyür', style: TextStyle(color: r.silik, fontSize: 12)),
+                        trailing: SegmentedButton<double>(
+                          showSelectedIcon: false,
+                          segments: const [
+                            ButtonSegment(value: 0, label: Text('Oto')),
+                            ButtonSegment(value: 1, label: Text('100')),
+                            ButtonSegment(value: 1.2, label: Text('120')),
+                            ButtonSegment(value: 1.4, label: Text('140')),
+                          ],
+                          selected: {
+                            const [0.0, 1.0, 1.2, 1.4].contains(v) ? v : 0.0,
+                          },
+                          onSelectionChanged: (s) => olcekKaydet(s.first),
+                        ),
+                      ),
+                    ),
                     ValueListenableBuilder<bool>(
                       valueListenable: sesAcik,
                       builder: (_, v, _) => SwitchListTile(

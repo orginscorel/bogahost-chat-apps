@@ -48,10 +48,45 @@ class DestekUygulamasi extends StatelessWidget {
         supportedLocales: const [Locale('tr', 'TR')],
         localizationsDelegates: const [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
         scrollBehavior: const _Kaydirma(),
+        builder: (_, child) => OlcekSarmal(child: child ?? const SizedBox.shrink()),
         home: AcilisChat(hazirla: () async => await Uyg.yukle() ? const Kabuk() : Uyg.girisEkrani()),
       ),
     );
   }
+}
+
+/// Arayüz ölçeği: pencere, ölçek kadar küçük bir mantıksal alana çizilip büyütülür; böylece yazı, ikon, düğme ve
+/// boşluklar büyük monitörde birlikte büyür (tercih 0 ise genişliğe göre otomatik).
+class OlcekSarmal extends StatelessWidget {
+  const OlcekSarmal({super.key, required this.child});
+  final Widget child;
+  @override
+  Widget build(BuildContext context) => ValueListenableBuilder<double>(
+    valueListenable: arayuzOlcegi,
+    builder: (_, tercih, _) => LayoutBuilder(
+      builder: (ctx, k) {
+        final w = k.maxWidth, h = k.maxHeight;
+        if (!w.isFinite || !h.isFinite) return child;
+        final f = tercih > 0 ? tercih : otomatikOlcek(w);
+        if ((f - 1).abs() < .01) return child;
+        final mq = MediaQuery.of(ctx);
+        return MediaQuery(
+          data: mq.copyWith(
+            size: Size(w / f, h / f),
+            devicePixelRatio: mq.devicePixelRatio * f,
+            padding: mq.padding / f,
+            viewPadding: mq.viewPadding / f,
+            viewInsets: mq.viewInsets / f,
+          ),
+          child: Transform.scale(
+            scale: f,
+            alignment: Alignment.topLeft,
+            child: SizedBox(width: w / f, height: h / f, child: child),
+          ),
+        );
+      },
+    ),
+  );
 }
 
 /// Mac/Windows'ta fare ile sürükleyerek de kaydırılsın (yatay sekme şeritleri, listeler).
