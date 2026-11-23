@@ -192,7 +192,10 @@ class _YasaklarEkraniState extends State<YasaklarEkrani> {
                       borderRadius: BorderRadius.circular(18),
                       child: Column(
                         children: [
-                          const TabloBasi([('TÜR', 2), ('DEĞER', 4), ('SEBEP', 4), ('DURUM', 2), ('EKLEYEN', 2), ('TARİH', 3), ('', 1)]),
+                          const TabloBasi(
+                            [('TÜR', 2), ('DEĞER', 4), ('SEBEP', 4), ('DURUM', 2), ('EKLEYEN', 2), ('TARİH', 3), ('', 0)],
+                            genislikler: [null, null, null, null, null, null, 52],
+                          ),
                           for (final (i, x) in liste.indexed) ...[
                             if (i > 0) Divider(height: 1, color: r.kenar.withValues(alpha: .6)),
                             _tabloSatiri(x, r, yenile),
@@ -285,8 +288,8 @@ class _YasaklarEkraniState extends State<YasaklarEkrani> {
               ],
             ),
           ),
-          Expanded(
-            flex: 1,
+          SizedBox(
+            width: 52,
             child: IconButton(
               tooltip: 'Kaldır',
               visualDensity: VisualDensity.compact,

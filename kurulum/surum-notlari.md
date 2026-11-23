@@ -1,3 +1,9 @@
+## 1.2.3
+
+- KPI kartları (pano, ziyaretçiler, bildirimler, raporlar, geçmiş): içerik sığmazsa taşmak yerine orantılı küçülür; büyük kart düzeni sıkılaştırıldı (36 px rozet, 26 px değer), pano hücresi 132 px. Yazı ölçeği 1.6'ya kadar taşma testi eklendi.
+- Simge seti: varsayılan ağırlık Light → Regular (daha dolgun ve net); yan menüde etkin bölümün simgesi dolu (Fill) çizilir.
+- Tablolar: Canlı Ziyaretçiler'de "Son hareket" (118 px) ve "İşlem" (236 px) sütunları sabit, metin sütunları esnek; dar pencerede tablo en az 1180 px olup yatay kaydırılır. Yasaklılar tablosunda işlem sütunu sabit (52 px). Tablo başlığı sabit genişlikli sütun destekler.
+
 ## 1.2.2
 
 - Görünüm boyutu: büyük monitörlerde arayüz otomatik büyür (1500 px üstü %112, 1900 üstü %125, 2300 üstü %135); Ayarlar > Görünüm boyutu ile Oto / 100 / 120 / 140 seçilebilir. Yazı, ikon, düğme ve boşluklar birlikte ölçeklenir.

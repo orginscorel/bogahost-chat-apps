@@ -174,63 +174,89 @@ class KpiKart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final r = context.r;
+    final icerik = kucuk
+        ? Row(
+            children: [
+              _rozet(38),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      deger,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: gosterim(22, renk: r.metin, agirlik: FontWeight.w700),
+                    ),
+                    Text(
+                      alt == null ? etiket : '$etiket · $alt',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: r.soluk, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          )
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  _rozet(36),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(mainAxisSize: MainAxisSize.min, children: [if (canli) const CanliIsareti(), if (egilim != null) _egilim(egilim!)]),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                deger,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: gosterim(26, renk: r.metin, agirlik: FontWeight.w700),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                etiket,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: r.metin, fontWeight: FontWeight.w500, fontSize: 12.5),
+              ),
+              if (alt != null)
+                Text(
+                  alt!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: r.silik, fontSize: 11),
+                ),
+            ],
+          );
+    // Sığmazsa taşmak yerine orantılı küçülür (ızgara hücresi sabit yükseklikte; büyük yazı ölçeğinde bile taşma yok).
     return HoverKutu(
       onTap: onTap,
-      padding: EdgeInsets.symmetric(horizontal: kucuk ? 14 : 16, vertical: kucuk ? 10 : 16),
-      child: kucuk
-          ? Row(
-              children: [
-                _rozet(40),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        deger,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: gosterim(23, renk: r.metin, agirlik: FontWeight.w700),
-                      ),
-                      Text(
-                        alt == null ? etiket : '$etiket · $alt',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: r.soluk, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(children: [_rozet(40), const Spacer(), if (canli) const CanliIsareti(), if (egilim != null) _egilim(egilim!)]),
-                const Spacer(),
-                Text(
-                  deger,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: gosterim(28, renk: r.metin, agirlik: FontWeight.w700),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  etiket,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: r.metin, fontWeight: FontWeight.w500, fontSize: 13),
-                ),
-                if (alt != null)
-                  Text(
-                    alt!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: r.silik, fontSize: 11.5),
-                  ),
-              ],
-            ),
+      padding: EdgeInsets.symmetric(horizontal: kucuk ? 14 : 16, vertical: kucuk ? 10 : 12),
+      child: LayoutBuilder(
+        builder: (_, k) => FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: kucuk ? Alignment.centerLeft : Alignment.topLeft,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: k.maxWidth, maxWidth: k.maxWidth),
+            child: icerik,
+          ),
+        ),
+      ),
     );
   }
 
@@ -763,8 +789,11 @@ String yasYaz(int sn) => sn < 60
 
 /// Tablo başlık satırı (geniş ekran listeleri).
 class TabloBasi extends StatelessWidget {
-  const TabloBasi(this.sutunlar, {super.key});
+  const TabloBasi(this.sutunlar, {super.key, this.genislikler});
   final List<(String, int)> sutunlar;
+
+  /// Sütun başına sabit genişlik (px); null → esnek (flex). Satırlar aynı düzeni kullanmalı.
+  final List<double?>? genislikler;
   @override
   Widget build(BuildContext context) {
     final r = context.r;
@@ -776,14 +805,23 @@ class TabloBasi extends StatelessWidget {
       ),
       child: Row(
         children: [
-          for (final (ad, f) in sutunlar)
-            Expanded(
-              flex: f,
-              child: Text(
-                ad,
-                style: TextStyle(color: r.silik, fontSize: 11.5, fontWeight: FontWeight.w600, letterSpacing: .3),
+          for (final (i, (ad, f)) in sutunlar.indexed)
+            if (genislikler != null && genislikler![i] != null)
+              SizedBox(
+                width: genislikler![i],
+                child: Text(
+                  ad,
+                  style: TextStyle(color: r.silik, fontSize: 11.5, fontWeight: FontWeight.w600, letterSpacing: .3),
+                ),
+              )
+            else
+              Expanded(
+                flex: f,
+                child: Text(
+                  ad,
+                  style: TextStyle(color: r.silik, fontSize: 11.5, fontWeight: FontWeight.w600, letterSpacing: .3),
+                ),
               ),
-            ),
         ],
       ),
     );

@@ -2,6 +2,16 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.3',
+    'date': '2026-11-23',
+    'title': 'KPI taşması, Regular simgeler, tablo sütunları',
+    'items': [
+      {'type': 'fix', 'text': 'KPI kartlarındaki yazılar taşmıyor; sığmazsa orantılı küçülür.'},
+      {'type': 'improve', 'text': 'Simge seti Regular ağırlığa geçti; etkin menü öğesi dolu simgeyle.'},
+      {'type': 'improve', 'text': 'Ziyaretçi ve yasak tablolarında sabit işlem sütunları, dar pencerede yatay kaydırma.'},
+    ],
+  },
+  {
     'version': '1.2.2',
     'date': '2026-11-23',
     'title': 'Büyük monitörde otomatik büyütme',

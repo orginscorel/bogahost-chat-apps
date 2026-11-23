@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'dart:math' as math;
+
 import 'package:boga_ortak/boga_ortak.dart';
 import 'package:flutter/material.dart';
 
@@ -239,28 +241,38 @@ class _ZiyaretcilerEkraniState extends State<ZiyaretcilerEkrani> {
                             padding: EdgeInsets.zero,
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(18),
-                              child: Column(
-                                children: [
-                                  const TabloBasi([
-                                    ('ZİYARETÇİ', 5),
-                                    ('KONUM', 3),
-                                    ('CİHAZ', 3),
-                                    ('BULUNDUĞU SAYFA', 5),
-                                    ('GELİŞ KAYNAĞI', 3),
-                                    ('SON HAREKET', 2),
-                                    ('İŞLEM', 4),
-                                  ]),
-                                  for (final (i, z) in suzulen.indexed) ...[
-                                    if (i > 0) Divider(height: 1, color: r.kenar.withValues(alpha: .6)),
-                                    _TabloSatiri(
-                                      z: z,
-                                      onDetay: () => _detay(z),
-                                      onDavet: () => _davet(z),
-                                      onBaslat: () => _baslat(z),
-                                      onEkran: () => _ekran(z),
-                                    ),
-                                  ],
-                                ],
+                              // Dar pencerede sütunlar ezilmesin: en az 1180 px, gerekirse yatay kaydır.
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: SizedBox(
+                                  width: math.max(k.maxWidth - 2, 1180),
+                                  child: Column(
+                                    children: [
+                                      const TabloBasi(
+                                        [
+                                          ('ZİYARETÇİ', 5),
+                                          ('KONUM', 3),
+                                          ('CİHAZ', 3),
+                                          ('BULUNDUĞU SAYFA', 5),
+                                          ('GELİŞ KAYNAĞI', 3),
+                                          ('SON HAREKET', 0),
+                                          ('İŞLEM', 0),
+                                        ],
+                                        genislikler: [null, null, null, null, null, _TabloSatiri.sonHareketG, _TabloSatiri.islemG],
+                                      ),
+                                      for (final (i, z) in suzulen.indexed) ...[
+                                        if (i > 0) Divider(height: 1, color: r.kenar.withValues(alpha: .6)),
+                                        _TabloSatiri(
+                                          z: z,
+                                          onDetay: () => _detay(z),
+                                          onDavet: () => _davet(z),
+                                          onBaslat: () => _baslat(z),
+                                          onEkran: () => _ekran(z),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                           )
@@ -422,6 +434,7 @@ IconData cihazSimgesi(String? cihaz) {
 
 /// Geniş ekran tablo satırı (hover vurgulu).
 class _TabloSatiri extends StatefulWidget {
+  static const sonHareketG = 118.0, islemG = 236.0;
   const _TabloSatiri({required this.z, required this.onDetay, required this.onDavet, required this.onBaslat, required this.onEkran});
   final Ziyaretci z;
   final VoidCallback onDetay, onDavet, onBaslat, onEkran;
@@ -568,8 +581,8 @@ class _TabloSatiriState extends State<_TabloSatiri> {
                   ),
                 ),
               ),
-              Expanded(
-                flex: 2,
+              SizedBox(
+                width: _TabloSatiri.sonHareketG,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -578,8 +591,8 @@ class _TabloSatiriState extends State<_TabloSatiri> {
                   ],
                 ),
               ),
-              Expanded(
-                flex: 4,
+              SizedBox(
+                width: _TabloSatiri.islemG,
                 child: Row(
                   children: [
                     if (z.sohbette)

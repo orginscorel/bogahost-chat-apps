@@ -581,7 +581,7 @@ class _YanMenuState extends State<YanMenu> {
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    Icon(m.ikon, size: 21, color: secili ? Colors.white : Colors.white70),
+                    Icon(secili ? simgeDolu(m.ikon) : m.ikon, size: 21, color: secili ? Colors.white : Colors.white70),
                     if (!acik && rozet > 0) Positioned(right: -10, top: -7, child: _rozet(rozet, rozetRengi, kucuk: true)),
                     if (uyari) const Positioned(right: -4, top: -3, child: Nokta(Marka.gul, boyut: 8, halka: _zemin)),
                   ],

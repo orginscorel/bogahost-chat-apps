@@ -112,7 +112,7 @@ class _OzetEkraniState extends State<OzetEkrani> {
                         const SizedBox(height: 14),
                         EsitIzgara(
                           enAz: 150,
-                          yukseklik: 126,
+                          yukseklik: 132,
                           children: [
                             KpiKart(
                               etiket: 'Şu an sitede',
