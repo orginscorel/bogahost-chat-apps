@@ -9,6 +9,7 @@ import '../oturum.dart';
 import '../veri/depo.dart';
 import '../veri/modeller.dart';
 import 'gorusme.dart';
+import 'kabuk.dart';
 
 /// Geniş ekranda sağ bölmede açık olan sohbet.
 final secilenSohbet = ValueNotifier<int?>(null);
@@ -113,7 +114,7 @@ class _SohbetlerEkraniState extends State<SohbetlerEkrani> {
     final r = context.r;
     if (!Uyg.yetki('chats.view')) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Sohbetler')),
+        appBar: AppBar(title: const Text('Sohbetler'), actions: kabukEylemleri(context)),
         body: const Yetkisiz('Sohbetleri görüntülemek'),
       );
     }
@@ -124,6 +125,7 @@ class _SohbetlerEkraniState extends State<SohbetlerEkrani> {
           if (_durum == 'missed' && (_sayilar['missed'] ?? 0) > 0 && Uyg.yetki('chats.reply'))
             TextButton(onPressed: _hepsiniCoz, child: const Text('Hepsini kapalıya al')),
           IconButton(tooltip: 'Yenile', onPressed: () => _yukle(), icon: const Icon(Simgeler.refresh)),
+          ...kabukEylemleri(context),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(108),

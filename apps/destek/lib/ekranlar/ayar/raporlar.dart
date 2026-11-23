@@ -1,6 +1,8 @@
 import 'package:boga_ortak/boga_ortak.dart';
 import 'package:flutter/material.dart';
 
+import '../../ortak/parcalar.dart';
+import '../../ortak/simgeler.dart';
 import '../../ortak/yardimci.dart';
 import '../../veri/json.dart';
 import '../../veri/panel.dart';
@@ -60,9 +62,9 @@ class _RaporlarEkraniState extends State<RaporlarEkrani> {
               }),
             ),
             const SizedBox(height: 12),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
+            EsitIzgara(
+              enAz: 150,
+              yukseklik: 66,
               children: [
                 _kart('Bugün', '${tamsayi(oz['today'])}', Marka.mor, r),
                 _kart('Bu hafta', '${tamsayi(oz['week'])}', Marka.mavi, r),
@@ -73,7 +75,39 @@ class _RaporlarEkraniState extends State<RaporlarEkrani> {
               ],
             ),
             Baslik(_donem == 'daily' ? 'Günlük sohbet / ziyaretçi' : 'Aylık sohbet / ziyaretçi'),
-            Kutu(child: SizedBox(height: 170, child: _Seri(seri, r))),
+            Kutu(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Nokta(r.vurgu, boyut: 9),
+                      const SizedBox(width: 5),
+                      Text('Sohbet', style: TextStyle(color: r.soluk, fontSize: 12)),
+                      const SizedBox(width: 14),
+                      const Nokta(Marka.zumrut, boyut: 9),
+                      const SizedBox(width: 5),
+                      Text('Ziyaretçi', style: TextStyle(color: r.soluk, fontSize: 12)),
+                      const Spacer(),
+                      Text(
+                        '${seri.fold<int>(0, (a, b) => a + tamsayi(b['count']))} sohbet · ${seri.fold<int>(0, (a, b) => a + tamsayi(b['visitors']))} ziyaretçi',
+                        style: TextStyle(color: r.silik, fontSize: 11.5),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 220,
+                    child: seri.isEmpty
+                        ? const BosKucuk('Veri yok.', ikon: Simgeler.showChart)
+                        : TrendGrafigi(
+                            degerler: [for (final x in seri) tamsayi(x['count'])],
+                            etiketler: [for (final x in seri) metin(x['label'])],
+                            ikinci: [for (final x in seri) tamsayi(x['visitors'])],
+                          ),
+                  ),
+                ],
+              ),
+            ),
             const Baslik('Durum dağılımı'),
             Kutu(
               child: Row(
@@ -136,26 +170,13 @@ class _RaporlarEkraniState extends State<RaporlarEkrani> {
                 ],
               ),
             ),
-            const Baslik('SLA'),
-            Kutu(
-              child: Column(
-                children: [
-                  bilgi(context, 'Hedef', tamsayi(sla['target_min']) == 0 ? 'Tanımlı değil' : '${tamsayi(sla['target_min'])} dk'),
-                  bilgi(context, 'Yanıtlanan', '${tamsayi(sla['answered'])}'),
-                  bilgi(context, 'Ort. ilk yanıt', _sure(ondalik(sla['avg_response']))),
-                  bilgi(context, 'En uzun yanıt', _sure(ondalik(sla['max_response']))),
-                  bilgi(context, 'Hedef içinde', sla['within_pct'] == null ? '—' : '%${ondalik(sla['within_pct']).toStringAsFixed(0)}'),
-                  bilgi(context, 'Aşılan', '${tamsayi(sla['breached'])}'),
-                  bilgi(context, 'Ort. çözüm', _sure(ondalik(sla['avg_resolution']))),
-                  bilgi(context, 'Şu an bekleyen', '${tamsayi(sla['waiting_now'])}'),
-                ],
-              ),
-            ),
+            const Baslik('SLA · ilk yanıt hedefi'),
+            _sla(sla, r),
             if (d.isNotEmpty) ...[
               Baslik('Detaylı rapor · ${metin(d['fromStr'])} – ${metin(d['toStr'])}'),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
+              EsitIzgara(
+                enAz: 150,
+                yukseklik: 66,
                 children: [
                   _kart('İlk yanıt', metin(harita(d['firstResponse'])['human'], '—'), Marka.mor, r),
                   _kart('Çözüm süresi', metin(harita(d['resolution'])['human'], '—'), Marka.mavi, r),
@@ -208,6 +229,63 @@ class _RaporlarEkraniState extends State<RaporlarEkrani> {
     );
   }
 
+  /// SLA paneli (web ile aynı): büyük renkli "hedef içinde" yüzdesi + 6 eşit kart.
+  Widget _sla(Map<String, dynamic> sla, Renkler r) {
+    final hedef = tamsayi(sla['target_min']);
+    final pct = sla['within_pct'] == null ? null : ondalik(sla['within_pct']);
+    final renk = pct == null
+        ? Marka.grafitAcik
+        : pct >= 90
+        ? Marka.zumrut
+        : pct >= 70
+        ? Marka.kehribar
+        : Marka.gul;
+    return Kutu(
+      child: LayoutBuilder(
+        builder: (_, k) {
+          final genis = k.maxWidth >= 640;
+          final ozet = Column(
+            crossAxisAlignment: genis ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                pct == null ? '—' : '%${pct.toStringAsFixed(0)}',
+                style: gosterim(44, renk: renk, agirlik: FontWeight.w800),
+              ),
+              Text('hedef içinde yanıtlanan', style: TextStyle(color: r.soluk, fontSize: 12.5)),
+              const SizedBox(height: 4),
+              Text(hedef == 0 ? 'Hedef tanımlı değil' : 'Hedef: ilk yanıt ≤ $hedef dk', style: TextStyle(color: r.silik, fontSize: 11.5)),
+              if (pct != null) ...[const SizedBox(height: 8), SizedBox(width: 160, child: IlerlemeCubugu(pct / 100, renk: renk, yukseklik: 8))],
+            ],
+          );
+          final kartlar = EsitIzgara(
+            enAz: 140,
+            yukseklik: 62,
+            bosluk: 10,
+            children: [
+              KpiKart(kucuk: true, etiket: 'Yanıtlanan', deger: '${tamsayi(sla['answered'])}', ikon: Simgeler.checkCircle, renk: Marka.zumrut),
+              KpiKart(kucuk: true, etiket: 'Ort. ilk yanıt', deger: _sure(ondalik(sla['avg_response'])), ikon: Simgeler.timer, renk: Marka.mavi),
+              KpiKart(kucuk: true, etiket: 'En uzun yanıt', deger: _sure(ondalik(sla['max_response'])), ikon: Simgeler.hourglassBottom, renk: Marka.kehribar),
+              KpiKart(kucuk: true, etiket: 'Aşılan', deger: '${tamsayi(sla['breached'])}', ikon: Simgeler.warningAmber, renk: Marka.gul),
+              KpiKart(kucuk: true, etiket: 'Ort. çözüm', deger: _sure(ondalik(sla['avg_resolution'])), ikon: Simgeler.taskAlt, renk: Marka.lavanta),
+              KpiKart(kucuk: true, etiket: 'Şu an bekleyen', deger: '${tamsayi(sla['waiting_now'])}', ikon: Simgeler.pending, renk: Marka.mor),
+            ],
+          );
+          return genis
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(width: 210, child: ozet),
+                    const SizedBox(width: 18),
+                    Expanded(child: kartlar),
+                  ],
+                )
+              : Column(children: [ozet, const SizedBox(height: 14), kartlar]);
+        },
+      ),
+    );
+  }
+
   Widget _sayfa(Map<String, dynamic> p, Renkler r) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 4),
     child: Row(
@@ -229,79 +307,8 @@ class _RaporlarEkraniState extends State<RaporlarEkrani> {
     ),
   );
 
-  Widget _kart(String ad, String deger, Color renk, Renkler r, {String? alt}) => SizedBox(
-    width: 150,
-    child: Kutu(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(deger, style: gosterim(22, renk: renk)),
-          Text(ad, style: TextStyle(color: r.soluk, fontSize: 12)),
-          if (alt != null) Text(alt, style: TextStyle(color: r.silik, fontSize: 11)),
-        ],
-      ),
-    ),
-  );
-}
-
-/// Sohbet + ziyaretçi serisi: çubuk (sohbet) + ince çizgi (ziyaretçi, ayrı ölçek).
-class _Seri extends StatelessWidget {
-  const _Seri(this.l, this.r);
-  final List<Map<String, dynamic>> l;
-  final Renkler r;
-  @override
-  Widget build(BuildContext context) => CustomPaint(painter: _SeriBoyayici(l, r), size: Size.infinite);
-}
-
-class _SeriBoyayici extends CustomPainter {
-  _SeriBoyayici(this.l, this.r);
-  final List<Map<String, dynamic>> l;
-  final Renkler r;
-  @override
-  void paint(Canvas c, Size s) {
-    if (l.isEmpty) return;
-    final altBos = 18.0, ustBos = 14.0;
-    final h = s.height - altBos - ustBos;
-    final enCok = l.fold<int>(1, (a, b) => tamsayi(b['count']) > a ? tamsayi(b['count']) : a);
-    final zEnCok = l.fold<int>(1, (a, b) => tamsayi(b['visitors']) > a ? tamsayi(b['visitors']) : a);
-    final adim = s.width / l.length;
-    final cubuk = Paint()..color = Marka.mor.withValues(alpha: .85);
-    final cizgi = Paint()
-      ..color = Marka.zumrut
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
-    final yol = Path();
-    for (final (i, x) in l.indexed) {
-      final cx = adim * i + adim / 2;
-      final ch = h * tamsayi(x['count']) / enCok;
-      c.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(cx - adim * .3, ustBos + h - ch, adim * .6, ch), const Radius.circular(3)), cubuk);
-      final zy = ustBos + h - h * tamsayi(x['visitors']) / zEnCok;
-      i == 0 ? yol.moveTo(cx, zy) : yol.lineTo(cx, zy);
-      if (l.length <= 12 || i % 5 == 0) {
-        final tp = TextPainter(
-          text: TextSpan(
-            text: metin(x['label']),
-            style: TextStyle(color: r.silik, fontSize: 9.5),
-          ),
-          textDirection: TextDirection.ltr,
-        )..layout();
-        tp.paint(c, Offset(cx - tp.width / 2, s.height - altBos + 4));
-      }
-    }
-    c.drawPath(yol, cizgi);
-    final tp = TextPainter(
-      text: TextSpan(
-        text: '■ sohbet  — ziyaretçi (en çok $enCok / $zEnCok)',
-        style: TextStyle(color: r.silik, fontSize: 9.5),
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    tp.paint(c, const Offset(0, 0));
-  }
-
-  @override
-  bool shouldRepaint(_SeriBoyayici o) => o.l != l;
+  Widget _kart(String ad, String deger, Color renk, Renkler r, {String? alt}) =>
+      KpiKart(kucuk: true, etiket: ad, deger: deger, ikon: Simgeler.chartBar, renk: renk, alt: alt);
 }
 
 /// Isı şeridi: değerler yoğunluğa göre renk alır.

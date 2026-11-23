@@ -1,6 +1,7 @@
 import 'package:boga_ortak/boga_ortak.dart';
 import 'package:flutter/material.dart';
 
+import '../../ortak/parcalar.dart';
 import '../../ortak/simgeler.dart';
 import '../../ortak/yardimci.dart';
 import '../../veri/json.dart';
@@ -22,6 +23,29 @@ class _GecmisEkraniState extends State<GecmisEkrani> {
   DateTime? _bas, _bit;
   int _sayfa = 1, _anahtar = 0;
   bool _suzgecAcik = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _sorguAl();
+    gecmisSorgusu.addListener(_sorguAl);
+  }
+
+  @override
+  void dispose() {
+    gecmisSorgusu.removeListener(_sorguAl);
+    super.dispose();
+  }
+
+  /// Üst çubuktaki genel aramadan gelen metin.
+  void _sorguAl() {
+    final q = gecmisSorgusu.value;
+    if (q == null) return;
+    gecmisSorgusu.value = null;
+    _q.text = q;
+    _sayfa = 1;
+    if (mounted) _yenile();
+  }
 
   String _t(DateTime? d) => d == null ? '' : '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
@@ -63,14 +87,14 @@ class _GecmisEkraniState extends State<GecmisEkrani> {
         final sonSayfa = tamsayi(convs['last_page'], 1);
         return ListView(
           children: [
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
+            EsitIzgara(
+              enAz: 150,
+              yukseklik: 66,
               children: [
-                _kart('Toplam', '${tamsayi(ozet['total'])}', Marka.mor, r),
+                _kart('Toplam', '${tamsayi(ozet['total'])}', Marka.mor, r, alt: 'tüm zamanlar'),
                 _kart('Kapalı', '${tamsayi(ozet['closed'])}', Marka.zumrut, r),
                 _kart('Bu ay', '${tamsayi(ozet['month'])}', Marka.mavi, r),
-                _kart('Ort. puan', ondalik(ozet['avg_rating']).toStringAsFixed(1), Marka.kehribar, r),
+                _kart('Ort. puan', ondalik(ozet['avg_rating']).toStringAsFixed(1), Marka.kehribar, r, alt: '/ 5'),
               ],
             ),
             const SizedBox(height: 12),
@@ -275,17 +299,6 @@ class _GecmisEkraniState extends State<GecmisEkrani> {
     );
   }
 
-  Widget _kart(String ad, String deger, Color renk, Renkler r) => SizedBox(
-    width: 150,
-    child: Kutu(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(deger, style: gosterim(22, renk: renk)),
-          Text(ad, style: TextStyle(color: r.soluk, fontSize: 12)),
-        ],
-      ),
-    ),
-  );
+  Widget _kart(String ad, String deger, Color renk, Renkler r, {String? alt}) =>
+      KpiKart(kucuk: true, etiket: ad, deger: deger, ikon: Simgeler.history, renk: renk, alt: alt);
 }

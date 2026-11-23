@@ -50,7 +50,13 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
   bool get _kapali => (_son?.durum ?? widget.ilk?.durum) == 'closed';
   bool get _yanitYetkisi => Uyg.yetki('chats.reply');
   String get _ad => widget.ilk?.ziyaretci ?? 'Sohbet #$_id';
-  bool get _aramaOlur => _yanitYetkisi && !_kapali && Uyg.yetki('chats.call') && (_son?.cevrimici ?? widget.ilk?.cevrimici ?? false);
+  bool get _aramaOlur => _yanitYetkisi && !_kapali && Uyg.yetki('chats.call');
+  bool get _ziyaretciCevrimici => _son?.cevrimici ?? widget.ilk?.cevrimici ?? false;
+
+  /// Ziyaretçi sekmesi kapalıysa arama bağlanamaz; yine de kullanıcıya bırak (sekme yeni açılmış olabilir).
+  Future<bool> _aramaOnay() async =>
+      _ziyaretciCevrimici ||
+      await onayla(context, 'Ziyaretçi şu an çevrimdışı görünüyor — arama yalnız sitedeki sekmesi açıkken bağlanır. Yine de denensin mi?', evet: 'Yine de ara');
 
   @override
   void initState() {
@@ -254,8 +260,10 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
       case 'bilgi':
         setState(() => _bilgiAcik = !_bilgiAcik);
       case 'sesli':
+        if (!await _aramaOnay() || !mounted) return;
         await AramaEkrani.baslat(context, sohbetId: _id, ad: _ad, video: false);
       case 'goruntulu':
+        if (!await _aramaOnay() || !mounted) return;
         await AramaEkrani.baslat(context, sohbetId: _id, ad: _ad, video: true);
       case 'ekran':
         if (_son?.oturumId != null) await EkranIzleEkrani.ac(context, oturumId: _son!.oturumId!, ad: _ad, kip: 'consent', sohbetId: _id, url: _son?.url);

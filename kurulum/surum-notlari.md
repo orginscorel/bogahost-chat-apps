@@ -1,3 +1,16 @@
+## 1.2.0
+
+Web paneliyle aynı düzen; eşit boyda KPI kartları; uyarı/bildirim/istatistik sistemleri.
+- Yan menü (geniş ekran): web panelindeki koyu, gruplu menü (Günlük iş / Analiz / Yönetim / Hesap & Yardım). Daraltılmış 74 px, üzerine gelince ya da sabitleyince 248 px; seçili öğe vurgulu + sol çubuk, hover yumuşak; bekleyen sohbet, çevrimiçi ziyaretçi, ekip ve bildirim rozetleri; acil durum/saldırı kırmızı nokta; altta sürüm satırı ve kullanıcı kartı.
+- Üst çubuk (her sayfada): genel arama (sohbet, hazır cevap, geçmişte ara), Çevrimiçi / Uzakta / Rahatsız Etme / Çevrimdışı durum menüsü, bildirim zili (okunmamış sayısı, "N sohbet bekliyor", tümünü okundu, hızlı liste), açık/koyu tema anahtarı, profil menüsü (profil, cihazlar, ayarlar, sürüm notları, web paneli, çıkış). Telefonda durum noktası + zil.
+- Genel Bakış: uyarı kartı (saldırı modu, acil durum, mesai dışı, bekleyen sohbet, yanıtsız çevrimdışı mesaj, kaçan sohbet, Rahatsız Etme/çevrimdışı durumunuz → "Çevrimiçi ol"), eşit boyda 6 KPI (canlı nokta ile "Şu an sitede"), 6 kısayol, 7 günlük yumuşak alan grafiği (üzerine gelince değer), Müşteri Memnuniyeti halkası + 👍/👎 + yıldız dağılımı, Bekleyen Kuyruğu, Temsilci Performansı, Departman Dağılımı, Son Sohbetler, Ekip.
+- Canlı Ziyaretçiler: web ile aynı tablo (Ziyaretçi · Konum · Cihaz · Bulunduğu sayfa · Geliş kaynağı renkli nokta · Son hareket · İşlem), üstte canlı sayaç ve son güncelleme, arama, Tümü/Sohbette/Geziniyor/Yazıyor/Mobil çipleri, 6 sayaç kartı; satırda Sohbete git / Sohbet başlat, davet, ekranı izle, CRM detayı. Telefonda zengin kartlar.
+- Bildirim merkezi: okunmamış/sohbet/mesaj/ekip/bugün sayaçları, tür süzgeçleri, Bugün/Dün/Daha eski grupları, tümünü okundu, bildirim ayarları kısayolu. Rahatsız Etme modunda uygulama içi ses ve bant susar.
+- Raporlar: renkli SLA paneli (hedef içinde yüzdesi ≥90 yeşil / ≥70 kehribar / altı kırmızı + 6 kart), sohbet+ziyaretçi yumuşak seri grafiği, eşit boyda özet kartları. Geçmiş sohbetler: eşit kartlar, üst çubuk aramasından devralma. Yasaklılar: sayaçlar, arama, tür/durum süzgeçleri, tablo (Tür · Değer · Sebep · Durum · Ekleyen · Tarih · isabet).
+- Sürüm notları: "Sistem sürümü · vX" / "Native sürümü · vY" rozetleri, dikey zaman çizelgesi, kaynak rozeti, "En güncel", tür etiketli maddeler.
+- Analiz ve yönetim ekranları geniş ekranda kabuk içinde açılır (yan menüden); telefonda Menü sekmesinden.
+- Arama: sesli/görüntülü arama düğmeleri ziyaretçi çevrimdışı görünse de gösterilir, durum açıkça sorulur. Sunucu: uygulama girişinde tüm yetki kataloğu gönderilir (ekran izleme, widget, rol yönetimi vb.).
+
 ## 1.1.0
 
 Dashboard ve yönetim: uygulama artık web panelinin işlevlerini taşıyor.

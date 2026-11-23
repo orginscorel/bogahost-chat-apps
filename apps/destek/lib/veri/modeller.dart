@@ -153,12 +153,17 @@ class Ziyaretci {
       sistem = metinYa(m['os']),
       ip = metinYa(m['ip']),
       kaynak = metinYa(m['referrer_label']) ?? metinYa(m['referrer_kind']),
+      kaynakTur = metinYa(m['referrer_kind']),
+      kaynakAlt = metinYa(m['referrer_line2']),
+      kaynakDetay = metinYa(m['referrer_detail']) ?? metinYa(m['referrer']),
       yaziyor = metinYa(m['sneak_peek']),
       sohbette = mantik(m['is_chatting']),
+      baslangic = metinYa(m['since']),
       sure = metinYa(m['last']) ?? metinYa(m['since']);
   final int id, sayfaSayisi;
-  final String? ad, eposta, url, baslik, ulke, sehir, cihaz, tarayici, sistem, ip, kaynak, yaziyor, sure;
+  final String? ad, eposta, url, baslik, ulke, sehir, cihaz, tarayici, sistem, ip, kaynak, kaynakTur, kaynakAlt, kaynakDetay, yaziyor, sure, baslangic;
   final bool sohbette;
+  bool get mobil => (cihaz ?? '').toLowerCase().contains('mobil') || (cihaz ?? '').toLowerCase() == 'phone' || (cihaz ?? '').toLowerCase() == 'tablet';
   String get gosterimAdi => ad ?? eposta ?? 'Ziyaretçi #$id';
 }
 

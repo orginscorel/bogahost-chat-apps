@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../ortak/simgeler.dart';
 import '../../veri/panel.dart';
+import '../kabuk.dart';
 
 /// Ayar sayfası iskeleti: yükle → göster; hata/yükleniyor durumları, yenile.
 class AyarSayfa extends StatefulWidget {
@@ -55,6 +56,7 @@ class _AyarSayfaState extends State<AyarSayfa> {
       actions: [
         ...widget.eylemler,
         IconButton(tooltip: 'Yenile', onPressed: yenile, icon: const Icon(Simgeler.refresh)),
+        ...kabukEylemleri(context),
       ],
     ),
     body: _hata != null

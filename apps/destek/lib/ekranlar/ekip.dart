@@ -11,6 +11,7 @@ import '../ortak/yardimci.dart';
 import '../oturum.dart';
 import '../veri/depo.dart';
 import '../veri/modeller.dart';
+import 'kabuk.dart';
 
 /// Dahili ekip sohbeti: kanal (herkes) + kişiye özel. Geniş ekranda kişi listesi + sohbet yan yana.
 class EkipEkrani extends StatefulWidget {
@@ -73,14 +74,17 @@ class _EkipEkraniState extends State<EkipEkrani> {
     final r = context.r;
     if (!Uyg.yetki('internal.use')) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Ekip')),
+        appBar: AppBar(title: const Text('Ekip'), actions: kabukEylemleri(context)),
         body: const Yetkisiz('Ekip sohbetini kullanmak'),
       );
     }
     final liste = Scaffold(
       appBar: AppBar(
         title: const Text('Ekip'),
-        actions: [IconButton(tooltip: 'Yenile', onPressed: _yukle, icon: const Icon(Simgeler.refresh))],
+        actions: [
+          IconButton(tooltip: 'Yenile', onPressed: _yukle, icon: const Icon(Simgeler.refresh)),
+          ...kabukEylemleri(context),
+        ],
       ),
       body: _hata != null
           ? Durum.hata(_hata!, tekrar: _yukle)

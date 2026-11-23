@@ -25,6 +25,7 @@ import 'ayar/tetikleyiciler.dart';
 import 'ayar/whatsapp.dart';
 import 'ayar/widget_ayar.dart';
 import 'ayar/yasaklar.dart';
+import 'kabuk.dart';
 
 /// Ayarlar merkezi: profil kartı, hızlı müsaitlik, bölümlere giden kartlar (yetkiye göre), tema, çıkış.
 class AyarlarEkrani extends StatefulWidget {
@@ -93,6 +94,7 @@ class _AyarlarEkraniState extends State<AyarlarEkrani> {
         _Oge('Cihazlar ve oturumlar', 'Web/uygulama oturumları, bildirim cihazları', Simgeler.deviceMobile, Marka.gok, () => _git(const CihazlarEkrani())),
     ];
     final kayit = <_Oge>[
+      _Oge('Bildirimler', 'Bildirim merkezi: sohbet, mesaj, ekip', Simgeler.notifications, Marka.gul, () => bolumIstegi.value = Bolum.bildirimler),
       if (Uyg.yetki('chats.view')) _Oge('Geçmiş sohbetler', 'Arama, süzgeç, dışa aktarım', Simgeler.history, Marka.mavi, () => _git(const GecmisEkrani())),
       if (Uyg.yetki('reports.view'))
         _Oge('Raporlar', 'Günlük/aylık istatistik, SLA, personel', Simgeler.chartBar, Marka.zumrut, () => _git(const RaporlarEkrani())),
