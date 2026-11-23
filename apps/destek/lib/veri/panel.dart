@@ -151,4 +151,11 @@ class Panel {
   static Future<Map<String, dynamic>> aiBilgiIncele(List<int> ids, String durum) => _post('ai/knowledge/review', {'ids': ids, 'status': durum});
   static Future<Map<String, dynamic>> aiGunluk() => _get('ai/logs');
   static Future<Map<String, dynamic>> aiGecmistenOgren({int gun = 365, int enCok = 1000}) => _post('ai/learn-history', {'days': gun, 'max': enCok});
+  static Future<Map<String, dynamic>> aiSistemSenkron() => _post('ai/sync-system', {});
+  static Future<Map<String, dynamic>> aiEgitim() => _get('ai/train');
+  static Future<Map<String, dynamic>> aiEgitimMesaj(String metin) => _post('ai/train/message', {'text': metin});
+  static Future<Map<String, dynamic>> aiEgitimOgret(String soru, String yanit, {int? logId}) =>
+      _post('ai/train/teach', {'question': soru, 'answer': yanit, 'log_id': ?logId});
+  static Future<Map<String, dynamic>> aiEgitimOnayla(int? logId) => _post('ai/train/approve', {'log_id': ?logId});
+  static Future<Map<String, dynamic>> aiEgitimTemizle() => _del('ai/train');
 }

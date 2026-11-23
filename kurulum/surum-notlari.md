@@ -1,3 +1,9 @@
+## 1.2.9
+
+- Butoi (yapay zeka): WHMCS köprüsü `ai_catalog` ile ürün/fiyat/alan adı/bilgi bankası/ödeme yöntemleri `ai_knowledge` (source=system, ext_key) olarak senkronlanır (gece 05:15 + elle). Eğitim sohbeti (`panel/ai/train*`), küçük konuşma üretimi (selam/teşekkür/veda), adlı throttle sayaçları (429 düzeltmesi).
+- Arama: `CallService` arayan kimliğini saklar; widget arayanın adını/avatarını gösterir; sohbete olay mesajı düşer.
+- Mesajlarda `avatar` alanı (mutlak URL); diğer personelin baloncuğunda `KisiAvatar`.
+
 ## 1.2.8
 
 - Roller ve yetkiler: `*` (tüm yetkiler) içeren roller ve bu rollerdeki personelin yetki ekranında kutucuklar boş görünüyordu; `*` kataloğun tamamına açılır, hepsi seçili kaldıysa kaydedilirken `*` olarak korunur. Rol listesinde "tüm yetki" yazar. Grup başlığında Tümünü seç / Temizle.

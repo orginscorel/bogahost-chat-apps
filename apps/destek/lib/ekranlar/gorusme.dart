@@ -1139,75 +1139,85 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!sag) ...[yeniGonderen ? Avatar(m.ad.isEmpty ? 'Z' : m.ad, boyut: avatarBoyu) : SizedBox(width: avatarBoyu), const SizedBox(width: 8)],
-          Flexible(
-            child: GestureDetector(
-              onLongPress: () => _mesajMenusu(m),
-              onSecondaryTap: () => _mesajMenusu(m),
-              child: Container(
-                constraints: BoxConstraints(maxWidth: genis ? 760 : 560),
-                padding: EdgeInsets.fromLTRB(genis ? 14 : 12, genis ? 10 : 8, genis ? 14 : 12, genis ? 8 : 6),
-                decoration: BoxDecoration(
-                  color: zemin,
-                  borderRadius: BorderRadius.only(
-                    topLeft: const Radius.circular(16),
-                    topRight: const Radius.circular(16),
-                    bottomLeft: Radius.circular(sag ? 16 : 4),
-                    bottomRight: Radius.circular(sag ? 4 : 16),
-                  ),
-                  border: icNot ? Border.all(color: Marka.kehribar.withValues(alpha: .5)) : (sag ? null : Border.all(color: r.kenar)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (yeniGonderen && (sag && !m.benim || icNot))
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 3),
-                        child: Text(
-                          icNot ? (m.fisilti ? 'Fısıltı · ${m.ad}' : 'İç not · ${m.ad}') : m.ad,
-                          style: TextStyle(
-                            fontSize: genis ? 12 : 11,
-                            fontWeight: FontWeight.w600,
-                            color: icNot ? Marka.kehribar : Colors.white.withValues(alpha: .85),
-                          ),
-                        ),
-                      ),
-                    if (m.ek != null) _ekGorunumu(m.ek!, yazi, r),
-                    if (m.silindi)
-                      Text(
-                        'Bu mesaj silindi',
-                        style: TextStyle(color: yazi.withValues(alpha: .7), fontStyle: FontStyle.italic, fontSize: yaziBoyu),
-                      )
-                    else if (m.govde != null && m.govde!.isNotEmpty)
-                      Text(
-                        m.govde!,
-                        style: TextStyle(color: yazi, fontSize: yaziBoyu, height: 1.4),
-                      ),
-                    const SizedBox(height: 3),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (m.duzenlendi)
-                          Text(
-                            'düzenlendi · ',
-                            style: TextStyle(color: yazi.withValues(alpha: .65), fontSize: genis ? 11.5 : 10.5),
-                          ),
-                        Text(
-                          m.saat,
-                          style: TextStyle(color: yazi.withValues(alpha: .65), fontSize: genis ? 11.5 : 10.5),
-                        ),
-                        if (sag && !icNot) ...[
-                          const SizedBox(width: 4),
-                          Icon(m.okundu ? Simgeler.doneAll : Simgeler.check, size: 13, color: m.okundu ? Colors.white : Colors.white.withValues(alpha: .65)),
-                        ],
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          // Sohbete katılan diğer personelin mesajı: kendi avatarı (fotoğraf varsa) sağda görünsün; benimkilerde avatar yok.
+          if (sag && !m.benim && !icNot) ...[
+            Flexible(child: _baloncuk(m, sag, icNot, zemin, yazi, yeniGonderen, genis, yaziBoyu, r)),
+            const SizedBox(width: 8),
+            yeniGonderen ? KisiAvatar(m.ad.isEmpty ? 'T' : m.ad, url: m.avatar, boyut: avatarBoyu) : SizedBox(width: avatarBoyu),
+          ] else
+            _baloncuk(m, sag, icNot, zemin, yazi, yeniGonderen, genis, yaziBoyu, r),
         ],
+      ),
+    );
+  }
+
+  Widget _baloncuk(Mesaj m, bool sag, bool icNot, Color zemin, Color yazi, bool yeniGonderen, bool genis, double yaziBoyu, Renkler r) {
+    return Flexible(
+      child: GestureDetector(
+        onLongPress: () => _mesajMenusu(m),
+        onSecondaryTap: () => _mesajMenusu(m),
+        child: Container(
+          constraints: BoxConstraints(maxWidth: genis ? 760 : 560),
+          padding: EdgeInsets.fromLTRB(genis ? 14 : 12, genis ? 10 : 8, genis ? 14 : 12, genis ? 8 : 6),
+          decoration: BoxDecoration(
+            color: zemin,
+            borderRadius: BorderRadius.only(
+              topLeft: const Radius.circular(16),
+              topRight: const Radius.circular(16),
+              bottomLeft: Radius.circular(sag ? 16 : 4),
+              bottomRight: Radius.circular(sag ? 4 : 16),
+            ),
+            border: icNot ? Border.all(color: Marka.kehribar.withValues(alpha: .5)) : (sag ? null : Border.all(color: r.kenar)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (yeniGonderen && (sag && !m.benim || icNot))
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  child: Text(
+                    icNot ? (m.fisilti ? 'Fısıltı · ${m.ad}' : 'İç not · ${m.ad}') : m.ad,
+                    style: TextStyle(
+                      fontSize: genis ? 12 : 11,
+                      fontWeight: FontWeight.w600,
+                      color: icNot ? Marka.kehribar : Colors.white.withValues(alpha: .85),
+                    ),
+                  ),
+                ),
+              if (m.ek != null) _ekGorunumu(m.ek!, yazi, r),
+              if (m.silindi)
+                Text(
+                  'Bu mesaj silindi',
+                  style: TextStyle(color: yazi.withValues(alpha: .7), fontStyle: FontStyle.italic, fontSize: yaziBoyu),
+                )
+              else if (m.govde != null && m.govde!.isNotEmpty)
+                Text(
+                  m.govde!,
+                  style: TextStyle(color: yazi, fontSize: yaziBoyu, height: 1.4),
+                ),
+              const SizedBox(height: 3),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (m.duzenlendi)
+                    Text(
+                      'düzenlendi · ',
+                      style: TextStyle(color: yazi.withValues(alpha: .65), fontSize: genis ? 11.5 : 10.5),
+                    ),
+                  Text(
+                    m.saat,
+                    style: TextStyle(color: yazi.withValues(alpha: .65), fontSize: genis ? 11.5 : 10.5),
+                  ),
+                  if (sag && !icNot) ...[
+                    const SizedBox(width: 4),
+                    Icon(m.okundu ? Simgeler.doneAll : Simgeler.check, size: 13, color: m.okundu ? Colors.white : Colors.white.withValues(alpha: .65)),
+                  ],
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

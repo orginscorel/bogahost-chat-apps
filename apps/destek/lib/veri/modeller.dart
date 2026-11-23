@@ -95,6 +95,7 @@ class Mesaj {
     : id = tamsayi(m['id']),
       gonderen = metin(m['sender']),
       ad = metin(m['name']),
+      avatar = metinYa(m['avatar']),
       tur = metin(m['type'], 'text'),
       icNot = mantik(m['internal']),
       fisilti = mantik(m['whisper']),
@@ -107,7 +108,7 @@ class Mesaj {
       ek = m['file'] is Map ? Ek.coz(harita(m['file'])) : null;
   final int id;
   final String gonderen, ad, tur, saat;
-  final String? govde;
+  final String? govde, avatar;
   final bool icNot, fisilti, okundu, duzenlendi, silindi, benim;
   final Ek? ek;
 
@@ -115,6 +116,7 @@ class Mesaj {
     required this.id,
     required this.gonderen,
     required this.ad,
+    required this.avatar,
     required this.tur,
     required this.saat,
     required this.govde,
@@ -132,6 +134,7 @@ class Mesaj {
     id: id,
     gonderen: gonderen,
     ad: ad,
+    avatar: avatar,
     tur: tur,
     saat: saat,
     govde: govde,

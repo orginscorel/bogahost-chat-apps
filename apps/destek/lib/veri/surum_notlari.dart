@@ -2,6 +2,25 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.9',
+    'date': '2026-11-23',
+    'title': 'Butoi ve arama düzeltmeleri',
+    'items': [
+      {
+        'type': 'new',
+        'text': 'Butoi: yapay zeka asistanı artık WHMCS ürün/paket fiyatlarını, özelliklerini, alan adı ücretlerini, bilgi bankasını ve ödeme yöntemlerini kendisi bilir (her gece senkron).',
+      },
+      {'type': 'new', 'text': 'Butoi\'yi eğit: Yapay zeka ekranında sohbet ederek eğitim — soru sorun, Düzelt ile doğrusunu öğretin, Doğru ile pekiştirin.'},
+      {'type': 'improve', 'text': 'Selamlama, teşekkür ve veda gibi mesajlara Butoi kendisi yanıt üretir.'},
+      {'type': 'fix', 'text': 'Yanıt önerisinde "istek başarısız (429)" hatası giderildi.'},
+      {
+        'type': 'fix',
+        'text': 'Sesli/görüntülü aramada arayan personel doğru gösterilir (birincil temsilciyle karışmıyor); sohbete "X arama başlattı" olayı düşer.',
+      },
+      {'type': 'fix', 'text': 'Sohbete katılan diğer personelin mesajlarında avatarı görünür.'},
+    ],
+  },
+  {
     'version': '1.2.8',
     'date': '2026-11-23',
     'title': 'Rol yetkileri',

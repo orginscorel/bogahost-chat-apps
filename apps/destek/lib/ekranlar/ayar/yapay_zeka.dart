@@ -17,7 +17,7 @@ class YapayZekaEkrani extends StatefulWidget {
 }
 
 class _YapayZekaEkraniState extends State<YapayZekaEkrani> {
-  String _bolum = 'ayarlar';
+  String _bolum = 'egitim';
 
   static String _oran(int a, int b) => a + b == 0 ? '–' : '%${(a * 100 / (a + b)).round()}';
 
@@ -29,7 +29,9 @@ class _YapayZekaEkraniState extends State<YapayZekaEkrani> {
       govde: (context, v, yenile) {
         final o = harita(v['summary']);
         final bekleyen = tamsayi(o['knowledge_pending']);
+        final botAdi = metin(harita(v['config'])['name'], 'Butoi');
         final bolumler = [
+          ('egitim', "$botAdi'yi eğit", Simgeler.chatText),
           ('ayarlar', 'Ayarlar', Simgeler.tune),
           ('bilgi', 'Bilgi tabanı', Simgeler.lightbulbOutline),
           ('onay', 'Onay bekleyen ($bekleyen)', Simgeler.pending),
@@ -93,6 +95,15 @@ class _YapayZekaEkraniState extends State<YapayZekaEkrani> {
                   renk: Marka.zumrut,
                   onTap: () => setState(() => _bolum = 'bilgi'),
                 ),
+                KpiKart(
+                  kucuk: true,
+                  etiket: 'Sistem bilgisi',
+                  alt: 'ürün, fiyat, alan adı, bilgi bankası',
+                  deger: sayiYaz(tamsayi(o['knowledge_system'])),
+                  ikon: Simgeler.storage,
+                  renk: Marka.mavi,
+                  onTap: () => setState(() => _bolum = 'bilgi'),
+                ),
                 KpiKart(kucuk: true, etiket: 'Hazır cevaplar', deger: sayiYaz(tamsayi(o['canned'])), ikon: Simgeler.forum, renk: Marka.indigo),
                 KpiKart(
                   kucuk: true,
@@ -123,6 +134,7 @@ class _YapayZekaEkraniState extends State<YapayZekaEkrani> {
             ),
             const SizedBox(height: 12),
             switch (_bolum) {
+              'egitim' => _Egitim(key: const ValueKey('egitim'), botAdi: botAdi, yenile: yenile),
               'bilgi' => _BilgiTabani(key: const ValueKey('bilgi'), tazele: v, yenile: yenile),
               'onay' => _OnayBekleyen(key: const ValueKey('onay'), tazele: v, yenile: yenile),
               'gunluk' => _Gunluk(key: const ValueKey('gunluk'), tazele: v),
@@ -151,6 +163,8 @@ class _AyarFormuState extends State<_AyarFormu> {
   late bool _etkin = mantik(_c['enabled']);
   late bool _ogren = mantik(_c['learn']);
   late bool _otoOgren = mantik(_c['auto_learn']);
+  late bool _sistemSenkron = mantik(_c['sync_system']);
+  bool _senkronluyor = false;
   late String _kip = metin(_c['mode'], 'suggest');
   late double _oneriEsik = tamsayi(_c['suggest_threshold'], 35).clamp(5, 100).toDouble();
   late double _otoEsik = tamsayi(_c['auto_threshold'], 70).clamp(5, 100).toDouble();
@@ -182,6 +196,7 @@ class _AyarFormuState extends State<_AyarFormu> {
         'mode': _kip,
         'learn': _ogren,
         'auto_learn': _otoOgren,
+        'sync_system': _sistemSenkron,
         'min_repeats': int.tryParse(_tekrar.text.trim()) ?? 2,
         'suggest_threshold': _oneriEsik.round(),
         'auto_threshold': _otoEsik.round(),
@@ -194,6 +209,24 @@ class _AyarFormuState extends State<_AyarFormu> {
     if (!mounted) return;
     setState(() => _mesgul = false);
     if (ok) widget.yenile();
+  }
+
+  Future<void> _sistemdenGuncelle() async {
+    if (_senkronluyor) return;
+    setState(() => _senkronluyor = true);
+    final v = await islem(Panel.aiSistemSenkron);
+    if (!mounted) return;
+    setState(() => _senkronluyor = false);
+    if (v == null) return;
+    if (!mantik(v['ok'])) {
+      bildir(metin(v['error'], 'Senkron başarısız'), tur: MesajTur.hata);
+      return;
+    }
+    bildir(
+      '${sayiYaz(tamsayi(v['total']))} sistem kaydı: ${sayiYaz(tamsayi(v['created']))} yeni, ${sayiYaz(tamsayi(v['updated']))} güncellendi',
+      tur: MesajTur.basari,
+    );
+    widget.yenile();
   }
 
   Future<void> _gecmistenOgren() async {
@@ -241,7 +274,7 @@ class _AyarFormuState extends State<_AyarFormu> {
         Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: Text(
-            'Asistan dış servis kullanmaz: bilgi tabanı ve hazır cevaplardan eşleştirir, ekibin yanıtlarından ve kapanan görüşmelerden öğrenir.',
+            'Asistan dış servis kullanmaz: WHMCS ürün/fiyat/alan adı/bilgi bankasını kendisi bilir, hazır cevaplardan eşleştirir, ekibin yanıtlarından, kapanan görüşmelerden ve eğitim sohbetinden öğrenir.',
             style: TextStyle(color: r.soluk, fontSize: 12.5),
           ),
         ),
@@ -252,7 +285,7 @@ class _AyarFormuState extends State<_AyarFormu> {
             children: [
               anahtar('Asistan etkin', _etkin, (x) => setState(() => _etkin = x), alt: 'Kapalıyken öneri ve otomatik yanıt çalışmaz', ikon: Simgeler.sparkle),
               const SizedBox(height: 8),
-              alan('Asistan adı', _ad, ipucu: 'Boga Asistan'),
+              alan('Asistan adı', _ad, ipucu: 'Butoi'),
             ],
           ),
         ),
@@ -336,6 +369,32 @@ class _AyarFormuState extends State<_AyarFormu> {
             label: const Text('Kaydet'),
           ),
         ),
+        const Baslik('Sistem bilgisi (WHMCS)'),
+        Kutu(
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              anahtar(
+                'Gece senkronu',
+                _sistemSenkron,
+                (x) => setState(() => _sistemSenkron = x),
+                alt: 'Her gece 05:15: ürün grupları, paket fiyat ve özellikleri, alan adı ücretleri, bilgi bankası, ödeme yöntemleri. Müşteri verisi okunmaz.',
+                ikon: Simgeler.storage,
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: FilledButton.tonalIcon(
+                  onPressed: _senkronluyor ? null : _sistemdenGuncelle,
+                  icon: _senkronluyor
+                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Icon(Simgeler.refresh, size: 18),
+                  label: const Text('Sistemden şimdi güncelle'),
+                ),
+              ),
+            ],
+          ),
+        ),
         const Baslik('Geçmişten öğren'),
         Kutu(
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
@@ -383,6 +442,7 @@ String _turAdi(String t) => t == 'doc' ? 'Belge' : 'Soru-yanıt';
 (String, Color) _kaynak(String s) => switch (s) {
   'learned' => ('Öğrenildi', Marka.zumrut),
   'feedback' => ('Düzeltme', Marka.kehribar),
+  'system' => ('Sistem', Marka.indigo),
   _ => ('Elle', Marka.mavi),
 };
 
@@ -770,6 +830,7 @@ class _GunlukState extends _ListeDurumu<_Gunluk> {
     'suggest' => 'Öneri',
     'auto' => 'Otomatik',
     'test' => 'Deneme',
+    'train' => 'Eğitim',
     'learn' => 'Öğrenme',
     _ => k.isEmpty ? '–' : k,
   };
@@ -968,6 +1029,285 @@ class _DenemeState extends State<_Deneme> {
               ],
             ),
           ),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------- Eğitim sohbeti
+
+/// Butoi ile sohbet ederek eğitme: soru sor → yanlışsa Düzelt (ya da "Doğrusu: …"), doğruysa Doğru; "Soru: … | Cevap: …" tek seferde öğretir.
+class _Egitim extends StatefulWidget {
+  const _Egitim({super.key, required this.botAdi, required this.yenile});
+  final String botAdi;
+  final VoidCallback yenile;
+  @override
+  State<_Egitim> createState() => _EgitimState();
+}
+
+class _EgitimState extends State<_Egitim> {
+  final _metin = TextEditingController();
+  final _duzelt = TextEditingController();
+  final _kaydirma = ScrollController();
+  List<Map<String, dynamic>> _mesajlar = [];
+  bool _yukleniyor = true;
+  bool _mesgul = false;
+  int? _duzeltId;
+
+  @override
+  void initState() {
+    super.initState();
+    _yukle();
+  }
+
+  @override
+  void dispose() {
+    _metin.dispose();
+    _duzelt.dispose();
+    _kaydirma.dispose();
+    super.dispose();
+  }
+
+  void _sonaKaydir() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_kaydirma.hasClients) _kaydirma.jumpTo(_kaydirma.position.maxScrollExtent);
+    });
+  }
+
+  Future<void> _yukle() async {
+    final v = await islem(Panel.aiEgitim);
+    if (!mounted) return;
+    setState(() {
+      _yukleniyor = false;
+      if (v != null) _mesajlar = haritalar(v['messages']);
+    });
+    _sonaKaydir();
+  }
+
+  void _ekle(Map<String, dynamic>? v) {
+    if (v == null) return;
+    setState(() => _mesajlar = [..._mesajlar, ...haritalar(v['messages'])]);
+    _sonaKaydir();
+  }
+
+  Future<void> _gonder() async {
+    final t = _metin.text.trim();
+    if (t.isEmpty || _mesgul) return;
+    setState(() {
+      _mesgul = true;
+      _duzeltId = null;
+    });
+    _metin.clear();
+    final v = await islem(() => Panel.aiEgitimMesaj(t));
+    if (!mounted) return;
+    setState(() => _mesgul = false);
+    if (v == null) {
+      _metin.text = t;
+      return;
+    }
+    _ekle(v);
+    widget.yenile();
+  }
+
+  Future<void> _ogret(Map<String, dynamic> m) async {
+    final yanit = _duzelt.text.trim();
+    if (yanit.isEmpty || _mesgul) return;
+    setState(() => _mesgul = true);
+    final v = await islem(() => Panel.aiEgitimOgret(metin(harita(m['meta'])['question']), yanit, logId: tamsayiYa(m['log_id'])));
+    if (!mounted) return;
+    setState(() {
+      _mesgul = false;
+      if (v != null && mantik(v['ok'])) _duzeltId = null;
+    });
+    _ekle(v);
+    widget.yenile();
+  }
+
+  Future<void> _dogru(Map<String, dynamic> m) async {
+    final v = await islem(() => Panel.aiEgitimOnayla(tamsayiYa(m['log_id'])));
+    if (!mounted || v == null) return;
+    setState(() => (m['meta'] as Map?)?['approved'] = true);
+    _ekle(v);
+  }
+
+  Future<void> _temizle() async {
+    final tamam = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text('Sohbeti temizle'),
+        content: const Text('Eğitim sohbeti silinsin mi? Öğretilen bilgiler silinmez.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Vazgeç')),
+          FilledButton(onPressed: () => Navigator.pop(c, true), child: const Text('Temizle')),
+        ],
+      ),
+    );
+    if (tamam != true) return;
+    final v = await islem(Panel.aiEgitimTemizle);
+    if (!mounted || v == null) return;
+    setState(() => _mesajlar = []);
+  }
+
+  Widget _balon(BuildContext context, Map<String, dynamic> m) {
+    final r = context.r;
+    final kullanici = metin(m['role']) == 'user';
+    final meta = harita(m['meta']);
+    final soru = metinYa(meta['question']);
+    final skor = tamsayi(meta['score']);
+    final kaynaklar = haritalar(meta['sources']);
+    final duzeltiliyor = _duzeltId == tamsayi(m['id']);
+    final renkler = Theme.of(context).colorScheme;
+    return Align(
+      alignment: kullanici ? Alignment.centerRight : Alignment.centerLeft,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 560),
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+          decoration: BoxDecoration(
+            color: kullanici ? Marka.mor : renkler.surfaceContainerHighest,
+            borderRadius: BorderRadius.only(
+              topLeft: const Radius.circular(16),
+              topRight: const Radius.circular(16),
+              bottomLeft: Radius.circular(kullanici ? 16 : 4),
+              bottomRight: Radius.circular(kullanici ? 4 : 16),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                kullanici ? 'Siz' : widget.botAdi,
+                style: TextStyle(color: kullanici ? Colors.white70 : r.silik, fontSize: 10.5, fontWeight: FontWeight.w600, letterSpacing: .4),
+              ),
+              const SizedBox(height: 2),
+              SelectableText(metin(m['text']), style: TextStyle(color: kullanici ? Colors.white : r.metin, fontSize: 14, height: 1.4)),
+              if (!kullanici && soru != null && !mantik(meta['taught'])) ...[
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Rozet('%$skor eşleşme', renk: _skorRengi(skor)),
+                    for (final k in kaynaklar.take(3)) Rozet('${metin(k['title'], '#${tamsayi(k['id'])}')} · %${tamsayi(k['score'])}', renk: Marka.grafitAcik),
+                    if (mantik(meta['ok']) && meta['intent'] == null && !mantik(meta['approved']))
+                      ActionChip(
+                        avatar: const Icon(Simgeler.checkCircle, size: 16, color: Marka.zumrut),
+                        label: const Text('Doğru'),
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () => _dogru(m),
+                      ),
+                    if (mantik(meta['approved'])) const Rozet('Pekiştirildi', renk: Marka.zumrut, ikon: Simgeler.check),
+                    if (!duzeltiliyor)
+                      ActionChip(
+                        avatar: const Icon(Simgeler.edit, size: 16),
+                        label: const Text('Düzelt'),
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () => setState(() {
+                          _duzeltId = tamsayi(m['id']);
+                          _duzelt.text = mantik(meta['ok']) ? metin(m['text']) : '';
+                        }),
+                      ),
+                  ],
+                ),
+              ],
+              if (duzeltiliyor) ...[
+                const SizedBox(height: 8),
+                Text('Soru: $soru', style: TextStyle(color: r.soluk, fontSize: 12)),
+                const SizedBox(height: 6),
+                TextField(
+                  controller: _duzelt,
+                  minLines: 2,
+                  maxLines: 6,
+                  autofocus: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Doğru yanıt',
+                    hintText: '{name} ve {email} yer tutucuları kullanılabilir',
+                    alignLabelWithHint: true,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(onPressed: () => setState(() => _duzeltId = null), child: const Text('Vazgeç')),
+                    const SizedBox(width: 8),
+                    FilledButton.icon(
+                      onPressed: _mesgul ? null : () => _ogret(m),
+                      icon: const Icon(Simgeler.autoFixHigh, size: 18),
+                      label: const Text('Öğret'),
+                    ),
+                  ],
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(
+                'Soru sorun; yanıt yanlışsa Düzelt (ya da "Doğrusu: …"), doğruysa Doğru. "Soru: … | Cevap: …" tek seferde öğretir. Öğretilenler hemen etkinleşir.',
+                style: TextStyle(color: r.soluk, fontSize: 12.5),
+              ),
+            ),
+            if (_mesajlar.isNotEmpty) IconButton(tooltip: 'Sohbeti temizle', onPressed: _temizle, icon: const Icon(Simgeler.deleteSweep, size: 20)),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Kutu(
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+          child: SizedBox(
+            height: 440,
+            child: _yukleniyor
+                ? const Center(child: CircularProgressIndicator())
+                : _mesajlar.isEmpty
+                ? Durum.bos('Henüz konuşma yok. Örneğin: "com alan adı ne kadar?"', ikon: Simgeler.chatText)
+                : ListView.builder(
+                    controller: _kaydirma,
+                    itemCount: _mesajlar.length + (_mesgul ? 1 : 0),
+                    itemBuilder: (c, i) => i == _mesajlar.length
+                        ? Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Text('${widget.botAdi} yazıyor…', style: TextStyle(color: r.silik, fontSize: 12)),
+                          )
+                        : _balon(c, _mesajlar[i]),
+                  ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _metin,
+                minLines: 1,
+                maxLines: 4,
+                textInputAction: TextInputAction.send,
+                onSubmitted: (_) => _gonder(),
+                decoration: const InputDecoration(hintText: "Soru sorun ya da 'Doğrusu: …' ile öğretin"),
+              ),
+            ),
+            const SizedBox(width: 8),
+            FilledButton(
+              onPressed: _mesgul ? null : _gonder,
+              child: _mesgul ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Simgeler.send, size: 18),
+            ),
+          ],
+        ),
       ],
     );
   }
