@@ -9,8 +9,8 @@ import 'package:flutter/services.dart';
 ///
 /// Koreografi (2,6 sn, "hareketi azalt" açıksa anında):
 ///  1. İndigo zemin; arkada yavaşça yükselen yarı saydam sohbet balonları ve nefes alan ışık halkası.
-///  2. Amblemin üç sunucu sütunu kalemle çizilir, dolar; gösterge çubukları yeşile yanar.
-///  3. "bogahost" harfleri soldan sağa çizilip dolar; üzerinden bir ışık süpürmesi geçer.
+///  2. Boğa başı amblemi kendini çizer: kaş, yüz, boynuzlar; kısa yeşil parlama.
+///  3. "bogahost" harfleri soldan sağa belirir; üzerinden bir ışık süpürmesi geçer.
 ///  4. Yeşil sohbet balonu rozeti yaylanarak oturur; içindeki üç nokta "yazıyor" ritmiyle oynar.
 ///  5. "CANLI DESTEK" etiketi ve ince ilerleme çizgisi belirir; hazırlık sürüyorsa çizgi akmaya devam eder.
 ///  6. Sonraki ekran yumuşak yakınlaşmayla açılır.
@@ -37,6 +37,7 @@ class _AcilisChatState extends State<AcilisChat> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    unawaited(BogahostLogo.yukle());
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (hareketAzalt(context)) {
@@ -301,7 +302,7 @@ class _LogoBoyayici extends CustomPainter {
     final amblemT = _aralik(t, .04, .52, Curves.easeInOut);
     final yaziT = _aralik(t, .30, .82, Curves.easeInOut);
     BogahostLogo.cizAnimasyonlu(c, hedef, amblemT: amblemT, yaziT: yaziT, renk: Colors.white, vurgu: amblemT >= 1 ? Marka.yesil : Colors.white);
-    // Gösterge çubukları yeşile "yanar" (amblem bittikten sonra kısa parlama)
+    // Amblem bittikten sonra kısa yeşil parlama
     final yan = _aralik(t, .52, .62);
     if (yan > 0 && yan < 1) {
       c.save();

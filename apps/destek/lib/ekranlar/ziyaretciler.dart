@@ -74,7 +74,8 @@ class _ZiyaretcilerEkraniState extends State<ZiyaretcilerEkrani> {
   }
 
   void _detay(Ziyaretci z) => ZiyaretciDetayEkrani.ac(context, z.id, ad: z.gosterimAdi);
-  void _ekran(Ziyaretci z) => EkranIzleEkrani.ac(context, oturumId: z.id, ad: z.gosterimAdi, kip: 'consent', url: z.url);
+
+  void _ekran(Ziyaretci z) => EkranIzleEkrani.sec(context, oturumId: z.id, ad: z.gosterimAdi, url: z.url);
 
   List<Ziyaretci> _suz(List<Ziyaretci> l) {
     final q = _q.text.trim().toLowerCase();
@@ -116,12 +117,10 @@ class _ZiyaretcilerEkraniState extends State<ZiyaretcilerEkrani> {
     }
     final l = _liste;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Canlı Ziyaretçiler'),
-        actions: [
-          IconButton(tooltip: 'Yenile', onPressed: _yukle, icon: const Icon(Simgeler.refresh)),
-          ...kabukEylemleri(context),
-        ],
+      appBar: ekranBasligi(
+        context,
+        'Canlı Ziyaretçiler',
+        eylemler: [IconButton(tooltip: 'Yenile', onPressed: _yukle, icon: const Icon(Simgeler.refresh))],
       ),
       body: _hata != null
           ? Durum.hata(_hata!, tekrar: _yukle)
@@ -137,134 +136,137 @@ class _ZiyaretcilerEkraniState extends State<ZiyaretcilerEkrani> {
                   final yaziyor = l.where((z) => (z.yaziyor ?? '').isNotEmpty).length;
                   final mobil = l.where((z) => z.mobil).length;
                   final ulkeler = l.map((z) => z.ulke).whereType<String>().toSet().length;
-                  final yatay = tablo ? 20.0 : 14.0;
-                  return ListView(
-                    padding: EdgeInsets.fromLTRB(yatay, 4, yatay, 32),
-                    children: [
-                      SayfaBasi(
-                        '${l.length} ziyaretçi sitede',
-                        rozet: const CanliIsareti(),
-                        alt: _son == null
-                            ? null
-                            : 'Son güncelleme ${_son!.hour.toString().padLeft(2, '0')}:${_son!.minute.toString().padLeft(2, '0')}:${_son!.second.toString().padLeft(2, '0')} · 5 sn\'de bir yenilenir',
-                        sag: [
-                          SizedBox(
-                            width: 300,
-                            child: TextField(
-                              controller: _q,
-                              onChanged: (_) => setState(() {}),
-                              decoration: InputDecoration(
-                                hintText: 'Ad, e-posta, IP, sayfa, şehir…',
-                                prefixIcon: const Icon(Simgeler.search, size: 18),
-                                suffixIcon: _q.text.isEmpty
-                                    ? null
-                                    : IconButton(icon: const Icon(Simgeler.close, size: 16), onPressed: () => setState(_q.clear)),
-                                isDense: true,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                  final yatay = tablo ? 24.0 : 14.0;
+                  return ortala(
+                    ListView(
+                      padding: EdgeInsets.fromLTRB(yatay, 4, yatay, 32),
+                      children: [
+                        SayfaBasi(
+                          '${l.length} ziyaretçi sitede',
+                          rozet: const CanliIsareti(),
+                          alt: _son == null
+                              ? null
+                              : 'Son güncelleme ${_son!.hour.toString().padLeft(2, '0')}:${_son!.minute.toString().padLeft(2, '0')}:${_son!.second.toString().padLeft(2, '0')} · 5 sn\'de bir yenilenir',
+                          sag: [
+                            SizedBox(
+                              width: 300,
+                              child: TextField(
+                                controller: _q,
+                                onChanged: (_) => setState(() {}),
+                                decoration: InputDecoration(
+                                  hintText: 'Ad, e-posta, IP, sayfa, şehir…',
+                                  prefixIcon: const Icon(Simgeler.search, size: 18),
+                                  suffixIcon: _q.text.isEmpty
+                                      ? null
+                                      : IconButton(icon: const Icon(Simgeler.close, size: 16), onPressed: () => setState(_q.clear)),
+                                  isDense: true,
+                                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      EsitIzgara(
-                        enAz: 146,
-                        yukseklik: 64,
-                        children: [
-                          KpiKart(
-                            kucuk: true,
-                            etiket: 'Toplam online',
-                            deger: '${l.length}',
-                            ikon: Simgeler.visibility,
-                            renk: Marka.zumrut,
-                            onTap: () => setState(() => _suzgec = 'hepsi'),
-                          ),
-                          KpiKart(
-                            kucuk: true,
-                            etiket: 'Sohbette',
-                            deger: '$sohbette',
-                            ikon: Simgeler.forum,
-                            renk: r.vurgu,
-                            onTap: () => setState(() => _suzgec = 'sohbette'),
-                          ),
-                          KpiKart(
-                            kucuk: true,
-                            etiket: 'Geziniyor',
-                            deger: '${l.length - sohbette}',
-                            ikon: Simgeler.cursorClick,
-                            renk: Marka.mavi,
-                            onTap: () => setState(() => _suzgec = 'geziniyor'),
-                          ),
-                          KpiKart(
-                            kucuk: true,
-                            etiket: 'Yazıyor',
-                            deger: '$yaziyor',
-                            ikon: Simgeler.chatDots,
-                            renk: Marka.kehribar,
-                            onTap: () => setState(() => _suzgec = 'yaziyor'),
-                          ),
-                          KpiKart(
-                            kucuk: true,
-                            etiket: 'Mobil',
-                            deger: '$mobil',
-                            ikon: Simgeler.smartphone,
-                            renk: Marka.lavanta,
-                            onTap: () => setState(() => _suzgec = 'mobil'),
-                          ),
-                          KpiKart(kucuk: true, etiket: 'Ülke', deger: '$ulkeler', ikon: Simgeler.public, renk: Marka.gok),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 6,
-                        children: [
-                          for (final (k, ad, n) in [
-                            ('hepsi', 'Tümü', l.length),
-                            ('sohbette', 'Sohbette', sohbette),
-                            ('geziniyor', 'Geziniyor', l.length - sohbette),
-                            ('yaziyor', 'Yazıyor', yaziyor),
-                            ('mobil', 'Mobil', mobil),
-                          ])
-                            ChoiceChip(
-                              label: Text('$ad · $n'),
-                              selected: _suzgec == k,
-                              visualDensity: VisualDensity.compact,
-                              onSelected: (_) => setState(() => _suzgec = k),
+                          ],
+                        ),
+                        EsitIzgara(
+                          enAz: 146,
+                          yukseklik: 72,
+                          children: [
+                            KpiKart(
+                              kucuk: true,
+                              etiket: 'Toplam online',
+                              deger: '${l.length}',
+                              ikon: Simgeler.visibility,
+                              renk: Marka.zumrut,
+                              onTap: () => setState(() => _suzgec = 'hepsi'),
                             ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      if (l.isEmpty)
-                        Durum.bos('Şu an sitede ziyaretçi yok.', ikon: Simgeler.visibilityOff)
-                      else if (suzulen.isEmpty)
-                        Durum.bos('Süzgece uyan ziyaretçi yok.', ikon: Simgeler.funnel)
-                      else if (tablo)
-                        Kutu(
-                          padding: EdgeInsets.zero,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(18),
-                            child: Column(
-                              children: [
-                                const TabloBasi([
-                                  ('ZİYARETÇİ', 5),
-                                  ('KONUM', 3),
-                                  ('CİHAZ', 3),
-                                  ('BULUNDUĞU SAYFA', 5),
-                                  ('GELİŞ KAYNAĞI', 3),
-                                  ('SON HAREKET', 2),
-                                  ('İŞLEM', 4),
-                                ]),
-                                for (final (i, z) in suzulen.indexed) ...[
-                                  if (i > 0) Divider(height: 1, color: r.kenar.withValues(alpha: .6)),
-                                  _TabloSatiri(z: z, onDetay: () => _detay(z), onDavet: () => _davet(z), onBaslat: () => _baslat(z), onEkran: () => _ekran(z)),
+                            KpiKart(
+                              kucuk: true,
+                              etiket: 'Sohbette',
+                              deger: '$sohbette',
+                              ikon: Simgeler.forum,
+                              renk: r.vurgu,
+                              onTap: () => setState(() => _suzgec = 'sohbette'),
+                            ),
+                            KpiKart(
+                              kucuk: true,
+                              etiket: 'Geziniyor',
+                              deger: '${l.length - sohbette}',
+                              ikon: Simgeler.cursorClick,
+                              renk: Marka.mavi,
+                              onTap: () => setState(() => _suzgec = 'geziniyor'),
+                            ),
+                            KpiKart(
+                              kucuk: true,
+                              etiket: 'Yazıyor',
+                              deger: '$yaziyor',
+                              ikon: Simgeler.chatDots,
+                              renk: Marka.kehribar,
+                              onTap: () => setState(() => _suzgec = 'yaziyor'),
+                            ),
+                            KpiKart(
+                              kucuk: true,
+                              etiket: 'Mobil',
+                              deger: '$mobil',
+                              ikon: Simgeler.smartphone,
+                              renk: Marka.lavanta,
+                              onTap: () => setState(() => _suzgec = 'mobil'),
+                            ),
+                            KpiKart(kucuk: true, etiket: 'Ülke', deger: '$ulkeler', ikon: Simgeler.public, renk: Marka.gok),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 6,
+                          children: [
+                            for (final (k, ad, n) in [
+                              ('hepsi', 'Tümü', l.length),
+                              ('sohbette', 'Sohbette', sohbette),
+                              ('geziniyor', 'Geziniyor', l.length - sohbette),
+                              ('yaziyor', 'Yazıyor', yaziyor),
+                              ('mobil', 'Mobil', mobil),
+                            ])
+                              ChoiceChip(label: Text('$ad · $n'), selected: _suzgec == k, onSelected: (_) => setState(() => _suzgec = k)),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        if (l.isEmpty)
+                          Durum.bos('Şu an sitede ziyaretçi yok.', ikon: Simgeler.visibilityOff)
+                        else if (suzulen.isEmpty)
+                          Durum.bos('Süzgece uyan ziyaretçi yok.', ikon: Simgeler.funnel)
+                        else if (tablo)
+                          Kutu(
+                            padding: EdgeInsets.zero,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(18),
+                              child: Column(
+                                children: [
+                                  const TabloBasi([
+                                    ('ZİYARETÇİ', 5),
+                                    ('KONUM', 3),
+                                    ('CİHAZ', 3),
+                                    ('BULUNDUĞU SAYFA', 5),
+                                    ('GELİŞ KAYNAĞI', 3),
+                                    ('SON HAREKET', 2),
+                                    ('İŞLEM', 4),
+                                  ]),
+                                  for (final (i, z) in suzulen.indexed) ...[
+                                    if (i > 0) Divider(height: 1, color: r.kenar.withValues(alpha: .6)),
+                                    _TabloSatiri(
+                                      z: z,
+                                      onDetay: () => _detay(z),
+                                      onDavet: () => _davet(z),
+                                      onBaslat: () => _baslat(z),
+                                      onEkran: () => _ekran(z),
+                                    ),
+                                  ],
                                 ],
-                              ],
+                              ),
                             ),
-                          ),
-                        )
-                      else
-                        for (final z in suzulen) Padding(padding: const EdgeInsets.only(bottom: 8), child: _kart(z, r)),
-                    ],
+                          )
+                        else
+                          for (final z in suzulen) Padding(padding: const EdgeInsets.only(bottom: 8), child: _kart(z, r)),
+                      ],
+                    ),
                   );
                 },
               ),
@@ -589,22 +591,19 @@ class _TabloSatiriState extends State<_TabloSatiri> {
                     if (!z.sohbette && Uyg.yetki('chats.reply'))
                       IconButton(
                         tooltip: 'Davet et',
-                        visualDensity: VisualDensity.compact,
                         onPressed: widget.onDavet,
-                        icon: Icon(Simgeler.wavingHand, size: 18, color: r.soluk),
+                        icon: Icon(Simgeler.wavingHand, size: 20, color: r.soluk),
                       ),
                     if (Uyg.yetki('screen.consent'))
                       IconButton(
                         tooltip: 'Ekranı izle',
-                        visualDensity: VisualDensity.compact,
                         onPressed: widget.onEkran,
-                        icon: Icon(Simgeler.monitor, size: 18, color: r.soluk),
+                        icon: Icon(Simgeler.monitor, size: 20, color: r.soluk),
                       ),
                     IconButton(
                       tooltip: 'Detay / CRM',
-                      visualDensity: VisualDensity.compact,
                       onPressed: widget.onDetay,
-                      icon: Icon(Simgeler.userCircle, size: 18, color: r.soluk),
+                      icon: Icon(Simgeler.userCircle, size: 20, color: r.soluk),
                     ),
                   ],
                 ),

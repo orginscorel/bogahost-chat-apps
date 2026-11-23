@@ -6,6 +6,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import '../ortak/simgeler.dart';
 import '../ortak/yardimci.dart';
+import '../oturum.dart';
 import '../veri/json.dart';
 import '../veri/panel.dart';
 
@@ -27,6 +28,104 @@ class EkranIzleEkrani extends StatefulWidget {
           builder: (_) => EkranIzleEkrani(oturumId: oturumId, ad: ad, kip: kip, sohbetId: sohbetId, url: url),
         ),
       );
+
+  /// Web panelindeki gibi önce yöntem sorulur: İzinli co-browse (önerilen) ya da İzinsiz izle (screen.direct yetkisi).
+  /// Seçilince izleme ekranı açılır.
+  static Future<void> sec(BuildContext context, {required int oturumId, required String ad, int? sohbetId, String? url}) async {
+    final izinli = Uyg.yetki('screen.consent'), dogrudan = Uyg.yetki('screen.direct');
+    if (!izinli && !dogrudan) {
+      bildir('Ekran izleme yetkiniz yok.', tur: MesajTur.hata);
+      return;
+    }
+    final kip = await showDialog<String>(
+      context: context,
+      builder: (c) {
+        final r = c.r;
+        Widget secenek(String deger, String baslik, String aciklama, IconData ikon, Color renk, {bool onerilen = false}) => Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(14),
+            onTap: () => Navigator.pop(c, deger),
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                color: onerilen ? renk.withValues(alpha: .07) : r.kart,
+                border: Border.all(color: onerilen ? renk : r.kenar, width: onerilen ? 1.6 : 1),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(color: renk.withValues(alpha: .14), borderRadius: BorderRadius.circular(12)),
+                    child: Icon(ikon, color: renk, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              baslik,
+                              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: r.metin),
+                            ),
+                            if (onerilen) ...[const SizedBox(width: 8), Rozet('önerilen', renk: renk)],
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(aciklama, style: TextStyle(color: r.soluk, fontSize: 13, height: 1.35)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+        return AlertDialog(
+          title: const Text('Canlı Ekran İzleme'),
+          contentPadding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
+          content: SizedBox(
+            width: 440,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text('$ad için izleme yöntemini seçin:', style: TextStyle(color: c.r.soluk, fontSize: 13.5)),
+                ),
+                if (izinli)
+                  secenek(
+                    'consent',
+                    'İzinli co-browse',
+                    'Ziyaretçiye onay istemi gönderilir; kabul ederse başlar ve "paylaşılıyor" göstergesi çıkar. Hassas alanlar otomatik gizlenir, görsel yönlendirme yapabilirsiniz.',
+                    Simgeler.visibility,
+                    Marka.zumrut,
+                    onerilen: true,
+                  ),
+                if (dogrudan)
+                  secenek(
+                    'direct',
+                    'İzinsiz izle',
+                    'Ziyaretçiye istem çıkmaz, izleme anında başlar (çerez/gizlilik politikanız kapsamında). Hassas alanlar yine maskelenir; denetim kaydına yazılır.',
+                    Simgeler.bolt,
+                    Marka.kehribar,
+                  ),
+              ],
+            ),
+          ),
+          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('Vazgeç'))],
+        );
+      },
+    );
+    if (kip == null || !context.mounted) return;
+    await ac(context, oturumId: oturumId, ad: ad, kip: kip, sohbetId: sohbetId, url: url);
+  }
 
   @override
   State<EkranIzleEkrani> createState() => _EkranIzleEkraniState();

@@ -177,10 +177,11 @@ ThemeData temaKur(Brightness parlaklik) {
   final r = parlaklik == Brightness.dark ? Renkler.karanlik : Renkler.acik;
   final masaustu = _masaustuPlatform;
   // Posta: web gibi her yerde 14 px (text-sm); yönetim masaüstünde 13.5.
-  final govde = masaustu && kimlik != Kimlik.posta ? 13.5 : 14.0;
+  final govde = 14.0;
   final temel = ThemeData(
     useMaterial3: true,
-    visualDensity: masaustu ? VisualDensity.compact : VisualDensity.standard,
+    // Masaüstünde de standart yoğunluk: düğme ve ikonlar fare için yeterince büyük (kullanıcı geri bildirimi).
+    visualDensity: VisualDensity.standard,
     brightness: parlaklik,
     fontFamily: _font,
     scaffoldBackgroundColor: r.zemin,
@@ -257,14 +258,16 @@ ThemeData temaKur(Brightness parlaklik) {
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        minimumSize: Size(0, masaustu ? 40 : 44),
+        minimumSize: Size(0, masaustu ? 42 : 44),
+        padding: const EdgeInsets.symmetric(horizontal: 18),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         textStyle: TextStyle(fontFamily: _font, fontWeight: FontWeight.w500, fontSize: govde),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        minimumSize: Size(0, masaustu ? 40 : 44),
+        minimumSize: Size(0, masaustu ? 42 : 44),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         side: BorderSide(color: r.kenar),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
@@ -273,14 +276,31 @@ ThemeData temaKur(Brightness parlaklik) {
       backgroundColor: r.ic,
       side: BorderSide.none,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      labelStyle: TextStyle(color: r.metin, fontFamily: _font, fontSize: 13),
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      labelStyle: TextStyle(color: r.metin, fontFamily: _font, fontSize: 13.5, fontWeight: FontWeight.w500),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      selectedColor: r.vurguYumusak,
+      checkmarkColor: r.vurgu,
     ),
     listTileTheme: ListTileThemeData(
       iconColor: r.soluk,
       titleTextStyle: TextStyle(fontFamily: _font, fontSize: govde, color: r.metin, fontWeight: FontWeight.w400),
     ),
-    iconTheme: IconThemeData(size: 20, color: r.soluk),
+    iconTheme: IconThemeData(size: 21, color: r.soluk),
+    iconButtonTheme: IconButtonThemeData(style: IconButton.styleFrom(minimumSize: const Size(42, 42), iconSize: 22)),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        minimumSize: Size(0, masaustu ? 40 : 44),
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        textStyle: TextStyle(fontFamily: _font, fontWeight: FontWeight.w600, fontSize: govde),
+      ),
+    ),
+    segmentedButtonTheme: SegmentedButtonThemeData(
+      style: ButtonStyle(
+        visualDensity: VisualDensity.standard,
+        textStyle: WidgetStatePropertyAll(TextStyle(fontFamily: _font, fontSize: govde - .5, fontWeight: FontWeight.w500)),
+        shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+      ),
+    ),
     snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
     bottomSheetTheme: BottomSheetThemeData(
       backgroundColor: r.kart,

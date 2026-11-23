@@ -1,6 +1,7 @@
 import 'package:boga_ortak/boga_ortak.dart';
 import 'package:flutter/material.dart';
 
+import '../ortak/parcalar.dart';
 import '../ortak/simgeler.dart';
 import '../ortak/yardimci.dart';
 import '../oturum.dart';
@@ -19,11 +20,9 @@ class ZiyaretciDetayEkrani extends StatefulWidget {
   final int oturumId;
   final String? ad;
 
-  static Future<void> ac(BuildContext context, int oturumId, {String? ad}) => Navigator.of(context).push(
-    HizliRota(
-      builder: (_) => ZiyaretciDetayEkrani(oturumId: oturumId, ad: ad),
-    ),
-  );
+  /// Geniş ekranda sağdan kayan panel, telefonda tam sayfa.
+  static Future<void> ac(BuildContext context, int oturumId, {String? ad}) =>
+      yanPanelAc(context, ZiyaretciDetayEkrani(oturumId: oturumId, ad: ad), genislik: 620);
 
   @override
   State<ZiyaretciDetayEkrani> createState() => _ZiyaretciDetayEkraniState();

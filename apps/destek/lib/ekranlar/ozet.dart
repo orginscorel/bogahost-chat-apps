@@ -70,12 +70,10 @@ class _OzetEkraniState extends State<OzetEkrani> {
     final v = _v;
     final simdi = DateTime.now();
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Genel Bakış'),
-        actions: [
-          IconButton(tooltip: 'Yenile', onPressed: _yukle, icon: const Icon(Simgeler.refresh)),
-          ...kabukEylemleri(context),
-        ],
+      appBar: ekranBasligi(
+        context,
+        'Genel Bakış',
+        eylemler: [IconButton(tooltip: 'Yenile', onPressed: _yukle, icon: const Icon(Simgeler.refresh))],
       ),
       body: _hata != null
           ? Durum.hata(_hata!, tekrar: _yukle)
@@ -91,95 +89,98 @@ class _OzetEkraniState extends State<OzetEkrani> {
                   final s = harita(v['stats']);
                   final uyari = harita(s['offline_alert']);
                   final puanlar = haritalar(v['ratingDist']);
-                  return ListView(
-                    padding: EdgeInsets.fromLTRB(genis ? 20 : 16, 4, genis ? 20 : 16, 32),
-                    children: [
-                      SayfaBasi(
-                        'Genel Bakış',
-                        alt:
-                            '${simdi.day} ${_aylar[simdi.month - 1]} ${simdi.year}, ${_gunler[simdi.weekday - 1]}'
-                            '${_son == null ? '' : ' · güncellendi ${_son!.hour.toString().padLeft(2, '0')}:${_son!.minute.toString().padLeft(2, '0')}:${_son!.second.toString().padLeft(2, '0')}'}',
-                        sag: [
-                          if (Uyg.yetki('chats.view'))
-                            FilledButton.icon(
-                              onPressed: () => bolumIstegi.value = Bolum.sohbetler,
-                              icon: const Icon(Simgeler.forum, size: 18),
-                              label: const Text('Sohbetlere git'),
+                  return ortala(
+                    ListView(
+                      padding: EdgeInsets.fromLTRB(genis ? 24 : 16, 4, genis ? 24 : 16, 32),
+                      children: [
+                        SayfaBasi(
+                          'Genel Bakış',
+                          alt:
+                              '${simdi.day} ${_aylar[simdi.month - 1]} ${simdi.year}, ${_gunler[simdi.weekday - 1]}'
+                              '${_son == null ? '' : ' · güncellendi ${_son!.hour.toString().padLeft(2, '0')}:${_son!.minute.toString().padLeft(2, '0')}:${_son!.second.toString().padLeft(2, '0')}'}',
+                          sag: [
+                            if (kabukGomulu(context)) IconButton(tooltip: 'Yenile', onPressed: _yukle, icon: const Icon(Simgeler.refresh)),
+                            if (Uyg.yetki('chats.view'))
+                              FilledButton.icon(
+                                onPressed: () => bolumIstegi.value = Bolum.sohbetler,
+                                icon: const Icon(Simgeler.forum, size: 18),
+                                label: const Text('Sohbetlere git'),
+                              ),
+                          ],
+                        ),
+                        _uyarilar(s, uyari, r),
+                        const SizedBox(height: 14),
+                        EsitIzgara(
+                          enAz: 150,
+                          yukseklik: 126,
+                          children: [
+                            KpiKart(
+                              etiket: 'Şu an sitede',
+                              deger: '${tamsayi(s['online'])}',
+                              alt: 'çevrimiçi ziyaretçi',
+                              ikon: Simgeler.visibility,
+                              renk: Marka.zumrut,
+                              canli: true,
+                              onTap: Uyg.yetki('visitors.view') ? () => bolumIstegi.value = Bolum.ziyaretciler : null,
                             ),
-                        ],
-                      ),
-                      _uyarilar(s, uyari, r),
-                      const SizedBox(height: 14),
-                      EsitIzgara(
-                        enAz: 150,
-                        yukseklik: 126,
-                        children: [
-                          KpiKart(
-                            etiket: 'Şu an sitede',
-                            deger: '${tamsayi(s['online'])}',
-                            alt: 'çevrimiçi ziyaretçi',
-                            ikon: Simgeler.visibility,
-                            renk: Marka.zumrut,
-                            canli: true,
-                            onTap: Uyg.yetki('visitors.view') ? () => bolumIstegi.value = Bolum.ziyaretciler : null,
-                          ),
-                          KpiKart(
-                            etiket: 'Bugünkü ziyaretçi',
-                            deger: '${tamsayi(s['today_visitors'])}',
-                            alt: 'tekil oturum',
-                            ikon: Simgeler.peopleAlt,
-                            renk: Marka.mavi,
-                          ),
-                          KpiKart(
-                            etiket: 'Aktif sohbet',
-                            deger: '${tamsayi(s['active_chats'])}',
-                            alt: 'şu an açık',
-                            ikon: Simgeler.forum,
-                            renk: r.vurgu,
-                            onTap: () => bolumIstegi.value = Bolum.sohbetler,
-                          ),
-                          KpiKart(
-                            etiket: 'Bekleyen',
-                            deger: '${tamsayi(s['pending'])}',
-                            alt: tamsayi(s['pending']) > 0 ? 'yanıt bekliyor' : 'kuyruk boş',
-                            ikon: Simgeler.pending,
-                            renk: Marka.kehribar,
-                            onTap: () => bolumIstegi.value = Bolum.sohbetler,
-                          ),
-                          KpiKart(etiket: 'Bugün', deger: '${tamsayi(s['today'])}', alt: 'yeni sohbet', ikon: Simgeler.today, renk: Marka.lavanta),
-                          KpiKart(
-                            etiket: 'Memnuniyet',
-                            deger: tamsayi(s['rated']) == 0 ? '–' : ondalik(s['avg_rating']).toStringAsFixed(1),
-                            alt: '${tamsayi(s['rated'])} değerlendirme',
-                            ikon: Simgeler.star,
-                            renk: Marka.kehribar,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      EsitIzgara(
-                        enAz: 150,
-                        yukseklik: 58,
-                        children: [
-                          if (Uyg.yetki('chats.view')) _kisayol('Aktif Sohbetler', Simgeler.forum, r.vurgu, Bolum.sohbetler),
-                          if (Uyg.yetki('visitors.view')) _kisayol('Canlı Ziyaretçiler', Simgeler.visibility, Marka.zumrut, Bolum.ziyaretciler),
-                          if (Uyg.yetki('reports.view')) _kisayol('Raporlar', Simgeler.chartBar, Marka.mavi, Bolum.raporlar),
-                          if (Uyg.yetki('chats.view')) _kisayol('Geçmiş', Simgeler.history, Marka.lavanta, Bolum.gecmis),
-                          if (Uyg.yetki('canned.manage')) _kisayol('Hazır Cevaplar', Simgeler.chatText, Marka.kehribar, Bolum.hazir),
-                          if (Uyg.yetki('bans.manage')) _kisayol('Yasaklılar', Simgeler.prohibit, Marka.gul, Bolum.yasaklar),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      _satir(genis, [(3, _trend(haritalar(v['last7']), s, r)), (2, _memnuniyet(puanlar, ondalik(s['avg_rating']), tamsayi(s['rated']), r))]),
-                      const SizedBox(height: 16),
-                      _izgara(sutun3, [
-                        _kuyruk(haritalar(v['queue']), r),
-                        _liderler(haritalar(v['leaderboard']), r),
-                        _bolumler(haritalar(v['departments']), r),
-                      ]),
-                      const SizedBox(height: 16),
-                      _satir(genis, [(3, _sonSohbetler(haritalar(v['recent']), r)), (2, _ekipKarti(r))]),
-                    ],
+                            KpiKart(
+                              etiket: 'Bugünkü ziyaretçi',
+                              deger: '${tamsayi(s['today_visitors'])}',
+                              alt: 'tekil oturum',
+                              ikon: Simgeler.peopleAlt,
+                              renk: Marka.mavi,
+                            ),
+                            KpiKart(
+                              etiket: 'Aktif sohbet',
+                              deger: '${tamsayi(s['active_chats'])}',
+                              alt: 'şu an açık',
+                              ikon: Simgeler.forum,
+                              renk: r.vurgu,
+                              onTap: () => bolumIstegi.value = Bolum.sohbetler,
+                            ),
+                            KpiKart(
+                              etiket: 'Bekleyen',
+                              deger: '${tamsayi(s['pending'])}',
+                              alt: tamsayi(s['pending']) > 0 ? 'yanıt bekliyor' : 'kuyruk boş',
+                              ikon: Simgeler.pending,
+                              renk: Marka.kehribar,
+                              onTap: () => bolumIstegi.value = Bolum.sohbetler,
+                            ),
+                            KpiKart(etiket: 'Bugün', deger: '${tamsayi(s['today'])}', alt: 'yeni sohbet', ikon: Simgeler.today, renk: Marka.lavanta),
+                            KpiKart(
+                              etiket: 'Memnuniyet',
+                              deger: tamsayi(s['rated']) == 0 ? '–' : ondalik(s['avg_rating']).toStringAsFixed(1),
+                              alt: '${tamsayi(s['rated'])} değerlendirme',
+                              ikon: Simgeler.star,
+                              renk: Marka.kehribar,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        EsitIzgara(
+                          enAz: 150,
+                          yukseklik: 58,
+                          children: [
+                            if (Uyg.yetki('chats.view')) _kisayol('Aktif Sohbetler', Simgeler.forum, r.vurgu, Bolum.sohbetler),
+                            if (Uyg.yetki('visitors.view')) _kisayol('Canlı Ziyaretçiler', Simgeler.visibility, Marka.zumrut, Bolum.ziyaretciler),
+                            if (Uyg.yetki('reports.view')) _kisayol('Raporlar', Simgeler.chartBar, Marka.mavi, Bolum.raporlar),
+                            if (Uyg.yetki('chats.view')) _kisayol('Geçmiş', Simgeler.history, Marka.lavanta, Bolum.gecmis),
+                            if (Uyg.yetki('canned.manage')) _kisayol('Hazır Cevaplar', Simgeler.chatText, Marka.kehribar, Bolum.hazir),
+                            if (Uyg.yetki('bans.manage')) _kisayol('Yasaklılar', Simgeler.prohibit, Marka.gul, Bolum.yasaklar),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        _satir(genis, [(3, _trend(haritalar(v['last7']), s, r)), (2, _memnuniyet(puanlar, ondalik(s['avg_rating']), tamsayi(s['rated']), r))]),
+                        const SizedBox(height: 16),
+                        _izgara(sutun3, [
+                          _kuyruk(haritalar(v['queue']), r),
+                          _liderler(haritalar(v['leaderboard']), r),
+                          _bolumler(haritalar(v['departments']), r),
+                        ]),
+                        const SizedBox(height: 16),
+                        _satir(genis, [(3, _sonSohbetler(haritalar(v['recent']), r)), (2, _ekipKarti(r))]),
+                      ],
+                    ),
                   );
                 },
               ),

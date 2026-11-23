@@ -2,6 +2,24 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.1',
+    'date': '2026-11-23',
+    'title': 'Üst çubuk, sağdan paneller, gerçek logo, ekran izleme seçici',
+    'items': [
+      {
+        'type': 'improve',
+        'text':
+            'Geniş ekranda tek üst çubuk: başlık, arama kutusu, durum, zil, tema, profil; ekranlar başlıklarını yinelemez. Düğme, çip ve ikonlar büyütüldü.',
+      },
+      {'type': 'improve', 'text': 'Ziyaretçi CRM, profil, bildirim ayarları ve menüden açılan ayarlar sağdan kayan panelde açılır.'},
+      {'type': 'improve', 'text': 'Büyük ekranlarda içerik ortalı ve 1240 px ile sınırlı; sohbet balonları ve yazı büyütüldü.'},
+      {'type': 'new', 'text': 'Gerçek Bogahost logosu (boynuzlu boğa başı): uygulama simgeleri ve açılış yenilendi.'},
+      {'type': 'new', 'text': 'Canlı ekran izleme: İzinli co-browse / İzinsiz izle seçici (web paneliyle aynı).'},
+      {'type': 'fix', 'text': 'Sohbete davet artık ziyaretçinin widget\'ında temsilci adı ve mesajıyla görünüyor.'},
+      {'type': 'improve', 'text': 'Widget ayarları: iki sütun, canlı önizleme, hazır renk paleti, bölümlü seçenekler.'},
+    ],
+  },
+  {
     'version': '1.2.0',
     'date': '2026-11-23',
     'title': 'Web paneliyle aynı düzen: yan menü, üst çubuk, pano ve ziyaretçi tablosu',

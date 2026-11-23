@@ -64,7 +64,7 @@ class _RaporlarEkraniState extends State<RaporlarEkrani> {
             const SizedBox(height: 12),
             EsitIzgara(
               enAz: 150,
-              yukseklik: 66,
+              yukseklik: 72,
               children: [
                 _kart('Bugün', '${tamsayi(oz['today'])}', Marka.mor, r),
                 _kart('Bu hafta', '${tamsayi(oz['week'])}', Marka.mavi, r),
@@ -176,7 +176,7 @@ class _RaporlarEkraniState extends State<RaporlarEkrani> {
               Baslik('Detaylı rapor · ${metin(d['fromStr'])} – ${metin(d['toStr'])}'),
               EsitIzgara(
                 enAz: 150,
-                yukseklik: 66,
+                yukseklik: 72,
                 children: [
                   _kart('İlk yanıt', metin(harita(d['firstResponse'])['human'], '—'), Marka.mor, r),
                   _kart('Çözüm süresi', metin(harita(d['resolution'])['human'], '—'), Marka.mavi, r),
@@ -260,7 +260,7 @@ class _RaporlarEkraniState extends State<RaporlarEkrani> {
           );
           final kartlar = EsitIzgara(
             enAz: 140,
-            yukseklik: 62,
+            yukseklik: 72,
             bosluk: 10,
             children: [
               KpiKart(kucuk: true, etiket: 'Yanıtlanan', deger: '${tamsayi(sla['answered'])}', ikon: Simgeler.checkCircle, renk: Marka.zumrut),

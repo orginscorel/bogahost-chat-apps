@@ -6,9 +6,9 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:path_drawing/path_drawing.dart';
 
 import 'api.dart';
+import 'boga_basi.dart';
 import 'guncelleme.dart';
 import 'ortak.dart';
 import 'tema.dart';
@@ -19,31 +19,7 @@ enum AcilisIsaret { posta, yonetim, destek }
 bool hareketAzalt(BuildContext c) => MediaQuery.maybeDisableAnimationsOf(c) ?? false;
 
 // ---------------------------------------------------------------------------------------------------------------
-// Bogahost logosu (bogahost.com/templates/bogahost/img/logo-new.svg, işaret kısmı): boynuzlu taç + üç sunucu sütunu.
-// Özgün koordinatlar 47 × 55.75 birimlik alandadır.
-
-const _sutunYollari = [
-  'M5.11,22.74V46.22c0,2.07,2,3.76,4.46,3.76h2.62c2.46,0,4.46-1.69,4.46-3.76V22.74c0-2.07-2-3.76-4.46-3.76H9.57C7.11,19,5.11,20.67,5.11,22.74ZM12.19,21a2,2,0,0,1,2.09,1.76V46.22A2,2,0,0,1,12.19,48H9.57a1.94,1.94,0,0,1-2.09-1.76V22.74A1.94,1.94,0,0,1,9.57,21Z',
-  'M17.72,23.44V51.29a4.46,4.46,0,0,0,4.46,4.46H24.8a4.46,4.46,0,0,0,4.46-4.46V23.44A4.46,4.46,0,0,0,24.8,19H22.18A4.46,4.46,0,0,0,17.72,23.44Zm7.08-2.09a2.1,2.1,0,0,1,2.09,2.09V51.29a2.1,2.1,0,0,1-2.09,2.09H22.18a2.1,2.1,0,0,1-2.09-2.09V23.44a2.1,2.1,0,0,1,2.09-2.09Z',
-  'M30.33,22.74V46.22c0,2.07,2,3.76,4.46,3.76h2.62c2.46,0,4.47-1.69,4.47-3.76V22.74c0-2.07-2-3.76-4.47-3.76H34.79C32.33,19,30.33,20.67,30.33,22.74ZM37.41,21a1.94,1.94,0,0,1,2.09,1.76V46.22A1.94,1.94,0,0,1,37.41,48H34.79a2,2,0,0,1-2.09-1.76V22.74A2,2,0,0,1,34.79,21Z',
-];
-const _cubukYollari = [
-  'M9.69,33.38V43.7a1.19,1.19,0,0,0,2.37,0V33.38a1.19,1.19,0,1,0-2.37,0Z',
-  'M22.31,39.66V50a1.19,1.19,0,0,0,2.37,0V39.66a1.19,1.19,0,1,0-2.37,0Z',
-  'M34.92,33.38V43.7a1.19,1.19,0,0,0,2.37,0V33.38a1.19,1.19,0,1,0-2.37,0Z',
-];
-const _tacYolu =
-    'M29.51,16.66H42.9A4.08,4.08,0,0,0,47,12.58V.9a.9.9,0,0,0-.9-.9.91.91,0,0,0-.74.38l-4,5.68a.87.87,0,0,0-.16.52v4.3H26.49l-2.61,3.75-.38.53,3-4.28H5.79V6.58a.87.87,0,0,0-.17-.52L1.65.38A.88.88,0,0,0,.92,0h0A.9.9,0,0,0,0,.9V12.59a4.07,4.07,0,0,0,4.08,4.07H17.49Z';
-
-const _logoG = 47.0;
-const _logoY = 55.75;
-
-class _Logo {
-  _Logo._();
-  static final sutunlar = [for (final d in _sutunYollari) parseSvgPathData(d)];
-  static final cubuklar = [for (final d in _cubukYollari) parseSvgPathData(d)];
-  static final tac = parseSvgPathData(_tacYolu);
-}
+// Bogahost amblemi: boynuzlu boğa başı (BogaBasi). Eski sunucu sütunlu işaret kaldırıldı.
 
 /// Uygulamanın imza degradesi (açılış/simge). [Marka.grad]'dan bağımsızdır: simge üretiminde kimlik ayarlı olmayabilir.
 LinearGradient isaretDegradesi(AcilisIsaret i) => i == AcilisIsaret.posta || i == AcilisIsaret.destek
@@ -62,48 +38,8 @@ double _aralik(double t, double a, double b, [Curve e = Curves.linear]) {
   return e.transform((t - a) / (b - a));
 }
 
-/// Logoyu (ilerlemeye göre) [alan]a çizer. [t]: 0..1 koreografi; 1 = tam logo.
-/// Sunucu sütunları alttan sırayla yükselir, iç göstergeleri dolar; taç önce çizgiyle çizilir sonra dolar.
-void _logoCiz(Canvas c, Rect alan, Color renk, double t) {
-  final olcek = alan.height / _logoY;
-  c.save();
-  c.translate(alan.center.dx - _logoG * olcek / 2, alan.top);
-  c.scale(olcek);
-  for (var i = 0; i < 3; i++) {
-    final a = _aralik(t, .08 + i * .09, .42 + i * .09, Curves.easeOutBack);
-    if (a <= 0) continue;
-    c.save();
-    c.translate(0, (1 - a) * 18);
-    final p = Paint()..color = renk.withValues(alpha: renk.a * a.clamp(0.0, 1.0));
-    c.drawPath(_Logo.sutunlar[i], p);
-    final b = _aralik(t, .40 + i * .07, .62 + i * .07, Curves.easeOutCubic);
-    if (b > 0) {
-      final cb = _Logo.cubuklar[i].getBounds();
-      c.save();
-      c.clipRect(Rect.fromLTRB(cb.left - 1, cb.bottom - cb.height * b, cb.right + 1, cb.bottom + 1));
-      c.drawPath(_Logo.cubuklar[i], p);
-      c.restore();
-    }
-    c.restore();
-  }
-  final ciz = _aralik(t, .30, .70, Curves.easeInOutCubic);
-  if (ciz > 0) {
-    final kalem = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = .9
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..color = renk;
-    final dol = _aralik(t, .58, .80, Curves.easeOut);
-    if (dol < 1) {
-      for (final m in _Logo.tac.computeMetrics()) {
-        c.drawPath(m.extractPath(0, m.length * ciz), kalem);
-      }
-    }
-    if (dol > 0) c.drawPath(_Logo.tac, Paint()..color = renk.withValues(alpha: renk.a * dol));
-  }
-  c.restore();
-}
+/// Logoyu (ilerlemeye göre) [alan]a çizer. [t]: 0..1 koreografi; 1 = tam amblem (kaş, yüz, boynuzlar, çentik).
+void _logoCiz(Canvas c, Rect alan, Color renk, double t) => BogaBasi.ciz(c, alan, renk: renk, t: t);
 
 /// Rozet: posta → zarf, yönetim → kontrol sürgüleri (yeşil). Merkez [m], yarıçap [y]; [halka] zeminden ayıran kenar.
 void _rozetCiz(Canvas c, Offset m, double y, AcilisIsaret i, {required Color halka, double olcek = 1}) {
@@ -173,7 +109,7 @@ void isaretCiz(Canvas c, AcilisIsaret isaret, {bool zemin = true}) {
     const r = Rect.fromLTWH(0, 0, 64, 64);
     c.drawRRect(RRect.fromRectAndRadius(r, const Radius.circular(14.5)), Paint()..shader = isaretDegradesi(isaret).createShader(r));
   }
-  _logoCiz(c, const Rect.fromLTWH(10.5, 10, 34, 36.4), Colors.white, 1);
+  _logoCiz(c, const Rect.fromLTWH(11, 17, 38, 29.6), Colors.white, 1);
   _rozetCiz(c, const Offset(46.5, 46.5), 9.6, isaret, halka: isaret == AcilisIsaret.yonetim ? const Color(0xFF181C2B) : const Color(0xFF4532BD));
 }
 
@@ -206,7 +142,7 @@ class _IsaretBoyayici extends CustomPainter {
 // ---------------------------------------------------------------------------------------------------------------
 
 /// Marka açılışı. Posta: beyaz zemin, indigo logo. Yönetim: grafit zemin, beyaz logo + yeşil vurgu.
-/// Bogahost logosunun sunucu sütunları alttan sırayla yükselir, iç göstergeleri dolar, taç çizilip dolar; rozet
+/// Bogahost boğa başı kendini çizer (kaş, yüz, boynuzlar); rozet
 /// yerine oturur, uygulama adı belirir. Bu sırada [hazirla] çalışır; bekleme uzarsa altta ince ilerleme çizgisi
 /// akar. Bitince sonraki ekran yumuşak bir yakınlaşmayla açılır.
 class AcilisEkrani extends StatefulWidget {
@@ -468,7 +404,7 @@ class _AcilisLogo extends CustomPainter {
   @override
   void paint(Canvas c, Size s) {
     c.scale(s.width / 150);
-    _logoCiz(c, const Rect.fromLTWH(30, 14, 84, 99.6), renk, t);
+    _logoCiz(c, const Rect.fromLTWH(22, 34, 100, 78), renk, t);
     _rozetCiz(c, const Offset(116, 112), 19, isaret, halka: halka, olcek: rozet);
   }
 

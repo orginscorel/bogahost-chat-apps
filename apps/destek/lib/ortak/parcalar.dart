@@ -6,6 +6,54 @@ import 'package:flutter/material.dart';
 
 import 'simgeler.dart';
 
+/// Sayfa içeriğinin en çok genişliği: çok geniş ekranlarda satırlar uzayıp göz yormasın.
+const sayfaEnCok = 1240.0;
+
+/// İçeriği üstte ortalar ve genişliğini sınırlar.
+Widget ortala(Widget child, {double enCok = sayfaEnCok}) => Align(
+  alignment: Alignment.topCenter,
+  child: ConstrainedBox(
+    constraints: BoxConstraints(maxWidth: enCok),
+    child: child,
+  ),
+);
+
+/// Ekran kabuğun içinde kök olarak mı duruyor? (Geniş ekran + geri gidilecek rota yok.) Öyleyse ekran kendi
+/// AppBar'ını çizmez; başlık ve ortak düğmeler kabuğun üst çubuğundadır.
+bool kabukGomulu(BuildContext c) => c.genis && !Navigator.of(c).canPop();
+
+/// Detay / CRM / profil gibi ekranlar: geniş ekranda sağdan kayan panel, telefonda tam sayfa rota.
+Future<T?> yanPanelAc<T>(BuildContext context, Widget child, {double genislik = 580}) {
+  if (!context.genis) return Navigator.of(context).push<T>(HizliRota(builder: (_) => child));
+  final w = MediaQuery.sizeOf(context).width;
+  return showGeneralDialog<T>(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: 'Kapat',
+    barrierColor: Colors.black.withValues(alpha: .32),
+    transitionDuration: const Duration(milliseconds: 230),
+    pageBuilder: (c, _, _) => Align(
+      alignment: Alignment.centerRight,
+      child: SizedBox(
+        width: math.min(genislik, w * .92),
+        height: double.infinity,
+        child: Material(
+          color: c.r.zemin,
+          elevation: 16,
+          shadowColor: Colors.black.withValues(alpha: .4),
+          clipBehavior: Clip.antiAlias,
+          borderRadius: const BorderRadius.horizontal(left: Radius.circular(20)),
+          child: child,
+        ),
+      ),
+    ),
+    transitionBuilder: (_, a, _, child) => SlideTransition(
+      position: Tween(begin: const Offset(1, 0), end: Offset.zero).animate(CurvedAnimation(parent: a, curve: Curves.easeOutCubic)),
+      child: FadeTransition(opacity: a, child: child),
+    ),
+  );
+}
+
 /// Sayfa başlığı: büyük başlık + alt açıklama + sağda eylemler. Web panelindeki `page-head` karşılığı.
 class SayfaBasi extends StatelessWidget {
   const SayfaBasi(this.baslik, {super.key, this.alt, this.sag = const [], this.rozet});
@@ -16,11 +64,12 @@ class SayfaBasi extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final r = context.r;
+    final gomulu = kabukGomulu(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 6, 0, 14),
+      padding: EdgeInsets.fromLTRB(0, gomulu ? 2 : 6, 0, gomulu ? 12 : 14),
       child: Wrap(
         alignment: WrapAlignment.spaceBetween,
-        crossAxisAlignment: WrapCrossAlignment.end,
+        crossAxisAlignment: WrapCrossAlignment.center,
         runSpacing: 10,
         children: [
           Column(
@@ -32,7 +81,9 @@ class SayfaBasi extends StatelessWidget {
                 children: [
                   Text(
                     baslik,
-                    style: gosterim(22, renk: r.metin, agirlik: FontWeight.w700),
+                    style: gomulu
+                        ? TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: r.metin)
+                        : gosterim(22, renk: r.metin, agirlik: FontWeight.w700),
                   ),
                   if (rozet != null) ...[const SizedBox(width: 10), rozet!],
                 ],
@@ -118,11 +169,11 @@ class KpiKart extends StatelessWidget {
     final r = context.r;
     return HoverKutu(
       onTap: onTap,
-      padding: EdgeInsets.all(kucuk ? 12 : 16),
+      padding: EdgeInsets.symmetric(horizontal: kucuk ? 14 : 16, vertical: kucuk ? 10 : 16),
       child: kucuk
           ? Row(
               children: [
-                _rozet(36),
+                _rozet(40),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -133,7 +184,7 @@ class KpiKart extends StatelessWidget {
                         deger,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: gosterim(22, renk: r.metin, agirlik: FontWeight.w700),
+                        style: gosterim(23, renk: r.metin, agirlik: FontWeight.w700),
                       ),
                       Text(
                         alt == null ? etiket : '$etiket · $alt',

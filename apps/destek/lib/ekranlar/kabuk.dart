@@ -4,6 +4,7 @@ import 'package:boga_ortak/boga_ortak.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../ortak/parcalar.dart';
 import '../ortak/simgeler.dart';
 import '../ortak/yardimci.dart';
 import '../oturum.dart';
@@ -198,11 +199,15 @@ Future<void> bildirimAc(Bildirim b) async {
   }
 }
 
-/// Her ekranın AppBar'ına eklenen ortak üst çubuk eylemleri: geniş ekranda arama, durum, zil, tema, profil;
-/// telefonda durum noktası + zil.
-List<Widget> kabukEylemleri(BuildContext context) => context.genis
-    ? const [AramaDugmesi(), MusaitlikDugmesi(), ZilDugmesi(), TemaDugmesi(), ProfilDugmesi(), SizedBox(width: 8)]
-    : const [MusaitlikDugmesi(kisa: true), ZilDugmesi()];
+/// Ekran AppBar'ına eklenen ortak eylemler. Geniş ekranda (kabuk içinde) üst çubuk zaten arama / durum / zil /
+/// tema / profil taşır, ekranlar hiçbir şey eklemez; telefonda ve itilmiş rotalarda durum noktası + zil.
+List<Widget> kabukEylemleri(BuildContext context) => kabukGomulu(context) ? const [] : const [MusaitlikDugmesi(kisa: true), ZilDugmesi(), SizedBox(width: 4)];
+
+/// Ekranın AppBar'ı: kabuk içinde gömülüyken yok (başlık üst çubukta); `alt` varsa yalnız o gösterilir.
+PreferredSizeWidget? ekranBasligi(BuildContext context, String baslik, {List<Widget> eylemler = const [], PreferredSizeWidget? alt}) {
+  if (kabukGomulu(context)) return alt == null ? null : AppBar(toolbarHeight: 0, bottom: alt);
+  return AppBar(title: Text(baslik), actions: [...eylemler, ...kabukEylemleri(context)], bottom: alt);
+}
 
 /// Ana kabuk: geniş ekranda web paneli gibi koyu yan menü (74 px, üzerine gelince/sabitleyince 248 px),
 /// telefonda alt gezinme + Menü. Arka planda 6 sn'de bir özet + bildirim akışını yoklar; yeni ziyaretçi
@@ -372,11 +377,19 @@ class _KabukState extends State<Kabuk> with WidgetsBindingObserver {
       ],
     );
     if (genis) {
+      final aktif = hepsi.firstWhere((o) => o.bolum == _bolum);
       return Scaffold(
         body: Row(
           children: [
             YanMenu(bolum: _bolum, gruplar: gruplar, onSec: _git),
-            Expanded(child: govde),
+            Expanded(
+              child: Column(
+                children: [
+                  UstCubuk(baslik: aktif.ad, ikon: aktif.ikon),
+                  Expanded(child: govde),
+                ],
+              ),
+            ),
           ],
         ),
       );
@@ -770,6 +783,89 @@ class _MenuSatiriState extends State<_MenuSatiri> {
 }
 
 // ---------------------------------------------------------------------------------------------------
+// Üst çubuk (geniş ekran): sayfa başlığı · arama · durum · zil · tema · profil
+// ---------------------------------------------------------------------------------------------------
+
+class UstCubuk extends StatelessWidget {
+  const UstCubuk({super.key, required this.baslik, required this.ikon});
+  final String baslik;
+  final IconData ikon;
+  @override
+  Widget build(BuildContext context) {
+    final r = context.r;
+    final dar = MediaQuery.sizeOf(context).width < 1180;
+    return Container(
+      height: 62,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: r.kart,
+        border: Border(bottom: BorderSide(color: r.kenar)),
+      ),
+      child: Row(
+        children: [
+          Icon(ikon, size: 20, color: r.vurgu),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              baslik,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: gosterim(18, renk: r.metin, agirlik: FontWeight.w700),
+            ),
+          ),
+          const SizedBox(width: 12),
+          if (dar) const AramaDugmesi() else const AramaHapi(),
+          const SizedBox(width: 8),
+          const MusaitlikDugmesi(),
+          const SizedBox(width: 2),
+          const ZilDugmesi(),
+          const TemaDugmesi(),
+          const SizedBox(width: 6),
+          const ProfilDugmesi(),
+        ],
+      ),
+    );
+  }
+}
+
+/// Üst çubuktaki arama alanı görünümlü düğme.
+class AramaHapi extends StatelessWidget {
+  const AramaHapi({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final r = context.r;
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: () => showDialog(context: context, builder: (_) => const _AramaDiyalog()),
+      child: Container(
+        width: 260,
+        height: 40,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: r.ic,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: r.kenar),
+        ),
+        child: Row(
+          children: [
+            Icon(Simgeler.search, size: 18, color: r.silik),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Ziyaretçi, e-posta, #sohbet ara…',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: r.silik, fontSize: 13),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------
 // Üst çubuk düğmeleri
 // ---------------------------------------------------------------------------------------------------
 
@@ -781,7 +877,7 @@ Future<T?> acilirPanel<T>(BuildContext context, Widget child, {double genislik =
     child: Align(
       alignment: Alignment.topRight,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 54, 12, 12),
+        padding: const EdgeInsets.fromLTRB(12, 58, 12, 12),
         child: Material(
           color: c.r.kart,
           elevation: 10,
@@ -847,8 +943,8 @@ class MusaitlikDugmesi extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6),
             child: Container(
-              height: 34,
-              padding: EdgeInsets.fromLTRB(kisa ? 9 : 10, 0, kisa ? 9 : 6, 0),
+              height: 40,
+              padding: EdgeInsets.fromLTRB(kisa ? 12 : 12, 0, kisa ? 12 : 8, 0),
               decoration: BoxDecoration(
                 color: musaitlikRengi(m).withValues(alpha: .12),
                 borderRadius: BorderRadius.circular(99),
@@ -1036,7 +1132,7 @@ class ZilPaneli extends StatelessWidget {
                 TextButton.icon(
                   onPressed: () {
                     Navigator.pop(context);
-                    Navigator.of(context, rootNavigator: true).push(HizliRota(builder: (_) => const BildirimAyarEkrani()));
+                    yanPanelAc(context, const BildirimAyarEkrani());
                   },
                   icon: const Icon(Simgeler.tune, size: 16),
                   label: const Text('Ayarlar'),
@@ -1100,7 +1196,7 @@ class ProfilDugmesi extends StatelessWidget {
               onSelected: (v) async {
                 switch (v) {
                   case 'profil':
-                    Navigator.of(context, rootNavigator: true).push(HizliRota(builder: (_) => const ProfilEkrani()));
+                    yanPanelAc(context, const ProfilEkrani());
                   case 'cihazlar':
                     bolumIstegi.value = Bolum.cihazlar;
                   case 'surum':

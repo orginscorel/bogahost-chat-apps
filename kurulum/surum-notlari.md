@@ -1,3 +1,14 @@
+## 1.2.1
+
+Üst çubuk, sağdan paneller, gerçek logo, ekran izleme seçici, davet düzeltmesi.
+- Geniş ekranda tek üst çubuk: sayfa başlığı · arama kutusu · durum · zil · tema · profil. Ekranlar kendi başlıklarını yinelemez; sıkışık ikonlar gitti. Düğme, çip, sekme ve ikonlar büyütüldü (masaüstünde de standart yoğunluk).
+- Detay ekranları (ziyaretçi CRM, profil, bildirim ayarları, menüden açılan ayarlar) geniş ekranda sağdan kayan panelde açılır; telefonda tam sayfa.
+- Büyük ekranlarda içerik genişliği sınırlı (1240 px) ve ortalı; sohbet listesi/ekip listesi/bilgi paneli genişliği ekrana göre; sohbet balonları ve yazı büyütüldü (15,5 px, 760 px balon).
+- Sohbetler: arama + süzgeç çubuğu yatay kaydırılır, "Hepsini kapalıya al" çubukta. Widget ayarları: iki sütun (form + canlı önizleme), hazır renk paleti, konum/başlık/köşe için bölümlü düğmeler.
+- Logo: gerçek Bogahost logosu (boynuzlu boğa başı "o"). Uygulama simgeleri, açılış ekranı ve amblemler yeniden üretildi; açılışta boğa başı kendini çizer.
+- Canlı ekran izleme: düğmeye basınca web panelindeki gibi "İzinli co-browse / İzinsiz izle" seçici çıkar.
+- Sohbete davet: sunucu daveti widget'a hiç iletmiyordu; artık ziyaretçide temsilci adı ve mesajıyla balon çıkar, tıklayınca sohbet açılır.
+
 ## 1.2.0
 
 Web paneliyle aynı düzen; eşit boyda KPI kartları; uyarı/bildirim/istatistik sistemleri.

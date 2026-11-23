@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:boga_ortak/boga_ortak.dart';
 import 'package:flutter/material.dart';
 
+import '../ortak/parcalar.dart';
 import '../ortak/simgeler.dart';
 import '../ortak/yardimci.dart';
 import '../oturum.dart';
@@ -113,58 +114,79 @@ class _SohbetlerEkraniState extends State<SohbetlerEkrani> {
   Widget build(BuildContext context) {
     final r = context.r;
     if (!Uyg.yetki('chats.view')) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Sohbetler'), actions: kabukEylemleri(context)),
-        body: const Yetkisiz('Sohbetleri görüntülemek'),
-      );
+      return Scaffold(appBar: ekranBasligi(context, 'Sohbetler'), body: const Yetkisiz('Sohbetleri görüntülemek'));
     }
-    final liste = Scaffold(
-      appBar: AppBar(
-        title: const Text('Sohbetler'),
-        actions: [
-          if (_durum == 'missed' && (_sayilar['missed'] ?? 0) > 0 && Uyg.yetki('chats.reply'))
-            TextButton(onPressed: _hepsiniCoz, child: const Text('Hepsini kapalıya al')),
-          IconButton(tooltip: 'Yenile', onPressed: () => _yukle(), icon: const Icon(Simgeler.refresh)),
-          ...kabukEylemleri(context),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(108),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
-                child: TextField(
-                  controller: _arama,
-                  onChanged: (_) => setState(() {}),
-                  decoration: InputDecoration(
-                    hintText: 'Ziyaretçi, e-posta, mesaj ya da #numara',
-                    prefixIcon: const Icon(Simgeler.search, size: 18),
-                    isDense: true,
-                    suffixIcon: _arama.text.isEmpty ? null : IconButton(icon: const Icon(Simgeler.close, size: 16), onPressed: () => setState(_arama.clear)),
+    final gomulu = kabukGomulu(context);
+    final kacanCoz = _durum == 'missed' && (_sayilar['missed'] ?? 0) > 0 && Uyg.yetki('chats.reply');
+    final ustCubuk = PreferredSize(
+      preferredSize: Size.fromHeight(gomulu ? 118 : 110),
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(12, gomulu ? 10 : 0, 8, 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _arama,
+                    onChanged: (_) => setState(() {}),
+                    decoration: InputDecoration(
+                      hintText: 'Ziyaretçi, e-posta, mesaj ya da #numara',
+                      prefixIcon: const Icon(Simgeler.search, size: 18),
+                      isDense: true,
+                      suffixIcon: _arama.text.isEmpty ? null : IconButton(icon: const Icon(Simgeler.close, size: 16), onPressed: () => setState(_arama.clear)),
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-                child: Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: [
-                    for (final (k, ad) in _sekmeler)
-                      ChoiceChip(
-                        selected: _durum == k,
-                        onSelected: (_) => _sekme(k),
-                        visualDensity: VisualDensity.compact,
-                        avatar: _durum == k ? null : Nokta(durumRengi(k), boyut: 8),
-                        label: Text('$ad${(_sayilar[k] ?? 0) > 0 ? ' · ${_sayilar[k]}' : ''}'),
-                      ),
-                  ],
-                ),
-              ),
-            ],
+                if (gomulu) IconButton(tooltip: 'Yenile', onPressed: () => _yukle(), icon: const Icon(Simgeler.refresh)),
+              ],
+            ),
           ),
-        ),
+          SizedBox(
+            height: 44,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+              children: [
+                for (final (k, ad) in _sekmeler)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: ChoiceChip(
+                      selected: _durum == k,
+                      onSelected: (_) => _sekme(k),
+                      avatar: _durum == k ? null : Nokta(durumRengi(k), boyut: 8),
+                      label: Text('$ad${(_sayilar[k] ?? 0) > 0 ? ' · ${_sayilar[k]}' : ''}'),
+                    ),
+                  ),
+                if (kacanCoz)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4),
+                    child: TextButton.icon(onPressed: _hepsiniCoz, icon: const Icon(Simgeler.doneAll, size: 18), label: const Text('Hepsini kapalıya al')),
+                  ),
+              ],
+            ),
+          ),
+        ],
       ),
+    );
+    final liste = Scaffold(
+      appBar: gomulu
+          ? PreferredSize(
+              preferredSize: ustCubuk.preferredSize,
+              child: Material(
+                color: r.zemin,
+                child: SafeArea(bottom: false, child: ustCubuk),
+              ),
+            )
+          : AppBar(
+              title: const Text('Sohbetler'),
+              actions: [
+                if (kacanCoz) TextButton(onPressed: _hepsiniCoz, child: const Text('Hepsini kapalıya al')),
+                IconButton(tooltip: 'Yenile', onPressed: () => _yukle(), icon: const Icon(Simgeler.refresh)),
+                ...kabukEylemleri(context),
+              ],
+              bottom: ustCubuk,
+            ),
       body: _hata != null
           ? Durum.hata(_hata!, tekrar: _yukle)
           : _liste == null
@@ -195,7 +217,7 @@ class _SohbetlerEkraniState extends State<SohbetlerEkrani> {
     return Row(
       children: [
         SizedBox(
-          width: 380,
+          width: (MediaQuery.sizeOf(context).width * .3).clamp(340.0, 420.0),
           child: Container(
             decoration: BoxDecoration(
               border: Border(right: BorderSide(color: r.kenar)),

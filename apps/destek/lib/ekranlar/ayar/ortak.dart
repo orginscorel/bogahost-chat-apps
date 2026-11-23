@@ -1,6 +1,7 @@
 import 'package:boga_ortak/boga_ortak.dart';
 import 'package:flutter/material.dart';
 
+import '../../ortak/parcalar.dart';
 import '../../ortak/simgeler.dart';
 import '../../veri/panel.dart';
 import '../kabuk.dart';
@@ -50,25 +51,47 @@ class _AyarSayfaState extends State<AyarSayfa> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      title: Text(widget.baslik),
-      actions: [
-        ...widget.eylemler,
-        IconButton(tooltip: 'Yenile', onPressed: yenile, icon: const Icon(Simgeler.refresh)),
-        ...kabukEylemleri(context),
-      ],
-    ),
-    body: _hata != null
+  Widget build(BuildContext context) {
+    final gomulu = kabukGomulu(context);
+    final yenileDugmesi = IconButton(tooltip: 'Yenile', onPressed: yenile, icon: const Icon(Simgeler.refresh));
+    final icerik = _hata != null
         ? Durum.hata(_hata!, tekrar: yenile)
         : _v == null
         ? const Durum.yukleniyor()
         : RefreshIndicator(
             onRefresh: yenile,
             child: Padding(padding: widget.dolgu, child: widget.govde(context, _v!, yenile)),
-          ),
-    bottomNavigationBar: widget.altBar,
-  );
+          );
+    return Scaffold(
+      appBar: gomulu ? null : AppBar(title: Text(widget.baslik), actions: [...widget.eylemler, yenileDugmesi, ...kabukEylemleri(context)]),
+      body: gomulu
+          ? ortala(
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 12, 0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            widget.baslik,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: context.r.metin),
+                          ),
+                        ),
+                        ...widget.eylemler,
+                        yenileDugmesi,
+                      ],
+                    ),
+                  ),
+                  Expanded(child: icerik),
+                ],
+              ),
+              enCok: 1100,
+            )
+          : icerik,
+      bottomNavigationBar: widget.altBar,
+    );
+  }
 }
 
 /// Kaydet düğmesi şeridi.

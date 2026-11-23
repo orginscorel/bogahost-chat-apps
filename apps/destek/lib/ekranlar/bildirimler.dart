@@ -86,16 +86,12 @@ class _BildirimlerEkraniState extends State<BildirimlerEkrani> {
     final r = context.r;
     final l = _liste;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bildirimler'),
-        actions: [
-          IconButton(
-            tooltip: 'Bildirim ayarları',
-            onPressed: () => Navigator.of(context, rootNavigator: true).push(HizliRota(builder: (_) => const BildirimAyarEkrani())),
-            icon: const Icon(Simgeler.tune),
-          ),
+      appBar: ekranBasligi(
+        context,
+        'Bildirimler',
+        eylemler: [
+          IconButton(tooltip: 'Bildirim ayarları', onPressed: () => yanPanelAc(context, const BildirimAyarEkrani()), icon: const Icon(Simgeler.tune)),
           IconButton(tooltip: 'Yenile', onPressed: _yukle, icon: const Icon(Simgeler.refresh)),
-          ...kabukEylemleri(context),
         ],
       ),
       body: _hata != null
@@ -126,118 +122,123 @@ class _BildirimlerEkraniState extends State<BildirimlerEkrani> {
                             [])
                         .add(b);
                   }
-                  return ListView(
-                    padding: EdgeInsets.fromLTRB(genis ? 20 : 14, 4, genis ? 20 : 14, 32),
-                    children: [
-                      SayfaBasi(
-                        'Bildirimler',
-                        alt: okunmamis == 0 ? 'Hepsi okundu' : '$okunmamis okunmamış bildirim',
-                        rozet: okunmamis == 0 ? null : Rozet('$okunmamis yeni', renk: Marka.gul),
-                        sag: [
-                          if (okunmamis > 0)
-                            FilledButton.tonalIcon(
-                              onPressed: () async {
-                                await islem(() => Depo.bildirimlerOkundu(), tamam: 'Hepsi okundu olarak işaretlendi');
-                                _yukle();
-                              },
-                              icon: const Icon(Simgeler.doneAll, size: 18),
-                              label: const Text('Tümünü okundu yap'),
+                  return ortala(
+                    ListView(
+                      padding: EdgeInsets.fromLTRB(genis ? 24 : 14, 4, genis ? 24 : 14, 32),
+                      children: [
+                        SayfaBasi(
+                          'Bildirimler',
+                          alt: okunmamis == 0 ? 'Hepsi okundu' : '$okunmamis okunmamış bildirim',
+                          rozet: okunmamis == 0 ? null : Rozet('$okunmamis yeni', renk: Marka.gul),
+                          sag: [
+                            if (kabukGomulu(context)) ...[
+                              IconButton(
+                                tooltip: 'Bildirim ayarları',
+                                onPressed: () => yanPanelAc(context, const BildirimAyarEkrani()),
+                                icon: const Icon(Simgeler.tune),
+                              ),
+                              IconButton(tooltip: 'Yenile', onPressed: _yukle, icon: const Icon(Simgeler.refresh)),
+                            ],
+                            if (okunmamis > 0)
+                              FilledButton.tonalIcon(
+                                onPressed: () async {
+                                  await islem(() => Depo.bildirimlerOkundu(), tamam: 'Hepsi okundu olarak işaretlendi');
+                                  _yukle();
+                                },
+                                icon: const Icon(Simgeler.doneAll, size: 18),
+                                label: const Text('Tümünü okundu yap'),
+                              ),
+                          ],
+                        ),
+                        EsitIzgara(
+                          enAz: 146,
+                          yukseklik: 72,
+                          children: [
+                            KpiKart(
+                              kucuk: true,
+                              etiket: 'Okunmamış',
+                              deger: '$okunmamis',
+                              ikon: Simgeler.notificationsActive,
+                              renk: Marka.gul,
+                              onTap: () => setState(() => _suzgec = 'okunmamis'),
                             ),
-                        ],
-                      ),
-                      EsitIzgara(
-                        enAz: 146,
-                        yukseklik: 64,
-                        children: [
-                          KpiKart(
-                            kucuk: true,
-                            etiket: 'Okunmamış',
-                            deger: '$okunmamis',
-                            ikon: Simgeler.notificationsActive,
-                            renk: Marka.gul,
-                            onTap: () => setState(() => _suzgec = 'okunmamis'),
-                          ),
-                          KpiKart(
-                            kucuk: true,
-                            etiket: 'Yeni sohbet',
-                            deger: '${sayilar['sohbet']}',
-                            ikon: Simgeler.forum,
-                            renk: r.vurgu,
-                            onTap: () => setState(() => _suzgec = 'sohbet'),
-                          ),
-                          KpiKart(
-                            kucuk: true,
-                            etiket: 'Mesaj',
-                            deger: '${sayilar['mesaj']}',
-                            ikon: Simgeler.mail,
-                            renk: Marka.mavi,
-                            onTap: () => setState(() => _suzgec = 'mesaj'),
-                          ),
-                          KpiKart(
-                            kucuk: true,
-                            etiket: 'Ekip',
-                            deger: '${sayilar['ekip']}',
-                            ikon: Simgeler.groups,
-                            renk: Marka.lavanta,
-                            onTap: () => setState(() => _suzgec = 'ekip'),
-                          ),
-                          KpiKart(
-                            kucuk: true,
-                            etiket: 'Bugün',
-                            deger: '$bugun',
-                            ikon: Simgeler.today,
-                            renk: Marka.zumrut,
-                            onTap: () => setState(() => _suzgec = 'hepsi'),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 6,
-                        children: [
-                          for (final (k, ad) in const [
-                            ('hepsi', 'Tümü'),
-                            ('okunmamis', 'Okunmamış'),
-                            ('sohbet', 'Sohbetler'),
-                            ('mesaj', 'Mesajlar'),
-                            ('ekip', 'Ekip'),
-                            ('sistem', 'Sistem'),
-                          ])
-                            ChoiceChip(
-                              label: Text(ad),
-                              selected: _suzgec == k,
-                              visualDensity: VisualDensity.compact,
-                              onSelected: (_) => setState(() => _suzgec = k),
+                            KpiKart(
+                              kucuk: true,
+                              etiket: 'Yeni sohbet',
+                              deger: '${sayilar['sohbet']}',
+                              ikon: Simgeler.forum,
+                              renk: r.vurgu,
+                              onTap: () => setState(() => _suzgec = 'sohbet'),
                             ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      if (suzulen.isEmpty)
-                        Durum.bos(l.isEmpty ? 'Bildirim yok.' : 'Bu süzgeçte bildirim yok.', ikon: Simgeler.notificationsNone)
-                      else
-                        for (final g in gruplar.entries) ...[
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
-                            child: Text(
-                              g.key.toUpperCase(),
-                              style: TextStyle(color: r.silik, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: .8),
+                            KpiKart(
+                              kucuk: true,
+                              etiket: 'Mesaj',
+                              deger: '${sayilar['mesaj']}',
+                              ikon: Simgeler.mail,
+                              renk: Marka.mavi,
+                              onTap: () => setState(() => _suzgec = 'mesaj'),
                             ),
-                          ),
-                          Kutu(
-                            padding: EdgeInsets.zero,
-                            child: Column(
-                              children: [
-                                for (final (i, b) in g.value.indexed) ...[
-                                  if (i > 0) Divider(height: 1, indent: 66, color: r.kenar.withValues(alpha: .6)),
-                                  _satir(b, r, ilk: i == 0, son: i == g.value.length - 1),
+                            KpiKart(
+                              kucuk: true,
+                              etiket: 'Ekip',
+                              deger: '${sayilar['ekip']}',
+                              ikon: Simgeler.groups,
+                              renk: Marka.lavanta,
+                              onTap: () => setState(() => _suzgec = 'ekip'),
+                            ),
+                            KpiKart(
+                              kucuk: true,
+                              etiket: 'Bugün',
+                              deger: '$bugun',
+                              ikon: Simgeler.today,
+                              renk: Marka.zumrut,
+                              onTap: () => setState(() => _suzgec = 'hepsi'),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 6,
+                          children: [
+                            for (final (k, ad) in const [
+                              ('hepsi', 'Tümü'),
+                              ('okunmamis', 'Okunmamış'),
+                              ('sohbet', 'Sohbetler'),
+                              ('mesaj', 'Mesajlar'),
+                              ('ekip', 'Ekip'),
+                              ('sistem', 'Sistem'),
+                            ])
+                              ChoiceChip(label: Text(ad), selected: _suzgec == k, onSelected: (_) => setState(() => _suzgec = k)),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        if (suzulen.isEmpty)
+                          Durum.bos(l.isEmpty ? 'Bildirim yok.' : 'Bu süzgeçte bildirim yok.', ikon: Simgeler.notificationsNone)
+                        else
+                          for (final g in gruplar.entries) ...[
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
+                              child: Text(
+                                g.key.toUpperCase(),
+                                style: TextStyle(color: r.silik, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: .8),
+                              ),
+                            ),
+                            Kutu(
+                              padding: EdgeInsets.zero,
+                              child: Column(
+                                children: [
+                                  for (final (i, b) in g.value.indexed) ...[
+                                    if (i > 0) Divider(height: 1, indent: 66, color: r.kenar.withValues(alpha: .6)),
+                                    _satir(b, r, ilk: i == 0, son: i == g.value.length - 1),
+                                  ],
                                 ],
-                              ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                        ],
-                    ],
+                            const SizedBox(height: 8),
+                          ],
+                      ],
+                    ),
                   );
                 },
               ),

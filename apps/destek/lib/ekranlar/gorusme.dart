@@ -266,7 +266,7 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
         if (!await _aramaOnay() || !mounted) return;
         await AramaEkrani.baslat(context, sohbetId: _id, ad: _ad, video: true);
       case 'ekran':
-        if (_son?.oturumId != null) await EkranIzleEkrani.ac(context, oturumId: _son!.oturumId!, ad: _ad, kip: 'consent', sohbetId: _id, url: _son?.url);
+        if (_son?.oturumId != null) await EkranIzleEkrani.sec(context, oturumId: _son!.oturumId!, ad: _ad, sohbetId: _id, url: _son?.url);
       case 'ekranDirekt':
         if (_son?.oturumId != null &&
             await onayla(context, 'Onaysız ekran izleme', mesaj: 'Ziyaretçiye izin sorulmaz; denetim kaydına yazılır. Devam edilsin mi?', evet: 'İzle')) {
@@ -390,7 +390,7 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
               ? Durum.bos('Henüz mesaj yok.', ikon: Simgeler.forum)
               : ListView.builder(
                   controller: _kaydirma,
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+                  padding: EdgeInsets.fromLTRB(genis ? 24 : 12, 12, genis ? 24 : 12, 8),
                   itemCount: _mesajlar.length,
                   itemBuilder: (_, i) => _balon(_mesajlar[i], i == 0 ? null : _mesajlar[i - 1], r),
                 ),
@@ -424,6 +424,7 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
       appBar: AppBar(
         automaticallyImplyLeading: !widget.gomulu,
         titleSpacing: widget.gomulu ? 16 : 0,
+        toolbarHeight: 60,
         title: InkWell(
           onTap: () => setState(() => _bilgiAcik = !_bilgiAcik),
           child: Row(
@@ -525,15 +526,10 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
                     child: ListTile(dense: true, leading: Icon(Simgeler.videocam), title: Text('Görüntülü arama')),
                   ),
                 ],
-                if (Uyg.yetki('screen.consent') && (_son?.cevrimici ?? false))
+                if (Uyg.yetki('screen.consent') || Uyg.yetki('screen.direct'))
                   const PopupMenuItem(
                     value: 'ekran',
-                    child: ListTile(dense: true, leading: Icon(Simgeler.monitor), title: Text('Ekranı izle (onaylı)')),
-                  ),
-                if (Uyg.yetki('screen.direct') && (_son?.cevrimici ?? false))
-                  const PopupMenuItem(
-                    value: 'ekranDirekt',
-                    child: ListTile(dense: true, leading: Icon(Simgeler.desktop), title: Text('Ekranı izle (onaysız)')),
+                    child: ListTile(dense: true, leading: Icon(Simgeler.monitor), title: Text('Canlı ekran izle')),
                   ),
               ],
               const PopupMenuDivider(),
@@ -599,7 +595,7 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
               children: [
                 Expanded(child: govde),
                 Container(
-                  width: 300,
+                  width: (MediaQuery.sizeOf(context).width * .24).clamp(300.0, 360.0),
                   decoration: BoxDecoration(
                     border: Border(left: BorderSide(color: r.kenar)),
                   ),
@@ -631,13 +627,19 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
               borderRadius: BorderRadius.circular(99),
               border: Border.all(color: r.kenar),
             ),
-            child: Text('${m.govde ?? ''} · ${m.saat}', style: TextStyle(color: r.silik, fontSize: 11.5)),
+            child: Text(
+              '${m.govde ?? ''} · ${m.saat}',
+              style: TextStyle(color: r.silik, fontSize: context.genis ? 12.5 : 11.5),
+            ),
           ),
         ),
       );
     }
     final sag = !m.ziyaretci;
     final icNot = m.icNot || m.fisilti;
+    final genis = context.genis;
+    final yaziBoyu = genis ? 15.5 : 14.5;
+    final avatarBoyu = genis ? 34.0 : 28.0;
     final zemin = icNot
         ? Marka.kehribar.withValues(alpha: .16)
         : sag
@@ -651,14 +653,14 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
         mainAxisAlignment: sag ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          if (!sag) ...[yeniGonderen ? Avatar(m.ad.isEmpty ? 'Z' : m.ad, boyut: 28) : const SizedBox(width: 28), const SizedBox(width: 8)],
+          if (!sag) ...[yeniGonderen ? Avatar(m.ad.isEmpty ? 'Z' : m.ad, boyut: avatarBoyu) : SizedBox(width: avatarBoyu), const SizedBox(width: 8)],
           Flexible(
             child: GestureDetector(
               onLongPress: () => _mesajMenusu(m),
               onSecondaryTap: () => _mesajMenusu(m),
               child: Container(
-                constraints: const BoxConstraints(maxWidth: 560),
-                padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
+                constraints: BoxConstraints(maxWidth: genis ? 760 : 560),
+                padding: EdgeInsets.fromLTRB(genis ? 14 : 12, genis ? 10 : 8, genis ? 14 : 12, genis ? 8 : 6),
                 decoration: BoxDecoration(
                   color: zemin,
                   borderRadius: BorderRadius.only(
@@ -678,23 +680,37 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
                         padding: const EdgeInsets.only(bottom: 3),
                         child: Text(
                           icNot ? (m.fisilti ? 'Fısıltı · ${m.ad}' : 'İç not · ${m.ad}') : m.ad,
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: icNot ? Marka.kehribar : Colors.white.withValues(alpha: .85)),
+                          style: TextStyle(
+                            fontSize: genis ? 12 : 11,
+                            fontWeight: FontWeight.w600,
+                            color: icNot ? Marka.kehribar : Colors.white.withValues(alpha: .85),
+                          ),
                         ),
                       ),
                     if (m.ek != null) _ekGorunumu(m.ek!, yazi, r),
                     if (m.silindi)
                       Text(
                         'Bu mesaj silindi',
-                        style: TextStyle(color: yazi.withValues(alpha: .7), fontStyle: FontStyle.italic, fontSize: 14),
+                        style: TextStyle(color: yazi.withValues(alpha: .7), fontStyle: FontStyle.italic, fontSize: yaziBoyu),
                       )
                     else if (m.govde != null && m.govde!.isNotEmpty)
-                      SelectableText(m.govde!, style: TextStyle(color: yazi, fontSize: 14.5, height: 1.35)),
+                      SelectableText(
+                        m.govde!,
+                        style: TextStyle(color: yazi, fontSize: yaziBoyu, height: 1.4),
+                      ),
                     const SizedBox(height: 3),
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (m.duzenlendi) Text('düzenlendi · ', style: TextStyle(color: yazi.withValues(alpha: .65), fontSize: 10.5)),
-                        Text(m.saat, style: TextStyle(color: yazi.withValues(alpha: .65), fontSize: 10.5)),
+                        if (m.duzenlendi)
+                          Text(
+                            'düzenlendi · ',
+                            style: TextStyle(color: yazi.withValues(alpha: .65), fontSize: genis ? 11.5 : 10.5),
+                          ),
+                        Text(
+                          m.saat,
+                          style: TextStyle(color: yazi.withValues(alpha: .65), fontSize: genis ? 11.5 : 10.5),
+                        ),
                         if (sag && !icNot) ...[
                           const SizedBox(width: 4),
                           Icon(m.okundu ? Simgeler.doneAll : Simgeler.check, size: 13, color: m.okundu ? Colors.white : Colors.white.withValues(alpha: .65)),

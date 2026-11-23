@@ -73,18 +73,13 @@ class _EkipEkraniState extends State<EkipEkrani> {
   Widget build(BuildContext context) {
     final r = context.r;
     if (!Uyg.yetki('internal.use')) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Ekip'), actions: kabukEylemleri(context)),
-        body: const Yetkisiz('Ekip sohbetini kullanmak'),
-      );
+      return Scaffold(appBar: ekranBasligi(context, 'Ekip'), body: const Yetkisiz('Ekip sohbetini kullanmak'));
     }
     final liste = Scaffold(
-      appBar: AppBar(
-        title: const Text('Ekip'),
-        actions: [
-          IconButton(tooltip: 'Yenile', onPressed: _yukle, icon: const Icon(Simgeler.refresh)),
-          ...kabukEylemleri(context),
-        ],
+      appBar: ekranBasligi(
+        context,
+        'Ekip',
+        eylemler: [IconButton(tooltip: 'Yenile', onPressed: _yukle, icon: const Icon(Simgeler.refresh))],
       ),
       body: _hata != null
           ? Durum.hata(_hata!, tekrar: _yukle)
@@ -113,7 +108,7 @@ class _EkipEkraniState extends State<EkipEkrani> {
     return Row(
       children: [
         SizedBox(
-          width: 320,
+          width: (MediaQuery.sizeOf(context).width * .26).clamp(300.0, 360.0),
           child: Container(
             decoration: BoxDecoration(
               border: Border(right: BorderSide(color: r.kenar)),
@@ -123,7 +118,7 @@ class _EkipEkraniState extends State<EkipEkrani> {
         ),
         Expanded(
           child: Scaffold(
-            appBar: AppBar(title: Text(ad), automaticallyImplyLeading: false),
+            appBar: AppBar(title: Text(ad), automaticallyImplyLeading: false, toolbarHeight: 52),
             body: IcSohbet(key: ValueKey(_kisi), kisi: _kisi),
           ),
         ),

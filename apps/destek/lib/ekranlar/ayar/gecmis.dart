@@ -89,7 +89,7 @@ class _GecmisEkraniState extends State<GecmisEkrani> {
           children: [
             EsitIzgara(
               enAz: 150,
-              yukseklik: 66,
+              yukseklik: 72,
               children: [
                 _kart('Toplam', '${tamsayi(ozet['total'])}', Marka.mor, r, alt: 'tüm zamanlar'),
                 _kart('Kapalı', '${tamsayi(ozet['closed'])}', Marka.zumrut, r),

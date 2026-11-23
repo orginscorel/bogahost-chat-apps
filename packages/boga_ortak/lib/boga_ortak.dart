@@ -3,6 +3,7 @@ library;
 
 export 'src/acilis.dart';
 export 'src/api.dart';
+export 'src/boga_basi.dart';
 export 'src/giris.dart';
 export 'src/guncelleme.dart';
 export 'src/logo.dart';

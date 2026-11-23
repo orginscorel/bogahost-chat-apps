@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:boga_ortak/boga_ortak.dart';
 import 'package:flutter/material.dart';
 
+import '../ortak/parcalar.dart';
 import '../ortak/simgeler.dart';
 import '../ortak/yardimci.dart';
 import '../oturum.dart';
@@ -54,7 +55,7 @@ class _AyarlarEkraniState extends State<AyarlarEkrani> {
     });
   }
 
-  void _git(Widget w) => Navigator.of(context).push(HizliRota(builder: (_) => w));
+  void _git(Widget w) => yanPanelAc(context, w);
 
   @override
   Widget build(BuildContext context) {
@@ -108,142 +109,149 @@ class _AyarlarEkraniState extends State<AyarlarEkrani> {
       ),
     ];
     return Scaffold(
-      appBar: AppBar(title: const Text('Ayarlar')),
+      appBar: ekranBasligi(context, 'Ayarlar'),
       body: ValueListenableBuilder<Temsilci?>(
         valueListenable: Uyg.ben,
-        builder: (_, t, _) => ListView(
-          padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
-          children: [
-            if (t != null)
-              Kutu(
-                onTap: () => _git(const ProfilEkrani()),
-                child: Row(
-                  children: [
-                    Stack(
-                      children: [
-                        KisiAvatar(t.ad, url: t.avatar, boyut: 56),
-                        Positioned(right: 0, bottom: 0, child: Nokta(musaitlikRengi(t.musaitlik), boyut: 14, halka: r.kart)),
-                      ],
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+        builder: (_, t, _) => ortala(
+          ListView(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
+            children: [
+              if (t != null)
+                Kutu(
+                  onTap: () => _git(const ProfilEkrani()),
+                  child: Row(
+                    children: [
+                      Stack(
                         children: [
-                          Text(t.ad, style: gosterim(18, renk: r.metin)),
-                          Text(t.eposta, style: TextStyle(color: r.soluk, fontSize: 13)),
-                          const SizedBox(height: 6),
-                          Wrap(
-                            spacing: 6,
-                            runSpacing: 4,
-                            children: [
-                              Rozet(t.rolAdi, renk: t.yonetici ? Marka.mor : Marka.mavi),
-                              if (t.bolum != null) Rozet(t.bolum!, renk: Marka.lavanta),
-                              Rozet(t.totp ? '2FA açık' : '2FA kapalı', renk: t.totp ? Marka.zumrut : Marka.kehribar, ikon: Simgeler.verifiedUser),
-                            ],
-                          ),
+                          KisiAvatar(t.ad, url: t.avatar, boyut: 56),
+                          Positioned(right: 0, bottom: 0, child: Nokta(musaitlikRengi(t.musaitlik), boyut: 14, halka: r.kart)),
                         ],
                       ),
-                    ),
-                    Icon(Simgeler.chevronRight, color: r.silik),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(t.ad, style: gosterim(18, renk: r.metin)),
+                            Text(t.eposta, style: TextStyle(color: r.soluk, fontSize: 13)),
+                            const SizedBox(height: 6),
+                            Wrap(
+                              spacing: 6,
+                              runSpacing: 4,
+                              children: [
+                                Rozet(t.rolAdi, renk: t.yonetici ? Marka.mor : Marka.mavi),
+                                if (t.bolum != null) Rozet(t.bolum!, renk: Marka.lavanta),
+                                Rozet(t.totp ? '2FA açık' : '2FA kapalı', renk: t.totp ? Marka.zumrut : Marka.kehribar, ikon: Simgeler.verifiedUser),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(Simgeler.chevronRight, color: r.silik),
+                    ],
+                  ),
+                ),
+              const Baslik('Durumum'),
+              Kutu(
+                padding: const EdgeInsets.all(10),
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (final m in ['online', 'away', 'dnd', 'offline'])
+                      ChoiceChip(
+                        selected: t?.musaitlik == m,
+                        onSelected: (_) => _musaitlik(m),
+                        avatar: Nokta(musaitlikRengi(m), boyut: 9),
+                        label: Text(musaitlikAdi(m)),
+                      ),
                   ],
                 ),
               ),
-            const Baslik('Durumum'),
-            Kutu(
-              padding: const EdgeInsets.all(10),
-              child: Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: [
-                  for (final m in ['online', 'away', 'dnd', 'offline'])
-                    ChoiceChip(
-                      selected: t?.musaitlik == m,
-                      onSelected: (_) => _musaitlik(m),
-                      avatar: Nokta(musaitlikRengi(m), boyut: 9),
-                      label: Text(musaitlikAdi(m)),
-                      visualDensity: VisualDensity.compact,
+              const Baslik('Hesabım'),
+              Kutu(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                child: Column(
+                  children: [
+                    _satir('Profil ve güvenlik', 'Ad, takma ad, parola, 2FA, avatar', Simgeler.userCircle, Marka.mor, () => _git(const ProfilEkrani())),
+                    _satir(
+                      'Bildirimler',
+                      'Push, ses, e-posta ve sohbet eşikleri',
+                      Simgeler.bellRinging,
+                      Marka.kehribar,
+                      () => _git(const BildirimAyarEkrani()),
                     ),
-                ],
-              ),
-            ),
-            const Baslik('Hesabım'),
-            Kutu(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-              child: Column(
-                children: [
-                  _satir('Profil ve güvenlik', 'Ad, takma ad, parola, 2FA, avatar', Simgeler.userCircle, Marka.mor, () => _git(const ProfilEkrani())),
-                  _satir('Bildirimler', 'Push, ses, e-posta ve sohbet eşikleri', Simgeler.bellRinging, Marka.kehribar, () => _git(const BildirimAyarEkrani())),
-                  _satir(
-                    'Müsaitlik ve çalışma saatlerim',
-                    'Rahatsız etme, otomatik uzakta',
-                    Simgeler.calendarCheck,
-                    Marka.zumrut,
-                    () => _git(const MusaitlikEkrani()),
-                  ),
-                  ValueListenableBuilder<ThemeMode>(
-                    valueListenable: temaKipi,
-                    builder: (_, kip, _) => ListTile(
-                      leading: _ikon(Simgeler.palette, Marka.indigo),
-                      title: const Text('Tema'),
-                      trailing: SegmentedButton<ThemeMode>(
-                        showSelectedIcon: false,
-                        segments: const [
-                          ButtonSegment(value: ThemeMode.system, label: Text('Sistem')),
-                          ButtonSegment(value: ThemeMode.light, icon: Icon(Simgeler.lightMode, size: 16)),
-                          ButtonSegment(value: ThemeMode.dark, icon: Icon(Simgeler.darkMode, size: 16)),
-                        ],
-                        selected: {kip},
-                        onSelectionChanged: (s) => temaKaydet(s.first),
+                    _satir(
+                      'Müsaitlik ve çalışma saatlerim',
+                      'Rahatsız etme, otomatik uzakta',
+                      Simgeler.calendarCheck,
+                      Marka.zumrut,
+                      () => _git(const MusaitlikEkrani()),
+                    ),
+                    ValueListenableBuilder<ThemeMode>(
+                      valueListenable: temaKipi,
+                      builder: (_, kip, _) => ListTile(
+                        leading: _ikon(Simgeler.palette, Marka.indigo),
+                        title: const Text('Tema'),
+                        trailing: SegmentedButton<ThemeMode>(
+                          showSelectedIcon: false,
+                          segments: const [
+                            ButtonSegment(value: ThemeMode.system, label: Text('Sistem')),
+                            ButtonSegment(value: ThemeMode.light, icon: Icon(Simgeler.lightMode, size: 16)),
+                            ButtonSegment(value: ThemeMode.dark, icon: Icon(Simgeler.darkMode, size: 16)),
+                          ],
+                          selected: {kip},
+                          onSelectionChanged: (s) => temaKaydet(s.first),
+                        ),
                       ),
                     ),
-                  ),
-                  ValueListenableBuilder<bool>(
-                    valueListenable: sesAcik,
-                    builder: (_, v, _) => SwitchListTile(
-                      value: v,
-                      onChanged: sesKaydet,
-                      secondary: _ikon(v ? Simgeler.speaker : Simgeler.speakerOff, Marka.mavi),
-                      title: const Text('Uygulama açıkken ses'),
-                      subtitle: Text('Yeni sohbet ve mesajda bildirim sesi', style: TextStyle(color: r.silik, fontSize: 12)),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: sesAcik,
+                      builder: (_, v, _) => SwitchListTile(
+                        value: v,
+                        onChanged: sesKaydet,
+                        secondary: _ikon(v ? Simgeler.speaker : Simgeler.speakerOff, Marka.mavi),
+                        title: const Text('Uygulama açıkken ses'),
+                        subtitle: Text('Yeni sohbet ve mesajda bildirim sesi', style: TextStyle(color: r.silik, fontSize: 12)),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            if (yonetim.isNotEmpty) ...[const Baslik('Sohbet ve widget'), _izgara(yonetim, r)],
-            if (ekip.isNotEmpty) ...[const Baslik('Ekip ve güvenlik'), _izgara(ekip, r)],
-            const Baslik('Kayıtlar'),
-            _izgara(kayit, r),
-            const Baslik('Diğer'),
-            Kutu(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-              child: Column(
-                children: [
-                  _satir('Web paneli', Uyg.api.sunucu.replaceFirst('https://', ''), Simgeler.openInNew, Marka.grafit, () => disAc('${Uyg.api.sunucu}/admin')),
-                  ListTile(
-                    leading: _ikon(Simgeler.logout, Marka.gul),
-                    title: const Text('Çıkış yap', style: TextStyle(color: Marka.gul)),
-                    subtitle: Text('Bu cihazın oturumu ve bildirim kaydı silinir', style: TextStyle(color: r.silik, fontSize: 12)),
-                    onTap: () async {
-                      if (await onayla(context, 'Çıkış yapılsın mı?', evet: 'Çıkış yap', tehlikeli: true)) await Uyg.cikis();
-                    },
-                  ),
-                ],
+              if (yonetim.isNotEmpty) ...[const Baslik('Sohbet ve widget'), _izgara(yonetim, r)],
+              if (ekip.isNotEmpty) ...[const Baslik('Ekip ve güvenlik'), _izgara(ekip, r)],
+              const Baslik('Kayıtlar'),
+              _izgara(kayit, r),
+              const Baslik('Diğer'),
+              Kutu(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                child: Column(
+                  children: [
+                    _satir('Web paneli', Uyg.api.sunucu.replaceFirst('https://', ''), Simgeler.openInNew, Marka.grafit, () => disAc('${Uyg.api.sunucu}/admin')),
+                    ListTile(
+                      leading: _ikon(Simgeler.logout, Marka.gul),
+                      title: const Text('Çıkış yap', style: TextStyle(color: Marka.gul)),
+                      subtitle: Text('Bu cihazın oturumu ve bildirim kaydı silinir', style: TextStyle(color: r.silik, fontSize: 12)),
+                      onTap: () async {
+                        if (await onayla(context, 'Çıkış yapılsın mı?', evet: 'Çıkış yap', tehlikeli: true)) await Uyg.cikis();
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-            Center(
-              child: Column(
-                children: [
-                  const BogahostLogoGorunumu(genislik: 44, yalnizAmblem: true),
-                  const SizedBox(height: 8),
-                  Text('Bogahost Chat ${Uyg.api.surum} · $platform', style: TextStyle(color: r.silik, fontSize: 12)),
-                  if (Uyg.sunucuSurumu.isNotEmpty) Text('Sunucu ${Uyg.sunucuSurumu}', style: TextStyle(color: r.silik, fontSize: 11.5)),
-                ],
+              const SizedBox(height: 24),
+              Center(
+                child: Column(
+                  children: [
+                    const BogahostLogoGorunumu(genislik: 44, yalnizAmblem: true),
+                    const SizedBox(height: 8),
+                    Text('Bogahost Chat ${Uyg.api.surum} · $platform', style: TextStyle(color: r.silik, fontSize: 12)),
+                    if (Uyg.sunucuSurumu.isNotEmpty) Text('Sunucu ${Uyg.sunucuSurumu}', style: TextStyle(color: r.silik, fontSize: 11.5)),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

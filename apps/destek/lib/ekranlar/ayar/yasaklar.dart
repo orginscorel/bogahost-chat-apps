@@ -115,7 +115,7 @@ class _YasaklarEkraniState extends State<YasaklarEkrani> {
                 ),
                 EsitIzgara(
                   enAz: 150,
-                  yukseklik: 64,
+                  yukseklik: 72,
                   children: [
                     KpiKart(
                       kucuk: true,
@@ -155,7 +155,6 @@ class _YasaklarEkraniState extends State<YasaklarEkrani> {
                     const SizedBox(width: 10),
                     SegmentedButton<String>(
                       showSelectedIcon: false,
-                      style: const ButtonStyle(visualDensity: VisualDensity.compact),
                       segments: const [
                         ButtonSegment(value: 'aktif', label: Text('Aktif')),
                         ButtonSegment(value: 'dolmus', label: Text('Dolmuş')),
@@ -171,15 +170,9 @@ class _YasaklarEkraniState extends State<YasaklarEkrani> {
                   spacing: 8,
                   runSpacing: 6,
                   children: [
-                    ChoiceChip(
-                      label: const Text('Tüm türler'),
-                      selected: _tur == 'hepsi',
-                      visualDensity: VisualDensity.compact,
-                      onSelected: (_) => setState(() => _tur = 'hepsi'),
-                    ),
+                    ChoiceChip(label: const Text('Tüm türler'), selected: _tur == 'hepsi', onSelected: (_) => setState(() => _tur = 'hepsi')),
                     for (final (t, ad) in yasakTurleri)
-                      if (turler.contains(t))
-                        ChoiceChip(label: Text(ad), selected: _tur == t, visualDensity: VisualDensity.compact, onSelected: (_) => setState(() => _tur = t)),
+                      if (turler.contains(t)) ChoiceChip(label: Text(ad), selected: _tur == t, onSelected: (_) => setState(() => _tur = t)),
                   ],
                 ),
                 const SizedBox(height: 12),
