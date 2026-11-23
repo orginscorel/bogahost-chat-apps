@@ -21,6 +21,10 @@ Map<String, dynamic> _k(dynamic v) {
 }
 
 Future<Map<String, dynamic>> _get(String yol, {Map<String, dynamic>? q}) async => _k(await Uyg.api.get(_p(yol), q: q));
+
+/// Sık yoklamalar için kısa zaman aşımlı (varsayılan 6 sn) ve iptal edilebilir GET; iptalde [IstekIptal] fırlatır.
+Future<Map<String, dynamic>> _getHizli(String yol, {Map<String, dynamic>? q, CancelToken? iptal, Duration zamanAsimi = const Duration(seconds: 6)}) async =>
+    _k(await Uyg.api.get(_p(yol), q: q, zamanAsimi: zamanAsimi, iptal: iptal));
 Future<Map<String, dynamic>> _post(String yol, [Object? g]) async => _k(await Uyg.api.post(_p(yol), g));
 Future<Map<String, dynamic>> _put(String yol, [Object? g]) async => _k(await Uyg.api.put(_p(yol), g));
 Future<Map<String, dynamic>> _del(String yol) async => _k(await Uyg.api.delete(_p(yol)));
@@ -126,4 +130,13 @@ class Panel {
   static Future<Map<String, dynamic>> aramaYokla(int sohbet) async => harita(await Uyg.api.get('${Uyg.apiKok}/chats/$sohbet/call/poll'));
   static Future<void> aramaIce(int sohbet, Map<String, dynamic> aday) => Uyg.api.post('${Uyg.apiKok}/chats/$sohbet/call/ice', {'candidate': aday});
   static Future<void> aramaBitir(int sohbet) => Uyg.api.post('${Uyg.apiKok}/chats/$sohbet/call/end');
+
+  // ---- Hızlı yoklamalar (kısa zaman aşımı + ekran kapanınca iptal)
+  static Future<Map<String, dynamic>> ekranAlHizli(int oturum, {Object? hv, CancelToken? iptal}) =>
+      _getHizli('visitors/$oturum/screen', q: {'hv': ?hv}, iptal: iptal);
+
+  /// Temsilcinin kaydırma konumunu ziyaretçinin tarayıcısına iter; ikisi de null → temizler.
+  static Future<Map<String, dynamic>> ekranKaydir(int oturum, int? sx, int? sy) => _post('visitors/$oturum/screen/scroll', {'sx': sx, 'sy': sy});
+  static Future<Map<String, dynamic>> aramaYoklaHizli(int sohbet, {CancelToken? iptal}) async =>
+      harita(await Uyg.api.get('${Uyg.apiKok}/chats/$sohbet/call/poll', zamanAsimi: const Duration(seconds: 5), iptal: iptal));
 }

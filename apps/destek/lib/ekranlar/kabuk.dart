@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:boga_ortak/boga_ortak.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -307,13 +308,9 @@ class _KabukState extends State<Kabuk> with WidgetsBindingObserver {
       sonOzet.value = o;
       final b = await Depo.bildirimler();
       sonBildirimler.value = b.ogeler;
-      rozetler.value = {
-        ...rozetler.value,
-        Bolum.sohbetler: o.bekleyen,
-        Bolum.ziyaretciler: o.cevrimici,
-        Bolum.ekip: o.icOkunmamis,
-        Bolum.bildirimler: b.okunmamis,
-      };
+      final yeni = {...rozetler.value, Bolum.sohbetler: o.bekleyen, Bolum.ziyaretciler: o.cevrimici, Bolum.ekip: o.icOkunmamis, Bolum.bildirimler: b.okunmamis};
+      // Değer değişmediyse dinleyiciler (yan menü, alt çubuk) boşuna yeniden çizilmesin.
+      if (!mapEquals(yeni, rozetler.value)) rozetler.value = yeni;
       if (b.engelli) {
         bildir('Erişiminiz kapatıldı', mesaj: 'Yönetici bu panele erişiminizi kapattı.', tur: MesajTur.hata);
       }

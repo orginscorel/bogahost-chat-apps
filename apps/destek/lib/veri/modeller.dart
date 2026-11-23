@@ -62,6 +62,10 @@ class Sohbet {
   final bool cevrimici, favori, arsiv, kacan;
   final int? puan;
 
+  /// Görünür alanların imzası: liste yoklamasında değişiklik yoksa setState atlanır.
+  String get imza =>
+      '$id|$ziyaretci|$durum|$son|$sonGonderen|$eposta|$bolum|$temsilci|$ulke|$onizleme|$yaziyor|$cevrimici|$favori|$arsiv|$kacan|$puan|$okunmamis';
+
   String get durumAdi => switch (durum) {
     'open' => 'Açık',
     'pending' => 'Bekliyor',
@@ -106,6 +110,39 @@ class Mesaj {
   final String? govde;
   final bool icNot, fisilti, okundu, duzenlendi, silindi, benim;
   final Ek? ek;
+
+  const Mesaj._({
+    required this.id,
+    required this.gonderen,
+    required this.ad,
+    required this.tur,
+    required this.saat,
+    required this.govde,
+    required this.icNot,
+    required this.fisilti,
+    required this.okundu,
+    required this.duzenlendi,
+    required this.silindi,
+    required this.benim,
+    required this.ek,
+  });
+
+  /// Yalnız okundu bilgisi değişince yeni nesne (JSON'u yeniden çözmeden).
+  Mesaj copyWith({bool? okundu}) => Mesaj._(
+    id: id,
+    gonderen: gonderen,
+    ad: ad,
+    tur: tur,
+    saat: saat,
+    govde: govde,
+    icNot: icNot,
+    fisilti: fisilti,
+    okundu: okundu ?? this.okundu,
+    duzenlendi: duzenlendi,
+    silindi: silindi,
+    benim: benim,
+    ek: ek,
+  );
 
   bool get ziyaretci => gonderen == 'visitor';
   bool get sistem => gonderen == 'system' || tur == 'event';

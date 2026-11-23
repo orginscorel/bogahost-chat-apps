@@ -1,3 +1,15 @@
+## 1.2.5
+
+- Sohbet yoklaması web paneliyle aynı uyarlanır düzene geçti: hareket varken 0,9 sn, 3 dk'ya kadar 2,5 sn, sonra 6 sn, pencere arkadayken 10 sn; yoklama 8 sn alma zaman aşımı ve ekran kapanınca iptal ile çalışır (takılan tek istek görüşmeyi dondurmuyor).
+- Performans: görünür bir şey değişmediyse görüşme, sohbet listesi ve yan menü rozetleri yeniden çizilmiyor; balonlar anahtarlı; balon başına SelectableText yerine masaüstünde tek seçim alanı; görsel önizlemeler küçük boyutta çözülüyor; okundu bilgisi JSON'u yeniden çözmeden güncelleniyor; HTTP istekleri gzip; ölçekli arayüzde RepaintBoundary.
+- Ctrl+V / Cmd+V ile panodaki görsel ya da dosya doğrudan ek olarak gönderilir (metin yapıştırma aynen sürer); masaüstünde sohbete dosya sürükle-bırak.
+- Talep formu modalı web ile aynı: Genel destek (birim seçimi, varsayılan otomatik) · Ödeme bildirimi (muhasebe) · İptal talebi (yalnız WHMCS müşterisi + yetki); kısa not isteğe bağlı.
+- Yeni: Transkript "PDF indir" (masaüstünde farklı kaydet, telefonda aç); "Hizmetler & iptal talebi" ekranı (WHMCS hizmet listesi, çift onaylı gerçek iptal talebi); ziyaretçi dili / çeviri seçimi; ziyaretçinin sesli / görüntülü / ekran talebi için Başlat · Yoksay şeridi; önemli/arşiv/kaçan durumları sohbet detayından okunur.
+- Canlı ekran izleme: JavaScript açık ve temizlenmiş kare (betik yok), kaydırma konumu gerçekten uygulanıyor; "Kaydır" ile temsilci sayfayı kaydırır ve bu ziyaretçinin tarayıcısına yansır; sona eren / reddedilen paylaşımda yoklama durur; sayfa değişince kare yeniden yüklenir; ilk kare denetleyiciden önce gelirse kaybolmuyor.
+- Arama: yoklama üst üste binmiyor, ICE adayları sıralı gönderiliyor, 45 sn yanıt yoksa kapanır, kopan bağlantıda ICE yeniden başlatma (2 deneme), kapanışta kamera/mikrofon kesin bırakılır; durum metinleri sadeleşti. iOS izin açıklamaları bu uygulamaya göre yazıldı.
+- Ziyaretçi bilgisi paneli toparlandı: Şu an → atama → bu sohbet → müşteri → ağ & cihaz → kaynak → teknik ayrıntılar (katlanır) → gezinti (8 + tümünü göster) → olay günlüğü (okunur) → geçmiş; yasaklama en altta.
+- Sunucu: davet, ziyaretçinin açık sohbeti varsa doğrudan sohbet mesajı olarak gider (widget açıkken/paylaşımda davet balonu görünmüyordu); temsilci başlatmalı sohbet 15 sn yerine sinyalle 3-6 sn'de widget'a düşer; SSE havuz sınırı gerçekten uygulanıyor; widget 429/5xx'te geri çekilir; ekran paylaşımı sayfa geçişinde sürer; izleme kalp atışı 30 sn.
+
 ## 1.2.4
 
 - Yan menü uygulamanın ilk renk stiline döndü: tema kartı zemini + kenar (açık/koyu temaya uyar), seçili öğe yumuşak mor zemin + mor simge/yazı; koyu sabit (#12151D) zemin kaldırıldı.

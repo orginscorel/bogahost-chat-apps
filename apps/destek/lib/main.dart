@@ -68,7 +68,7 @@ class OlcekSarmal extends StatelessWidget {
         final w = k.maxWidth, h = k.maxHeight;
         if (!w.isFinite || !h.isFinite) return child;
         final f = tercih > 0 ? tercih : otomatikOlcek(w);
-        if ((f - 1).abs() < .01) return child;
+        if ((f - 1).abs() < .01) return RepaintBoundary(child: child);
         final mq = MediaQuery.of(ctx);
         return MediaQuery(
           data: mq.copyWith(
@@ -89,7 +89,11 @@ class OlcekSarmal extends StatelessWidget {
               maxWidth: w / f,
               minHeight: h / f,
               maxHeight: h / f,
-              child: SizedBox(width: w / f, height: h / f, child: child),
+              child: SizedBox(
+                width: w / f,
+                height: h / f,
+                child: RepaintBoundary(child: child),
+              ),
             ),
           ),
         );

@@ -11,6 +11,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// API hatası. [durum] null ise sunucuya hiç ulaşılamadı.
+/// Ekran kapandığı için iptal edilen istek (hata değildir; çağıran sessizce yutar).
+class IstekIptal implements Exception {
+  const IstekIptal();
+}
+
 class ApiHata implements Exception {
   ApiHata(this.durum, this.mesaj, {this.kod = '', this.alan});
   final int? durum;
@@ -95,7 +100,12 @@ class BogaApi {
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 60),
         sendTimeout: const Duration(seconds: 120),
-        headers: {'User-Agent': 'BogaMail-${uygulama == 'posta' ? 'Posta' : 'Yonetim'}/$surum ($platform)', 'Accept': 'application/json'},
+        headers: {
+          'User-Agent': 'BogaMail-${uygulama == 'posta' ? 'Posta' : 'Yonetim'}/$surum ($platform)',
+          'Accept': 'application/json',
+          // h2 bağdaştırıcısı gzip'i kendiliğinden istemez; JSON yanıtlar sıkıştırılsın.
+          'Accept-Encoding': 'gzip',
+        },
         validateStatus: (_) => true,
       ),
     );
@@ -160,7 +170,9 @@ class BogaApi {
 
   Future<void> cerezleriTemizle() => _jar.deleteAll();
 
-  Future<dynamic> get(String yol, {Map<String, dynamic>? q}) => _istek('GET', yol, q: q);
+  /// [zamanAsimi]: bu istek için alma zaman aşımı (yoklamalarda kısa tutulur; varsayılan 60 sn). [iptal]: ekran kapanınca iptal.
+  Future<dynamic> get(String yol, {Map<String, dynamic>? q, Duration? zamanAsimi, CancelToken? iptal}) =>
+      _istek('GET', yol, q: q, zamanAsimi: zamanAsimi, iptal: iptal);
   Future<dynamic> post(String yol, [Object? govde]) => _istek('POST', yol, govde: govde ?? const <String, dynamic>{});
   Future<dynamic> put(String yol, [Object? govde]) => _istek('PUT', yol, govde: govde ?? const <String, dynamic>{});
   Future<dynamic> patch(String yol, [Object? govde]) => _istek('PATCH', yol, govde: govde ?? const <String, dynamic>{});
@@ -194,17 +206,19 @@ class BogaApi {
     return ApiHata(null, zaman ? 'Sunucu zamanında yanıt vermedi. Bağlantınızı kontrol edin.' : 'Sunucuya ulaşılamıyor. İnternet bağlantınızı kontrol edin.');
   }
 
-  Future<dynamic> _istek(String yontem, String yol, {Object? govde, Map<String, dynamic>? q}) async {
+  Future<dynamic> _istek(String yontem, String yol, {Object? govde, Map<String, dynamic>? q, Duration? zamanAsimi, CancelToken? iptal}) async {
     final Response<dynamic> c;
     try {
       c = await dio.request<dynamic>(
         yol,
         data: govde,
         queryParameters: q,
-        options: Options(method: yontem),
+        options: Options(method: yontem, receiveTimeout: zamanAsimi),
+        cancelToken: iptal,
       );
     } on DioException catch (e) {
-      if (e.type != DioExceptionType.cancel) ulasilabilirlik?.call(false);
+      if (e.type == DioExceptionType.cancel) throw const IstekIptal();
+      ulasilabilirlik?.call(false);
       throw _agHatasi(e);
     }
     ulasilabilirlik?.call(true);

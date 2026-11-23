@@ -52,6 +52,22 @@ class _SohbetlerEkraniState extends State<SohbetlerEkrani> {
 
   void _secimDegisti() => setState(() {});
 
+  static bool _ayniListe(List<Sohbet> a, List<Sohbet> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i].imza != b[i].imza) return false;
+    }
+    return true;
+  }
+
+  static bool _ayniSayilar(Map<String, int> a, Map<String, int> b) {
+    if (a.length != b.length) return false;
+    for (final e in b.entries) {
+      if (a[e.key] != e.value) return false;
+    }
+    return true;
+  }
+
   Future<void> _yukle({bool sessiz = false, bool daha = false}) async {
     if (_yukleniyor) return;
     _yukleniyor = true;
@@ -59,8 +75,13 @@ class _SohbetlerEkraniState extends State<SohbetlerEkrani> {
       final sayfa = daha ? _sayfa + 1 : 1;
       final v = await Depo.sohbetler(durum: _durum, sayfa: sayfa);
       if (!mounted) return;
+      final yeni = daha ? [...?_liste, ...v.sohbetler] : v.sohbetler;
+      // Sessiz yoklamada görünür hiçbir şey değişmediyse yeniden çizme (4 sn'de bir tüm liste yenilenmesin).
+      final ayni =
+          sessiz && !daha && _liste != null && _hata == null && _dahaVar == v.dahaVar && _ayniSayilar(_sayilar, v.sayilar) && _ayniListe(_liste!, yeni);
+      if (ayni) return;
       setState(() {
-        _liste = daha ? [...?_liste, ...v.sohbetler] : v.sohbetler;
+        _liste = yeni;
         _sayilar = v.sayilar;
         _dahaVar = v.dahaVar;
         _sayfa = sayfa;

@@ -2,6 +2,21 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.5',
+    'date': '2026-11-23',
+    'title': 'Hız, yapıştırma, talep formu, PDF, iptal talebi, ekran kaydırma',
+    'items': [
+      {'type': 'improve', 'text': 'Uyarlanır yoklama (0,9 / 2,5 / 6 sn) ve gereksiz yeniden çizimlerin kaldırılması: uygulama belirgin hafifledi.'},
+      {'type': 'new', 'text': 'Ctrl+V / Cmd+V ile panodaki görsel ve dosyalar ek olarak gider; masaüstünde sürükle-bırak.'},
+      {'type': 'improve', 'text': 'Talep formu modalı web ile aynı: Genel destek · Ödeme bildirimi · İptal talebi.'},
+      {'type': 'new', 'text': 'Transkript PDF indir, Hizmetler & iptal talebi ekranı, ziyaretçi dili seçimi, görüşme talebi şeridi.'},
+      {'type': 'fix', 'text': 'Canlı ekran izleme: kaydırma gerçekten uygulanıyor; "Kaydır" ile temsilcinin kaydırması ziyaretçiye yansır.'},
+      {'type': 'fix', 'text': 'Arama: yanıt yoksa 45 sn\'de kapanır, kopan bağlantı yeniden kurulur, kamera/mikrofon kesin bırakılır.'},
+      {'type': 'improve', 'text': 'Ziyaretçi bilgisi paneli derli toplu sırada; teknik kimlikler katlanır; olay günlüğü okunur.'},
+      {'type': 'fix', 'text': 'Canlı ziyaretçilerde "Davet et": açık sohbeti olan ziyaretçiye davet doğrudan sohbet mesajı olarak düşer.'},
+    ],
+  },
+  {
     'version': '1.2.4',
     'date': '2026-11-23',
     'title': 'Yan menü ilk renk stili, yumuşak ölçek',

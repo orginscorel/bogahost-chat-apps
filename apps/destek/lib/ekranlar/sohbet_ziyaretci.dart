@@ -13,7 +13,7 @@ import 'ekran_izle.dart';
 import 'kabuk.dart';
 import 'ziyaretci_detay.dart';
 
-/// Sohbet ekranının sağ bloğu: web panelindeki "Ziyaretçi bilgileri" paneliyle aynı kapsam —
+/// Sohbet ekranının sağ bloğu: web panelindeki "Ziyaretçi bilgileri" paneliyle aynı kapsam, derli toplu sırayla —
 /// kimlik, iletişim, WHMCS, ağ (IP · port · parmak izi), cihaz, konum + yerel saat, kaynak/UTM,
 /// atama, yasaklama / yasak kaldırma, gezinti geçmişi, olay günlüğü, geçmiş görüşmeler.
 class SohbetZiyaretciPaneli extends StatefulWidget {
@@ -26,6 +26,7 @@ class SohbetZiyaretciPaneli extends StatefulWidget {
 
 class _SohbetZiyaretciPaneliState extends State<SohbetZiyaretciPaneli> {
   late Future<Map<String, dynamic>> _f = Panel.sohbetZiyaretci(widget.sohbetId);
+  bool _tumSayfalar = false;
   void _yenile() => setState(() => _f = Panel.sohbetZiyaretci(widget.sohbetId));
 
   @override
@@ -90,7 +91,7 @@ class _SohbetZiyaretciPaneliState extends State<SohbetZiyaretciPaneli> {
     final whmcs = z['whmcs_id'];
     final simdikiUrl = metinYa(v['current_url']) ?? metinYa(n['current_url']);
     final utm = n['utm'] is Map
-        ? (n['utm'] as Map).entries.where((e) => e.value != null && '${e.value}'.isNotEmpty).map((e) => '${e.key}=${e.value}').join(' ')
+        ? (n['utm'] as Map).entries.where((e) => e.value != null && '${e.value}'.isNotEmpty).map((e) => '${e.key}=${e.value}').join('\n')
         : '';
     final yasakYetkisi = mantik(can['ban']) && Uyg.yetki('bans.manage');
 
@@ -128,10 +129,130 @@ class _SohbetZiyaretciPaneliState extends State<SohbetZiyaretciPaneli> {
       ),
     );
 
+    final sayfaListesi = _tumSayfalar ? sayfalar : sayfalar.take(8).toList();
+
+    Widget teknik(String k, String? v) => v == null || v.isEmpty
+        ? const SizedBox.shrink()
+        : InkWell(
+            onTap: () => kopyala(v),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 118,
+                    child: Text(k, style: TextStyle(color: r.silik, fontSize: 12.5)),
+                  ),
+                  Expanded(
+                    child: Text(
+                      v,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: r.metin, fontSize: 12.5),
+                    ),
+                  ),
+                  Icon(Simgeler.copy, size: 14, color: r.silik),
+                ],
+              ),
+            ),
+          );
+
+    Widget yasakBlogu() => banSayisi == 0
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              FilledButton.icon(
+                style: FilledButton.styleFrom(backgroundColor: Marka.gul, foregroundColor: Colors.white),
+                onPressed: () async {
+                  final ok = await sohbetYasaklaDiyalog(
+                    context,
+                    widget.sohbetId,
+                    ip: metinYa(n['ip']),
+                    parmakIzi: metinYa(n['fingerprint']),
+                    eposta: metinYa(z['email']),
+                  );
+                  if (ok) _yenile();
+                },
+                icon: const Icon(Simgeler.shield, size: 17),
+                label: const Text('Ziyaretçiyi yasakla'),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  'IP · ağ bloğu · cihaz · kimlik · e-posta',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: r.silik, fontSize: 11),
+                ),
+              ),
+            ],
+          )
+        : Kutu(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Simgeler.prohibit, color: Marka.gul, size: 18),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Bu ziyaretçi yasaklı ($banSayisi kayıt)',
+                        style: const TextStyle(color: Marka.gul, fontWeight: FontWeight.w700, fontSize: 13),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                for (final b in yasaklar)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${YasaklarEkraniYardim.turAdi(metin(b['type']))}: ${metin(b['value'])}'
+                            '${metinYa(b['reason']) != null ? ' · ${metin(b['reason'])}' : ''}'
+                            '${metinYa(b['expires']) != null ? ' · bitiş ${metin(b['expires'])}' : ' · kalıcı'}',
+                            style: TextStyle(color: r.metin, fontSize: 12),
+                          ),
+                        ),
+                        TextButton(
+                          style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
+                          onPressed: () async {
+                            if (await kaydet(() => Panel.yasakSil(tamsayi(b['id'])), tamam: 'Yasak kaldırıldı')) _yenile();
+                          },
+                          child: const Text('Kaldır'),
+                        ),
+                      ],
+                    ),
+                  ),
+                const SizedBox(height: 4),
+                FilledButton.icon(
+                  style: FilledButton.styleFrom(backgroundColor: Marka.zumrut, foregroundColor: Colors.white),
+                  onPressed: () async {
+                    final onay = await onayla(
+                      context,
+                      'Tüm yasaklar kaldırılsın mı?',
+                      mesaj: 'IP, ağ bloğu, cihaz, kimlik ve e-posta yasaklarının hepsi kaldırılır.',
+                      evet: 'Kaldır',
+                    );
+                    if (!onay) return;
+                    final x = await islem(() => Depo.sohbetYasakKaldir(widget.sohbetId), tamam: 'Yasaklar kaldırıldı');
+                    if (x != null) _yenile();
+                  },
+                  icon: const Icon(Simgeler.check, size: 17),
+                  label: const Text('Tüm yasakları kaldır'),
+                ),
+              ],
+            ),
+          );
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
       children: [
-        // ---- Kimlik başlığı
+        // ---- Kimlik başlığı: avatar, bayrak + ad, e-posta, telefon, rozetler
         Center(
           child: Column(
             children: [
@@ -148,16 +269,28 @@ class _SohbetZiyaretciPaneliState extends State<SohbetZiyaretciPaneli> {
                 style: gosterim(17, renk: r.metin),
               ),
               if (metinYa(z['email']) != null)
-                SelectableText(
-                  metin(z['email']),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: r.soluk, fontSize: 13),
+                InkWell(
+                  onTap: () => kopyala(metin(z['email'])),
+                  child: Text(
+                    metin(z['email']),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: r.soluk, fontSize: 13),
+                  ),
                 ),
               if (metinYa(z['phone']) != null)
-                SelectableText(
-                  metin(z['phone']),
+                InkWell(
+                  onTap: () => kopyala(metin(z['phone'])),
+                  child: Text(
+                    metin(z['phone']),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: r.soluk, fontSize: 13),
+                  ),
+                ),
+              if (sehir != null || ulke != null)
+                Text(
+                  [sehir, ulke].whereType<String>().join(', '),
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: r.soluk, fontSize: 13),
+                  style: TextStyle(color: r.silik, fontSize: 12),
                 ),
               const SizedBox(height: 10),
               Wrap(
@@ -179,101 +312,8 @@ class _SohbetZiyaretciPaneliState extends State<SohbetZiyaretciPaneli> {
             ],
           ),
         ),
-        const SizedBox(height: 12),
-        // ---- Yasaklama
-        if (yasakYetkisi)
-          banSayisi == 0
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    FilledButton.icon(
-                      style: FilledButton.styleFrom(backgroundColor: Marka.gul, foregroundColor: Colors.white),
-                      onPressed: () async {
-                        final ok = await sohbetYasaklaDiyalog(
-                          context,
-                          widget.sohbetId,
-                          ip: metinYa(n['ip']),
-                          parmakIzi: metinYa(n['fingerprint']),
-                          eposta: metinYa(z['email']),
-                        );
-                        if (ok) _yenile();
-                      },
-                      icon: const Icon(Simgeler.shield, size: 17),
-                      label: const Text('Ziyaretçiyi yasakla'),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        'IP · ağ bloğu · cihaz parmak izi · kimlik · e-posta — VPN/proxy atlatamaz',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: r.silik, fontSize: 11),
-                      ),
-                    ),
-                  ],
-                )
-              : Kutu(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Simgeler.prohibit, color: Marka.gul, size: 18),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Bu ziyaretçi yasaklı ($banSayisi kayıt)',
-                              style: const TextStyle(color: Marka.gul, fontWeight: FontWeight.w700, fontSize: 13),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      for (final b in yasaklar)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 4),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  '${YasaklarEkraniYardim.turAdi(metin(b['type']))}: ${metin(b['value'])}'
-                                  '${metinYa(b['reason']) != null ? ' · ${metin(b['reason'])}' : ''}'
-                                  '${metinYa(b['expires']) != null ? ' · bitiş ${metin(b['expires'])}' : ' · kalıcı'}',
-                                  style: TextStyle(color: r.metin, fontSize: 12),
-                                ),
-                              ),
-                              TextButton(
-                                style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
-                                onPressed: () async {
-                                  if (await kaydet(() => Panel.yasakSil(tamsayi(b['id'])), tamam: 'Yasak kaldırıldı')) _yenile();
-                                },
-                                child: const Text('Kaldır'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      const SizedBox(height: 4),
-                      FilledButton.icon(
-                        style: FilledButton.styleFrom(backgroundColor: Marka.zumrut, foregroundColor: Colors.white),
-                        onPressed: () async {
-                          final onay = await onayla(
-                            context,
-                            'Tüm yasaklar kaldırılsın mı?',
-                            mesaj: 'IP, ağ bloğu, cihaz, kimlik ve e-posta yasaklarının hepsi kaldırılır.',
-                            evet: 'Kaldır',
-                          );
-                          if (!onay) return;
-                          final x = await islem(() => Depo.sohbetYasakKaldir(widget.sohbetId), tamam: 'Yasaklar kaldırıldı');
-                          if (x != null) _yenile();
-                        },
-                        icon: const Icon(Simgeler.check, size: 17),
-                        label: const Text('Tüm yasakları kaldır'),
-                      ),
-                    ],
-                  ),
-                ),
         // ---- Hızlı eylemler
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -298,6 +338,35 @@ class _SohbetZiyaretciPaneliState extends State<SohbetZiyaretciPaneli> {
               ),
           ],
         ),
+        // ---- Şu an (sayfa + yazıyor)
+        if (simdikiUrl != null || metinYa(si?['sneak_peek']) != null) ...[
+          bolum('Şu an'),
+          if (simdikiUrl != null)
+            InkWell(
+              onTap: () => disAc(simdikiUrl),
+              child: Text(
+                metinYa(si?['current_title']) != null ? '${metin(si?['current_title'])}\n${kisaUrl(simdikiUrl, en: 70)}' : kisaUrl(simdikiUrl, en: 70),
+                style: const TextStyle(color: Marka.mavi, fontSize: 12.5, height: 1.35),
+              ),
+            ),
+          if (metinYa(si?['sneak_peek']) != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Simgeler.edit, size: 14, color: Marka.mor),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'Yazıyor: ${metin(si?['sneak_peek'])}',
+                      style: const TextStyle(color: Marka.mor, fontStyle: FontStyle.italic, fontSize: 12.5),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
         // ---- Atama
         if (ziyaretciId != null && temsilciler.isNotEmpty) ...[
           bolum('Atama'),
@@ -327,81 +396,7 @@ class _SohbetZiyaretciPaneliState extends State<SohbetZiyaretciPaneli> {
             },
           ),
         ],
-        // ---- Şu an
-        if (simdikiUrl != null || metinYa(si?['sneak_peek']) != null) ...[
-          bolum('Şu an'),
-          if (simdikiUrl != null)
-            InkWell(
-              onTap: () => disAc(simdikiUrl),
-              child: Text(
-                metinYa(si?['current_title']) != null ? '${metin(si?['current_title'])}\n$simdikiUrl' : simdikiUrl,
-                style: const TextStyle(color: Marka.mavi, fontSize: 12.5, height: 1.35),
-              ),
-            ),
-          if (metinYa(si?['sneak_peek']) != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Simgeler.edit, size: 14, color: Marka.mor),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'Yazıyor: ${metin(si?['sneak_peek'])}',
-                      style: const TextStyle(color: Marka.mor, fontStyle: FontStyle.italic, fontSize: 12.5),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-        ],
-        // ---- İletişim & kimlik
-        bolum('İletişim & kimlik'),
-        bilgi(context, 'Ad Soyad', ad),
-        bilgi(context, 'E-posta', metinYa(z['email']), kopyalanir: true),
-        bilgi(context, 'Telefon', metinYa(z['phone']), kopyalanir: true),
-        bilgi(context, 'WHMCS ID', whmcs?.toString(), kopyalanir: true),
-        bilgi(context, 'İlk ziyaret', metinYa(z['first_seen'])),
-        bilgi(context, 'Ziyaretçi no', ziyaretciId?.toString()),
-        bilgi(context, 'Kalıcı kimlik', metinYa(n['visitor_uid']), kopyalanir: true),
-        bilgi(context, 'Sohbet dili', metinYa(v['visitor_lang'])),
-        // ---- Ağ & cihaz
-        bolum('Ağ & cihaz'),
-        bilgi(context, 'IP', metinYa(n['ip']), kopyalanir: true),
-        bilgi(context, 'Port', metinYa(n['port'])),
-        bilgi(context, 'İşletim sistemi', metinYa(n['os'])),
-        bilgi(context, 'Tarayıcı', metinYa(n['browser'])),
-        bilgi(context, 'Cihaz', metinYa(n['device'])),
-        bilgi(context, 'Ekran', metinYa(n['screen'])),
-        bilgi(context, 'Dil', metinYa(n['language'])),
-        bilgi(
-          context,
-          'Saat dilimi',
-          [metinYa(n['timezone']), if (metinYa(si?['local_time']) != null) 'yerel saat ${metin(si?['local_time'])}'].whereType<String>().join(' · '),
-        ),
-        bilgi(context, 'Parmak izi', metinYa(n['fingerprint']), kopyalanir: true),
-        bilgi(context, 'Tarayıcı kimliği', metinYa(n['user_agent']), kopyalanir: true),
-        // ---- Konum
-        if (ulke != null || sehir != null) ...[
-          bolum('Konum'),
-          bilgi(context, 'Ülke / şehir', '${ulke != null ? '${bayrak(ulke)} ' : ''}${[sehir, ulke].whereType<String>().join(', ')}'),
-        ],
-        // ---- Oturum
-        if (si != null) ...[
-          bolum('Oturum'),
-          bilgi(context, 'Başlangıç', metinYa(si['started'])),
-          bilgi(context, 'Son hareket', metinYa(si['last_activity'])),
-          bilgi(context, 'Sayfa sayısı', si['pageviews'] == null ? null : '${tamsayi(si['pageviews'])}'),
-          bilgi(context, 'Oturum no', '${tamsayi(si['id'])}'),
-        ],
-        // ---- Kaynak
-        if (metinYa(n['referrer']) != null || utm.isNotEmpty) ...[
-          bolum('Kaynak'),
-          bilgi(context, 'Yönlendiren', metinYa(n['referrer']), kopyalanir: true),
-          bilgi(context, 'UTM', utm.isEmpty ? null : utm, kopyalanir: true),
-        ],
-        // ---- Sohbet
+        // ---- Bu sohbet
         bolum('Bu sohbet'),
         bilgi(context, 'Sohbet', '#${widget.sohbetId} · ${_durumAdi(metin(v['status']))}'),
         bilgi(context, 'Departman', metinYa(v['department'])),
@@ -411,14 +406,61 @@ class _SohbetZiyaretciPaneliState extends State<SohbetZiyaretciPaneli> {
           'Katılımcılar',
           katilimcilar.isEmpty ? null : katilimcilar.map((k) => metin(k['name'] ?? k['display_name'] ?? k['user'])).where((x) => x.isNotEmpty).join(', '),
         ),
+        bilgi(context, 'Sohbet dili', metinYa(v['visitor_lang'])?.toUpperCase()),
         if (v['rating'] != null)
-          bilgi(context, 'Değerlendirme', '${'★' * tamsayi(v['rating'])}${metinYa(v['rating_comment']) != null ? ' · ${metin(v['rating_comment'])}' : ''}'),
+          bilgi(context, 'Değerlendirme', '★ ${tamsayi(v['rating'])}/5${metinYa(v['rating_comment']) != null ? ' · ${metin(v['rating_comment'])}' : ''}'),
+        // ---- Müşteri
+        bolum('Müşteri'),
+        bilgi(context, 'WHMCS ID', whmcs?.toString(), kopyalanir: true),
+        bilgi(context, 'İlk ziyaret', metinYa(z['first_seen'])),
+        if (si != null) ...[
+          bilgi(context, 'Oturum başı', metinYa(si['started'])),
+          bilgi(context, 'Son hareket', metinYa(si['last_activity'])),
+          bilgi(context, 'Bu oturumda', si['pageviews'] == null ? null : '${tamsayi(si['pageviews'])} sayfa'),
+        ],
+        // ---- Ağ & cihaz
+        bolum('Ağ & cihaz'),
+        bilgi(context, 'IP', [metinYa(n['ip']), if (metinYa(n['port']) != null) 'port ${metin(n['port'])}'].whereType<String>().join(' · '), kopyalanir: true),
+        bilgi(context, 'Cihaz', [metinYa(n['device']), metinYa(n['os'])].whereType<String>().join(' · ')),
+        bilgi(context, 'Tarayıcı', metinYa(n['browser'])),
+        bilgi(context, 'Ekran', metinYa(n['screen'])),
+        bilgi(context, 'Tarayıcı dili', metinYa(n['language'])),
+        bilgi(
+          context,
+          'Saat dilimi',
+          [metinYa(n['timezone']), if (metinYa(si?['local_time']) != null) 'yerel saat ${metin(si?['local_time'])}'].whereType<String>().join(' · '),
+        ),
+        // ---- Kaynak
+        if (metinYa(n['referrer']) != null || utm.isNotEmpty) ...[
+          bolum('Kaynak'),
+          bilgi(context, 'Yönlendiren', metinYa(n['referrer']) == null ? null : kisaUrl(metin(n['referrer']), en: 60), kopyalanir: true),
+          bilgi(context, 'UTM', utm.isEmpty ? null : utm, kopyalanir: true),
+        ],
+        // ---- Teknik ayrıntılar (uzun kimlikler katlanır)
+        Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            tilePadding: EdgeInsets.zero,
+            childrenPadding: EdgeInsets.zero,
+            title: Text(
+              'TEKNİK AYRINTILAR',
+              style: TextStyle(color: r.silik, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: .7),
+            ),
+            children: [
+              teknik('Parmak izi', metinYa(n['fingerprint'])),
+              teknik('Kalıcı kimlik', metinYa(n['visitor_uid'])),
+              teknik('Tarayıcı kimliği', metinYa(n['user_agent'])),
+              teknik('Ziyaretçi no', ziyaretciId?.toString()),
+              teknik('Oturum no', si == null ? null : '${tamsayi(si['id'])}'),
+            ],
+          ),
+        ),
         // ---- Gezinti
         bolum('Sayfa gezinti geçmişi (${sayfalar.length})'),
         if (sayfalar.isEmpty)
           Text('Kayıt yok.', style: TextStyle(color: r.silik, fontSize: 12.5))
-        else
-          for (final p in sayfalar)
+        else ...[
+          for (final p in sayfaListesi)
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
               child: Kutu(
@@ -450,6 +492,9 @@ class _SohbetZiyaretciPaneliState extends State<SohbetZiyaretciPaneli> {
                 ),
               ),
             ),
+          if (sayfalar.length > sayfaListesi.length)
+            TextButton(onPressed: () => setState(() => _tumSayfalar = true), child: Text('Tümünü göster (${sayfalar.length})')),
+        ],
         // ---- Olay günlüğü
         if (olaylar.isNotEmpty) ...[
           bolum('Olay günlüğü (${olaylar.length})'),
@@ -466,11 +511,11 @@ class _SohbetZiyaretciPaneliState extends State<SohbetZiyaretciPaneli> {
                           width: 74,
                           child: Text(metin(e['at']), style: TextStyle(color: r.silik, fontSize: 11)),
                         ),
-                        Rozet(metin(e['name']), renk: Marka.mavi),
+                        Rozet(_olayAdi(metin(e['name'])), renk: _olayRengi(metin(e['name']))),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
-                            e['data'] == null ? '' : '${e['data']}',
+                            _olayAciklama(e),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(color: r.soluk, fontSize: 11.5),
@@ -525,8 +570,53 @@ class _SohbetZiyaretciPaneliState extends State<SohbetZiyaretciPaneli> {
               ),
             ),
         ],
+        // ---- Yasaklama (en altta; en yıkıcı eylem paneli domine etmesin)
+        if (yasakYetkisi) ...[bolum('Yasaklama'), yasakBlogu()],
       ],
     );
+  }
+
+  static String _olayAdi(String s) => switch (s) {
+    'chat_open' => 'Sohbet açıldı',
+    'chat_start' => 'Sohbet başladı',
+    'invite_shown' => 'Davet gösterildi',
+    'pageview' => 'Sayfa',
+    'screen_prompt' => 'Ekran izni soruldu',
+    'screen_accept' => 'Ekran izni verildi',
+    'screen_decline' => 'Ekran izni reddedildi',
+    'call_accept' => 'Arama kabul',
+    'call_reject' => 'Arama ret',
+    'ticket_sent' => 'Talep formu',
+    'rating' => 'Değerlendirme',
+    final x => x.replaceAll('_', ' '),
+  };
+
+  static Color _olayRengi(String s) => s.contains('decline') || s.contains('reject')
+      ? Marka.gul
+      : s.contains('accept') || s.contains('start')
+      ? Marka.zumrut
+      : s.contains('screen') || s.contains('call')
+      ? Marka.kehribar
+      : Marka.mavi;
+
+  /// Olay verisini okunur tek satıra indirir (ham Map yazdırılmaz).
+  static String _olayAciklama(Map<String, dynamic> e) {
+    final d = e['data'];
+    if (d == null) return '';
+    if (d is! Map) return '$d';
+    final m = harita(d);
+    final parcalar = <String>[];
+    if (metinYa(m['title']) != null) parcalar.add(metin(m['title']));
+    if (metinYa(m['url']) != null) parcalar.add(kisaUrl(metin(m['url']), en: 50));
+    if (metinYa(m['ref']) != null) parcalar.add('← ${kisaUrl(metin(m['ref']), en: 36)}');
+    if (metinYa(m['reason']) != null) parcalar.add(metin(m['reason']));
+    if (metinYa(m['mode']) != null) parcalar.add(metin(m['mode']));
+    if (parcalar.isEmpty) {
+      for (final x in m.entries) {
+        if (x.value != null && '${x.value}'.isNotEmpty) parcalar.add('${x.key}: ${x.value}');
+      }
+    }
+    return parcalar.join(' · ');
   }
 
   static String _adayAdi(String s) => switch (s) {

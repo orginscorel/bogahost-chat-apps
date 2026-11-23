@@ -1,6 +1,8 @@
 // Sunucu uçları tek yerde. Tüm yollar /api/app/v1 altındadır (routes/app.php).
 import 'dart:io';
 
+import 'dart:typed_data';
+
 import 'package:boga_ortak/boga_ortak.dart';
 import 'package:dio/dio.dart';
 
@@ -46,7 +48,27 @@ class Depo {
     return (sohbetler: haritalar(m['conversations']).map(Sohbet.coz).toList(), sayilar: s, dahaVar: mantik(m['has_more']));
   }
 
-  static Future<Yoklama> yokla(int id, {int sonra = 0}) async => Yoklama.coz(harita(await _get('chats/$id/poll', q: {'after': sonra})));
+  /// Mesaj yoklaması: kısa alma zaman aşımı (takılan tek istek ekranı dondurmasın), ekran kapanınca iptal edilebilir.
+  static Future<Yoklama> yokla(int id, {int sonra = 0, CancelToken? iptal}) async =>
+      Yoklama.coz(harita(await Uyg.api.get(_y('chats/$id/poll'), q: {'after': sonra}, zamanAsimi: const Duration(seconds: 8), iptal: iptal).then(_k)));
+
+  /// Sohbet detayı (web admin/chats/{id}): visitor, network, crm, ban_active, favorite, archived, history, participants, messages…
+  static Future<Map<String, dynamic>> sohbetDetay(int id) async => harita(harita(await _get('chats/$id'))['conversation']);
+
+  /// Ziyaretçi dilini zorla + son mesajları çevir (web: changeLang).
+  static Future<void> dilAyarla(int id, String dil) => _post('chats/$id/lang', {'lang': dil});
+
+  /// Ziyaretçinin sesli/görüntülü/ekran talebi şeridini kapat.
+  static Future<void> iletisimTalebiTemizle(int id) => _post('chats/$id/contact-request/clear');
+
+  /// Transkript PDF baytları (web: PDF indir).
+  static Future<Uint8List> transkriptPdf(int id) => Uyg.api.indir(_y('chats/$id/transcript.pdf'));
+
+  /// WHMCS hizmet listesi (yetki chats.cancel_request): {match, client, currency, services[], visitor}.
+  static Future<Map<String, dynamic>> hizmetler(int id) async => harita(await _get('chats/$id/hizmetler/liste'));
+
+  /// Gerçek WHMCS iptal talebi: service_id, cancellationreason (3–2000), type Immediate|End of Billing Period, confirm, identity_confirmed, service_label.
+  static Future<Map<String, dynamic>> iptalTalebi(int id, Map<String, dynamic> g) async => harita(await _post('chats/$id/hizmetler/iptal-talebi', g));
   static Future<Mesaj> yanitla(int id, String govde, {bool icNot = false}) async =>
       Mesaj.coz(harita(harita(await _post('chats/$id/reply', {'body': govde, 'internal': icNot ? 1 : 0}))['message']));
   static Future<void> yaziyor(int id) => _post('chats/$id/typing');
@@ -65,8 +87,11 @@ class Depo {
   static Future<Map<String, dynamic>> sohbetYasakla(int id, Map<String, dynamic> g) async => harita(await _post('chats/$id/ban', g));
   static Future<Map<String, dynamic>> sohbetYasakKaldir(int id) async => harita(await _post('chats/$id/unban'));
   static Future<void> transkriptEposta(int id, {String? eposta}) => _post('chats/$id/transcript/email', {'email': ?eposta});
-  static Future<String?> transkriptBaglanti(int id) async =>
-      metinYa(harita(await _get('chats/$id/transcript/link'))['url'] ?? harita(await _get('chats/$id/transcript/link'))['link']);
+  static Future<String?> transkriptBaglanti(int id) async {
+    final m = harita(await _get('chats/$id/transcript/link'));
+    return metinYa(m['url'] ?? m['link']);
+  }
+
   static Future<String?> portalBaglanti(int id) async {
     final m = harita(await _get('chats/$id/portal-link'));
     return metinYa(m['url'] ?? m['link']);

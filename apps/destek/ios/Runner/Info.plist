@@ -33,11 +33,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>E-postaya fotoğraf çekip eklemek için kullanılır.</string>
+	<string>Görüntülü görüşme ve sohbete fotoğraf eklemek için kameraya erişim gerekir.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Video eklerken ses kaydı için kullanılır.</string>
+	<string>Sesli ve görüntülü görüşme için mikrofona erişim gerekir.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>E-postaya fotoğraf eklemek için kullanılır.</string>
+	<string>Sohbete fotoğraf eklemek, profil resmi veya marka logosu seçmek için fotoğraflarınıza erişilir.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -82,7 +82,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Profil resmi veya marka logosu olarak seçtiğiniz görsellere erişilir.</string>
 </dict>
 </plist>
