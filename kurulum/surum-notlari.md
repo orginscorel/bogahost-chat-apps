@@ -2,6 +2,8 @@
 
 - Görünüm boyutu: büyük monitörlerde arayüz otomatik büyür (1500 px üstü %112, 1900 üstü %125, 2300 üstü %135); Ayarlar > Görünüm boyutu ile Oto / 100 / 120 / 140 seçilebilir. Yazı, ikon, düğme ve boşluklar birlikte ölçeklenir.
 - Geniş ekranda hiçbir ekran üst çubuktaki durum / zil / tema / profil nesnelerini yinelemez (kabuk içi işaretleme ile; sohbetler sayfası dahil).
+- Sohbetler: sol listede süzgeç çipleri (Açık/Bekleyen/Kaçan/Çevrimdışı/Kapalı) artık sarılır, hepsi görünür; liste geniş ekranda 480 px'e kadar; mesaj sütunu ve yazım kutusu en çok 1180 px ortalanır (uçsuz bucaksız genişlik yok).
+- Sayfa içeriği büyük ekranda daha geniş: genel 1600 px, ziyaretçi tablosu 1900 px, ayar sayfaları 1400 px.
 
 ## 1.2.1
 

@@ -138,6 +138,7 @@ class _ZiyaretcilerEkraniState extends State<ZiyaretcilerEkrani> {
                   final ulkeler = l.map((z) => z.ulke).whereType<String>().toSet().length;
                   final yatay = tablo ? 24.0 : 14.0;
                   return ortala(
+                    enCok: 1900,
                     ListView(
                       padding: EdgeInsets.fromLTRB(yatay, 4, yatay, 32),
                       children: [

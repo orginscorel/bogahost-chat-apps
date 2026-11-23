@@ -86,7 +86,7 @@ class _AyarSayfaState extends State<AyarSayfa> {
                   Expanded(child: icerik),
                 ],
               ),
-              enCok: 1100,
+              enCok: 1400,
             )
           : icerik,
       bottomNavigationBar: widget.altBar,

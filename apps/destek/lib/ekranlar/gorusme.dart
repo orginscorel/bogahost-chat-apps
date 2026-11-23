@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../ortak/parcalar.dart';
 import '../ortak/simgeler.dart';
 import '../ortak/yardimci.dart';
 import '../oturum.dart';
@@ -379,7 +380,7 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
     final cevrimici = _son?.cevrimici ?? widget.ilk?.cevrimici ?? false;
     final yaziyor = _son?.yaziyor;
     final genis = context.genis;
-    final govde = Column(
+    final govdeSutun = Column(
       children: [
         Expanded(
           child: _hata != null
@@ -420,6 +421,8 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> {
         _yazimKutusu(r, durum),
       ],
     );
+    // Geniş ekranda mesaj sütunu en çok 1180 px: balonlar ve yazım kutusu ortada, uçsuz bucaksız boşluk yok.
+    final govde = genis ? ortala(govdeSutun, enCok: 1180) : govdeSutun;
     final ekran = Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: !widget.gomulu,

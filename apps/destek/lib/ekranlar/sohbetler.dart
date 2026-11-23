@@ -118,66 +118,62 @@ class _SohbetlerEkraniState extends State<SohbetlerEkrani> {
     }
     final gomulu = kabukGomulu(context);
     final kacanCoz = _durum == 'missed' && (_sayilar['missed'] ?? 0) > 0 && Uyg.yetki('chats.reply');
+    Widget aramaKutusu() => TextField(
+      controller: _arama,
+      onChanged: (_) => setState(() {}),
+      decoration: InputDecoration(
+        hintText: 'Ziyaretçi, e-posta, mesaj ya da #numara',
+        prefixIcon: const Icon(Simgeler.search, size: 18),
+        isDense: true,
+        suffixIcon: _arama.text.isEmpty ? null : IconButton(icon: const Icon(Simgeler.close, size: 16), onPressed: () => setState(_arama.clear)),
+      ),
+    );
+    List<Widget> cipler() => [
+      for (final (k, ad) in _sekmeler)
+        ChoiceChip(
+          selected: _durum == k,
+          onSelected: (_) => _sekme(k),
+          avatar: _durum == k ? null : Nokta(durumRengi(k), boyut: 8),
+          label: Text('$ad${(_sayilar[k] ?? 0) > 0 ? ' · ${_sayilar[k]}' : ''}'),
+        ),
+      if (kacanCoz) TextButton.icon(onPressed: _hepsiniCoz, icon: const Icon(Simgeler.doneAll, size: 18), label: const Text('Hepsini kapalıya al')),
+    ];
+    // Telefon: AppBar altında yatay kayan şerit. Kabuk içinde: gövdenin üstünde sarılan çipler (hepsi görünür).
     final ustCubuk = PreferredSize(
-      preferredSize: Size.fromHeight(gomulu ? 118 : 110),
+      preferredSize: const Size.fromHeight(104),
       child: Column(
         children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(12, gomulu ? 10 : 0, 8, 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _arama,
-                    onChanged: (_) => setState(() {}),
-                    decoration: InputDecoration(
-                      hintText: 'Ziyaretçi, e-posta, mesaj ya da #numara',
-                      prefixIcon: const Icon(Simgeler.search, size: 18),
-                      isDense: true,
-                      suffixIcon: _arama.text.isEmpty ? null : IconButton(icon: const Icon(Simgeler.close, size: 16), onPressed: () => setState(_arama.clear)),
-                    ),
-                  ),
-                ),
-                if (gomulu) IconButton(tooltip: 'Yenile', onPressed: () => _yukle(), icon: const Icon(Simgeler.refresh)),
-              ],
-            ),
-          ),
+          Padding(padding: const EdgeInsets.fromLTRB(12, 0, 12, 8), child: aramaKutusu()),
           SizedBox(
             height: 44,
             child: ListView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-              children: [
-                for (final (k, ad) in _sekmeler)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 6),
-                    child: ChoiceChip(
-                      selected: _durum == k,
-                      onSelected: (_) => _sekme(k),
-                      avatar: _durum == k ? null : Nokta(durumRengi(k), boyut: 8),
-                      label: Text('$ad${(_sayilar[k] ?? 0) > 0 ? ' · ${_sayilar[k]}' : ''}'),
-                    ),
-                  ),
-                if (kacanCoz)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 4),
-                    child: TextButton.icon(onPressed: _hepsiniCoz, icon: const Icon(Simgeler.doneAll, size: 18), label: const Text('Hepsini kapalıya al')),
-                  ),
-              ],
+              children: [for (final c in cipler()) Padding(padding: const EdgeInsets.only(right: 6), child: c)],
             ),
           ),
         ],
       ),
     );
+    final gomuluBas = Padding(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: aramaKutusu()),
+              IconButton(tooltip: 'Yenile', onPressed: () => _yukle(), icon: const Icon(Simgeler.refresh)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Wrap(spacing: 6, runSpacing: 6, children: cipler()),
+        ],
+      ),
+    );
     final liste = Scaffold(
       appBar: gomulu
-          ? PreferredSize(
-              preferredSize: ustCubuk.preferredSize,
-              child: Material(
-                color: r.zemin,
-                child: SafeArea(bottom: false, child: ustCubuk),
-              ),
-            )
+          ? null
           : AppBar(
               title: const Text('Sohbetler'),
               actions: [
@@ -187,37 +183,44 @@ class _SohbetlerEkraniState extends State<SohbetlerEkrani> {
               ],
               bottom: ustCubuk,
             ),
-      body: _hata != null
-          ? Durum.hata(_hata!, tekrar: _yukle)
-          : _liste == null
-          ? const Durum.yukleniyor()
-          : _suzulmus.isEmpty
-          ? Durum.bos(_arama.text.isNotEmpty ? 'Aramayla eşleşen sohbet yok.' : 'Bu listede sohbet yok.', ikon: Simgeler.forum)
-          : RefreshIndicator(
-              onRefresh: () => _yukle(),
-              child: ListView.separated(
-                padding: const EdgeInsets.only(bottom: 24),
-                itemCount: _suzulmus.length + (_dahaVar && _arama.text.isEmpty ? 1 : 0),
-                separatorBuilder: (_, _) => Divider(height: 1, indent: 72, color: r.kenar.withValues(alpha: .6)),
-                itemBuilder: (_, i) {
-                  if (i == _suzulmus.length) {
-                    return Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Center(
-                        child: OutlinedButton(onPressed: () => _yukle(daha: true), child: const Text('Daha fazla yükle')),
-                      ),
-                    );
-                  }
-                  return _satir(_suzulmus[i], r);
-                },
-              ),
-            ),
+      body: Column(
+        children: [
+          if (gomulu) gomuluBas,
+          Expanded(
+            child: _hata != null
+                ? Durum.hata(_hata!, tekrar: _yukle)
+                : _liste == null
+                ? const Durum.yukleniyor()
+                : _suzulmus.isEmpty
+                ? Durum.bos(_arama.text.isNotEmpty ? 'Aramayla eşleşen sohbet yok.' : 'Bu listede sohbet yok.', ikon: Simgeler.forum)
+                : RefreshIndicator(
+                    onRefresh: () => _yukle(),
+                    child: ListView.separated(
+                      padding: const EdgeInsets.only(bottom: 24),
+                      itemCount: _suzulmus.length + (_dahaVar && _arama.text.isEmpty ? 1 : 0),
+                      separatorBuilder: (_, _) => Divider(height: 1, indent: 72, color: r.kenar.withValues(alpha: .6)),
+                      itemBuilder: (_, i) {
+                        if (i == _suzulmus.length) {
+                          return Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Center(
+                              child: OutlinedButton(onPressed: () => _yukle(daha: true), child: const Text('Daha fazla yükle')),
+                            ),
+                          );
+                        }
+                        return _satir(_suzulmus[i], r);
+                      },
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
     if (!context.genis) return liste;
     return Row(
       children: [
         SizedBox(
-          width: (MediaQuery.sizeOf(context).width * .3).clamp(340.0, 420.0),
+          width: (MediaQuery.sizeOf(context).width * .28).clamp(340.0, 480.0),
           child: Container(
             decoration: BoxDecoration(
               border: Border(right: BorderSide(color: r.kenar)),

@@ -8,6 +8,8 @@ const uygulamaNotlari = <Map<String, dynamic>>[
     'items': [
       {'type': 'new', 'text': 'Görünüm boyutu: geniş pencerede arayüz otomatik büyür; Ayarlar > Görünüm boyutu ile Oto / 100 / 120 / 140.'},
       {'type': 'fix', 'text': 'Geniş ekranda üst çubuk nesneleri (durum, zil, tema, profil) ekranlarda bir daha yinelenmez.'},
+      {'type': 'improve', 'text': 'Sohbetler: süzgeç çipleri sarılır ve hepsi görünür; mesaj sütunu ortalanır (en çok 1180 px).'},
+      {'type': 'improve', 'text': 'Sayfa içeriği büyük ekranda daha geniş (1600 / ziyaretçiler 1900 px).'},
     ],
   },
   {

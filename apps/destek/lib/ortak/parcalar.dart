@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'simgeler.dart';
 
 /// Sayfa içeriğinin en çok genişliği: çok geniş ekranlarda satırlar uzayıp göz yormasın.
-const sayfaEnCok = 1240.0;
+const sayfaEnCok = 1600.0;
 
 /// İçeriği üstte ortalar ve genişliğini sınırlar.
 Widget ortala(Widget child, {double enCok = sayfaEnCok}) => Align(
