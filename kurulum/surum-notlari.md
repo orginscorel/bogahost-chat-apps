@@ -1,3 +1,9 @@
+## 1.2.15 (24 Kasım 2026)
+- Yeni: Öz bilgi soruları ("selamlama varyantları neler", "X deyince ne diyorsun", "ne biliyorsun", "kurallar neler", "son öğrendiklerin").
+- Yeni: Eşdeğerlik öğretme ("howdy demek selam ile aynı şey", "kutu yani sanal sunucu").
+- Düzeltme: Selam varyantları tanınıyor; açıklama cümleleri yanıt sanılmıyor.
+- İyileştirme: Eğitim ekranı ipucu metni.
+
 ## 1.2.14
 
 - Sunucu: `AiService::niyetTam` (type=lexicon sözlük + Profanity::has, kelime sınırı), `sozlukEkle`, `niyetYanitiKaydet`, eğitim direktifleri (liste öğretme, "bunlara şöyle cevap ver", geniş onay sözcükleri, await/bildirim taslağı, taslaksız onay uyarısı), meta.nomatch/await. Web+uygulama: skor rozeti yalnız eşleşme yok / emin değilim.

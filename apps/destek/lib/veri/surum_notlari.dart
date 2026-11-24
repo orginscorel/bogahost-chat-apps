@@ -2,6 +2,27 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.15',
+    'date': '2026-11-24',
+    'title': 'Butoi kendini anlatıyor',
+    'items': [
+      {
+        'type': 'new',
+        'text': 'Öz bilgi: "selamlama varyantları neler", "küfür listesinde ne var", "X deyince ne diyorsun", "ne biliyorsun", "kurallar neler", "son öğrendiklerin" sorularını Butoi kendi durumundan yanıtlar.',
+      },
+      {
+        'type': 'new',
+        'text':
+            'Eşdeğerlik öğretme: "howdy demek selam ile aynı şey", "kutu yani sanal sunucu" ile sözlük ya da eş anlam ekleme; bekleyen soru yeniden denenir.',
+      },
+      {
+        'type': 'fix',
+        'text': 'Selam varyantları (selamlar, merhabalar, hello there, good morning…) tanınıyor; "selamlar demek selam ile aynı şey" açıklaması artık yanıt sanılmıyor.',
+      },
+      {'type': 'improve', 'text': 'Eğitim ekranı ipucu metni yeni sohbet biçimine göre güncellendi.'},
+    ],
+  },
+  {
     'version': '1.2.14',
     'date': '2026-11-24',
     'title': 'Butoi ile sohbet ederek eğitim',
