@@ -2,6 +2,26 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.16',
+    'date': '2026-11-24',
+    'title': 'Butoi araştırır, İngilizce öğrenir',
+    'items': [
+      {
+        'type': 'new',
+        'text': 'Davranış talimatı: "doğrudan paket öneriyorsun, önce hangi lokasyon lazım sormalısın" → Butoi karşı soru taslağı üretir (seçenekleri kataloğundan çıkarır), "Tamamdır" ile öğrenir.',
+      },
+      {
+        'type': 'new',
+        'text': '"Bunların İngilizcelerini de ekle": yerleşik Türkçe-İngilizce sözlükten kategori varyantları ve eş anlamlar; İngilizce sorular ("domain price", "how much is a vps") Türkçe bilgiyle eşleşir.',
+      },
+      {
+        'type': 'new',
+        'text': '"X konusunu araştır": etkin bilgi + ticket/sohbetten öğrenilmiş onay bekleyen taslaklar; "hepsini onayla", "2\'yi göster", "1\'i reddet".',
+      },
+      {'type': 'new', 'text': 'Kapanmış canlı sohbetlerdeki temsilci yanıtlarından günlük otomatik taslak üretimi (Sohbetten etiketi, onay bekler).'},
+    ],
+  },
+  {
     'version': '1.2.15',
     'date': '2026-11-24',
     'title': 'Butoi kendini anlatıyor',

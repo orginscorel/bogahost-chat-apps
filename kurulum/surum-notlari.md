@@ -1,3 +1,9 @@
+## 1.2.16 (24 Kasım 2026)
+- Yeni: Davranış talimatı ("önce hangi lokasyon lazım sor") → karşı soru taslağı.
+- Yeni: "Bunların İngilizcelerini de ekle" (yerleşik TR-EN sözlük); İngilizce sorular Türkçe bilgiyle eşleşir.
+- Yeni: "X konusunu araştır" + sohbet içinden taslak onayı.
+- Yeni: Kapanmış sohbetlerdeki temsilci yanıtlarından günlük taslak üretimi.
+
 ## 1.2.15 (24 Kasım 2026)
 - Yeni: Öz bilgi soruları ("selamlama varyantları neler", "X deyince ne diyorsun", "ne biliyorsun", "kurallar neler", "son öğrendiklerin").
 - Yeni: Eşdeğerlik öğretme ("howdy demek selam ile aynı şey", "kutu yani sanal sunucu").

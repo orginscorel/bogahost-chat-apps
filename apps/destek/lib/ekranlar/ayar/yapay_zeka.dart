@@ -1477,7 +1477,7 @@ class _EgitimState extends State<_Egitim> {
                   ),
                   Text(
                     'Butoi ile sohbet ederek eğitin. Yanıtı beğenmezseniz "cevabını geliştir", "kısalt", "resmi ol" deyin ya da doğru yanıtı yazın; taslağı "Tamamdır" ile onaylayın. '
-                    'Sözlük: "bunlar küfür: …", "howdy demek selam ile aynı şey". Kendisini sorun: "selamlama varyantları neler", "X deyince ne diyorsun", "ne biliyorsun". Yardım için "seni nasıl eğitebilirim" yazın.',
+                    'Davranış: "önce hangi lokasyon lazım sor". Görev: "bunların İngilizcelerini de ekle", "X konusunu araştır". Kendisini sorun: "X deyince ne diyorsun", "ne biliyorsun". Yardım için "seni nasıl eğitebilirim" yazın.',
                     style: TextStyle(color: r.soluk, fontSize: 12),
                   ),
                 ],
