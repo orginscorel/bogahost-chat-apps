@@ -1008,10 +1008,10 @@ class _DenemeState extends State<_Deneme> {
                   runSpacing: 6,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    if (skor != null)
+                    if (!mantik(s['ok']))
                       Text(
-                        '%$skor eşleşme',
-                        style: TextStyle(color: _skorRengi(skor), fontSize: 20, fontWeight: FontWeight.w700),
+                        skor != null && skor > 0 ? 'Eşleşme bulunamadı (en yakın %$skor)' : 'Eşleşme bulunamadı',
+                        style: const TextStyle(color: Marka.kehribar, fontSize: 16, fontWeight: FontWeight.w700),
                       ),
                     if (mantik(s['auto'])) const Rozet('Otomatik yanıtlanır', renk: Marka.zumrut),
                     if (mantik(s['handoff'])) const Rozet('Temsilciye devredilir', renk: Marka.kehribar),
@@ -1360,8 +1360,11 @@ class _EgitimState extends State<_Egitim> {
                 runSpacing: 6,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Rozet('%$skor eşleşme', renk: _skorRengi(skor)),
-                  for (final k in kaynaklar.take(3)) Rozet('${metin(k['title'], '#${tamsayi(k['id'])}')} · %${tamsayi(k['score'])}', renk: Marka.grafitAcik),
+                  if (!mantik(meta['ok']) && meta['intent'] == null)
+                    Rozet(kaynaklar.isNotEmpty ? 'Eşleşme bulunamadı (en yakın %$skor)' : 'Eşleşme bulunamadı', renk: Marka.gul),
+                  if (mantik(meta['ok']) && !mantik(meta['auto']) && meta['intent'] == null) Rozet('Emin değilim (%$skor)', renk: Marka.kehribar),
+                  if (mantik(meta['ok']))
+                    for (final k in kaynaklar.take(2)) Rozet('Kaynak: ${metin(k['title'], '#${tamsayi(k['id'])}')}', renk: Marka.grafitAcik),
                   if (mantik(meta['ok']) && meta['intent'] == null && !mantik(meta['approved']))
                     ActionChip(
                       avatar: const Icon(Simgeler.checkCircle, size: 16, color: Marka.zumrut),

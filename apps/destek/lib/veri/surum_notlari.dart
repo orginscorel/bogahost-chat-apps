@@ -2,6 +2,26 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.14',
+    'date': '2026-11-24',
+    'title': 'Butoi ile sohbet ederek eğitim',
+    'items': [
+      {
+        'type': 'new',
+        'text': 'Doğal direktifler: "bunlar küfür: oç, amk" sözlüğe ekler (tam kelime; "koç" sayılmaz), "bunlara şöyle cevap ver: …" yanıtı belirler, "verdiğin cevabı değiştir" alternatif üretir, "tamamdır / bunu geçerli say" onaylar.',
+      },
+      {
+        'type': 'new',
+        'text': 'Butoi bilmediğinde "nasıl yanıtlamam gerektiğini yazın" der; bir sonraki serbest cümleniz taslak olur. Noktayla biten düzeltme cümleleri de taslağa dönüşür ("Doğrusu:" zorunlu değil).',
+      },
+      {
+        'type': 'improve',
+        'text': 'Yüzde eşleşme etiketi kaldırıldı; yalnız eşleşme bulunamadığında ya da Butoi emin değilken uyarı gösterilir. Kaynak başlıkları yanıt altında.',
+      },
+      {'type': 'fix', 'text': 'Küfür ve hakarete yanıtsız kalma düzeltildi: yerleşik filtre + öğretilen sözlükle nazik yanıt.'},
+    ],
+  },
+  {
     'version': '1.2.13',
     'date': '2026-11-24',
     'title': 'Butoi RAG öğrenme yapısı',

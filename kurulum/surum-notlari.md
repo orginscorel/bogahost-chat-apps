@@ -1,3 +1,7 @@
+## 1.2.14
+
+- Sunucu: `AiService::niyetTam` (type=lexicon sözlük + Profanity::has, kelime sınırı), `sozlukEkle`, `niyetYanitiKaydet`, eğitim direktifleri (liste öğretme, "bunlara şöyle cevap ver", geniş onay sözcükleri, await/bildirim taslağı, taslaksız onay uyarısı), meta.nomatch/await. Web+uygulama: skor rozeti yalnız eşleşme yok / emin değilim.
+
 ## 1.2.13
 
 - Sunucu: `AiAraclar` (araç katmanı, `ai_tool_calls`), `AiKoruma` (maskeleme, kota), RAG parçalı dizin (`parcala`, BM25, `config/ai_esanlam.php`, `yanitMetni`), `ai:ogren` komutu (04:40 cron) + köprü `closed_tickets_since`, `ai_knowledge.url/origin/pii_checked`, type=rule kurallar, `intent_replies`. Widget: `ui.kind=sources` kaynak satırı. Uygulama: `_talimat` sözlüğü genişledi.
