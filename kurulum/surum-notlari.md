@@ -1,3 +1,8 @@
+## 1.2.17 (25 Kasım 2026)
+- Yeni: Butoi devrettiğinde sohbet yeniden çalar (panel `handoffs` + bekleyen alarmı `Conversation::temsilciBekleyen`); devir olay satırı müşteri/panelde görünür.
+- Düzeltme: "Devral" sohbete katılır (AiController::handoff → join) ve sonucu bildirir; join/takeover/reply → `AiService::insanDevraldi` (bot düşer).
+- Yeni: Yasaklılar demet görünümü (BanController::demetler, `groups`); DELETE bans/{id} demetin tamamını kaldırır.
+
 ## 1.2.16 (24 Kasım 2026)
 - Yeni: Davranış talimatı ("önce hangi lokasyon lazım sor") → karşı soru taslağı.
 - Yeni: "Bunların İngilizcelerini de ekle" (yerleşik TR-EN sözlük); İngilizce sorular Türkçe bilgiyle eşleşir.

@@ -2,6 +2,25 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.17',
+    'date': '2026-11-25',
+    'title': 'Devir zili, Devral katılımı, yasak demetleri',
+    'items': [
+      {
+        'type': 'new',
+        'text': 'Butoi "temsilciye aktarıyorum" dediğinde sohbet panelde ve uygulamada yeni istek gibi yeniden çalar; personel katılana kadar bekleyen alarmı sürer.',
+      },
+      {
+        'type': 'fix',
+        'text': '"Devral" artık sohbete gerçekten katılır (katılımcı + atama + "sohbete katıldı" olayı) ve sonucu bildirir; personel katılınca/yazınca Butoi düşer, "Bota geri ver" denene kadar susar.',
+      },
+      {
+        'type': 'new',
+        'text': 'Yasaklılar: sohbetten verilen IP + ağ bloğu + cihaz + ziyaretçi + e-posta yasakları tek satırda "neyle yasaklandı" çipleriyle; "Hepsini kaldır" ile tek dokunuşta kalkar.',
+      },
+    ],
+  },
+  {
     'version': '1.2.16',
     'date': '2026-11-24',
     'title': 'Butoi araştırır, İngilizce öğrenir',

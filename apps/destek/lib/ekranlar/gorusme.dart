@@ -312,7 +312,8 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
 
   /// bot:false → temsilci devralır; bot:true → bota geri verilir.
   Future<void> _aiDevir(bool bot) async {
-    final v = await islem(() => Depo.aiDevir(_id, bot: bot));
+    // Sunucu (AiController::handoff) devralmada sohbete katılımı da yapar; `message` ile ne olduğunu söyler.
+    final v = await islem(() => Depo.aiDevir(_id, bot: bot), tamam: bot ? 'Sohbet Butoi\'ye geri verildi' : 'Sohbeti devraldınız; artık siz yanıtlıyorsunuz');
     if (v == null) return;
     await _detayYukle();
   }
@@ -329,7 +330,7 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
           const SizedBox(width: 6),
           Expanded(
             child: Text(
-              devredildi ? 'Asistan devredildi' : '🤖 Asistan yanıtlıyor',
+              devredildi ? 'Asistan devredildi · temsilci yanıtlıyor' : '🤖 Asistan yanıtlıyor',
               style: TextStyle(color: renk, fontSize: 12, fontWeight: FontWeight.w500),
             ),
           ),
