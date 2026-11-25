@@ -1,3 +1,7 @@
+## 1.2.20 (25 Kas 2026)
+- Yeni: Düzelt kutusu = talimat/bilgi (sunucu `AiService::egitimOgret` → `talimatTaslagi`, Claude katmanı; mevcut yanıta %60+ benzer metin ya da "Doğrusu: …" aynen öğretilir). Uygulamada kutu boş açılır, etiket "Talimat ya da bilgi", düğme "Yeniden yaz".
+- Sunucu: `serbestTalimat` 4+ kelime ve -ebilirsin/-malısın kalıplarını tanır; 24+ kelimelik talimatlar "ayrıca" ile bölünmez; butoi-claude sarmalayıcısı `--max-turns 2` (error_max_turns düzeltmesi).
+
 ## 1.2.19 (25 Kas 2026)
 - Düzeltme: Butoi maskotu web widget'ı, personel paneli ve eğitim sohbetiyle aynı avatar paketinden gösterilir (assets/butoi/*.png ← livechat/public/img/butoi/circle/static/*.svg, rsvg-convert 256px). Elle çizilen maskot kaldırıldı; `ButoiMaskot(durum: 'typing' | 'handoff' | …)` ile durum seçilebilir.
 

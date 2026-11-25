@@ -2,6 +2,18 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.20',
+    'date': '2026-11-25',
+    'title': 'Düzelt kutusu talimat alır',
+    'items': [
+      {
+        'type': 'new',
+        'text': 'Eğitim sohbetinde "Düzelt" kutusuna yazılan metin artık talimat/bilgi olarak işlenir; Butoi yanıtı buna göre yeniden yazıp taslak sunar. Metni aynen öğretmek için "Doğrusu: …" ile başlayın.',
+      },
+      {'type': 'fix', 'text': 'Kısa talimatlar ("…yönlendirebilirsin") ve uzun, "ayrıca" ile birleşik talimatlar yeni soru sanılmaz; tek taslak üretilir.'},
+    ],
+  },
+  {
     'version': '1.2.19',
     'date': '2026-11-25',
     'title': 'Butoi avatarı web ile aynı',

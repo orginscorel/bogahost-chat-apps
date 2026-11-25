@@ -1380,7 +1380,7 @@ class _EgitimState extends State<_Egitim> {
                       visualDensity: VisualDensity.compact,
                       onPressed: () => setState(() {
                         _duzeltId = tamsayi(m['id']);
-                        _duzelt.text = mantik(meta['ok']) ? metin(m['text']) : '';
+                        _duzelt.text = '';
                       }),
                     ),
                 ],
@@ -1396,8 +1396,8 @@ class _EgitimState extends State<_Egitim> {
                 maxLines: 6,
                 autofocus: true,
                 decoration: const InputDecoration(
-                  labelText: 'Doğru yanıt',
-                  hintText: '{name} ve {email} yer tutucuları kullanılabilir',
+                  labelText: 'Talimat ya da bilgi',
+                  hintText: 'Örn. "aynı zamanda destek talebi açmaya da yönlendir" — Butoi yanıtı buna göre yeniden yazar. Metni aynen öğretmek için "Doğrusu: …" ile başlayın.',
                   alignLabelWithHint: true,
                 ),
               ),
@@ -1407,7 +1407,7 @@ class _EgitimState extends State<_Egitim> {
                 children: [
                   TextButton(onPressed: () => setState(() => _duzeltId = null), child: const Text('Vazgeç')),
                   const SizedBox(width: 8),
-                  FilledButton.icon(onPressed: _mesgul ? null : () => _ogret(m), icon: const Icon(Simgeler.autoFixHigh, size: 18), label: const Text('Öğret')),
+                  FilledButton.icon(onPressed: _mesgul ? null : () => _ogret(m), icon: const Icon(Simgeler.autoFixHigh, size: 18), label: const Text('Yeniden yaz')),
                 ],
               ),
             ],
