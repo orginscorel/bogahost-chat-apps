@@ -1,7 +1,7 @@
 name: destek
 description: "Bogahost Chat — chat.bogahost.com canlı destek temsilci uygulaması"
 publish_to: 'none'
-version: 1.2.18+25
+version: 1.2.19+26
 resolution: workspace
 
 environment:
@@ -35,6 +35,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  # Butoi avatarı: web widget'ı ve panelle aynı paket (livechat/public/img/butoi/circle/static/*.svg → png, rsvg-convert 256px)
+  assets:
+    - assets/butoi/
   # Phosphor simgeleri (MIT, assets/fonts/phosphor/LICENSE). Eşleme: lib/ortak/simgeler.dart
   fonts:
     - family: PhosphorLight

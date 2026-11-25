@@ -1,3 +1,6 @@
+## 1.2.19 (25 Kas 2026)
+- Düzeltme: Butoi maskotu web widget'ı, personel paneli ve eğitim sohbetiyle aynı avatar paketinden gösterilir (assets/butoi/*.png ← livechat/public/img/butoi/circle/static/*.svg, rsvg-convert 256px). Elle çizilen maskot kaldırıldı; `ButoiMaskot(durum: 'typing' | 'handoff' | …)` ile durum seçilebilir.
+
 ## 1.2.18 (25 Kas 2026)
 - Düzeltme: sohbet ekranında Butoi mesajlarında "B" baş harfi yerine Butoi maskotu.
 - Yeni: asistan şeridi botu devralan personelin adını gösterir (meta.ai_handoff_by).

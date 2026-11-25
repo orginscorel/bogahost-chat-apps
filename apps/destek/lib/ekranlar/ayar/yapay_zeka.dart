@@ -1430,7 +1430,7 @@ class _EgitimState extends State<_Egitim> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        const Padding(padding: EdgeInsets.only(bottom: 6, right: 6), child: ButoiMaskot(boyut: 28, dusunuyor: true)),
+        const Padding(padding: EdgeInsets.only(bottom: 6, right: 6), child: ButoiMaskot(boyut: 28, dusunuyor: true, durum: 'typing')),
         Container(
           margin: const EdgeInsets.symmetric(vertical: 4),
           padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),

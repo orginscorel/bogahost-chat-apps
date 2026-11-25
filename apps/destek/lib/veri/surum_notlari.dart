@@ -2,6 +2,17 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.19',
+    'date': '2026-11-25',
+    'title': 'Butoi avatarı web ile aynı',
+    'items': [
+      {
+        'type': 'fix',
+        'text': 'Butoi maskotu artık web widget\'ı, personel paneli ve eğitim sohbetiyle aynı avatar paketinden (idle, düşünüyor, yazıyor, selamlama, devir, çevrimdışı) gösterilir; elle çizilen eski maskot kaldırıldı.',
+      },
+    ],
+  },
+  {
     'version': '1.2.18',
     'date': '2026-11-25',
     'title': 'Butoi avatarı, devralan personel',
