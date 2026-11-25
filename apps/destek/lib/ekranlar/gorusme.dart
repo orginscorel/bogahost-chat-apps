@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:pasteboard/pasteboard.dart';
 
+import '../ortak/maskot.dart';
 import '../ortak/parcalar.dart';
 import '../ortak/simgeler.dart';
 import '../ortak/yardimci.dart';
@@ -80,6 +81,13 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
   Map<String, dynamic> get _meta => _detay?['meta'] is Map ? Map<String, dynamic>.from(_detay!['meta'] as Map) : const {};
   int get _aiTur => _meta['ai_turns'] is num ? (_meta['ai_turns'] as num).toInt() : int.tryParse('${_meta['ai_turns'] ?? ''}') ?? 0;
   bool get _aiDevredildi => _meta['ai_handoff'] == true || _meta['ai_handoff'] == 1 || _meta['ai_handoff'] == '1';
+
+  /// Botu devralan personelin adı (meta.ai_handoff_by); yoksa null.
+  String? get _devralan {
+    final v = _meta['ai_handoff_by'];
+    return v is String && v.trim().isNotEmpty ? v.trim() : null;
+  }
+
   Map<String, dynamic>? get _talep => _son?.iletisimTalebi is Map ? Map<String, dynamic>.from(_son!.iletisimTalebi as Map) : null;
 
   /// Ziyaretçi sekmesi kapalıysa arama bağlanamaz; yine de kullanıcıya bırak (sekme yeni açılmış olabilir).
@@ -330,7 +338,7 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
           const SizedBox(width: 6),
           Expanded(
             child: Text(
-              devredildi ? 'Asistan devredildi · temsilci yanıtlıyor' : '🤖 Asistan yanıtlıyor',
+              devredildi ? 'Asistan devredildi · ${_devralan ?? 'temsilci'} yanıtlıyor' : '🤖 Asistan yanıtlıyor',
               style: TextStyle(color: renk, fontSize: 12, fontWeight: FontWeight.w500),
             ),
           ),
@@ -1144,7 +1152,10 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
           if (sag && !m.benim && !icNot) ...[
             Flexible(child: _baloncuk(m, sag, icNot, zemin, yazi, yeniGonderen, genis, yaziBoyu, r)),
             const SizedBox(width: 8),
-            yeniGonderen ? KisiAvatar(m.ad.isEmpty ? 'T' : m.ad, url: m.avatar, boyut: avatarBoyu) : SizedBox(width: avatarBoyu),
+            // Butoi mesajı: baş harf yerine maskot (uygulamada bot avatarı görünmüyordu)
+            yeniGonderen
+                ? (m.botMu ? ButoiMaskot(boyut: avatarBoyu) : KisiAvatar(m.ad.isEmpty ? 'T' : m.ad, url: m.avatar, boyut: avatarBoyu))
+                : SizedBox(width: avatarBoyu),
           ] else
             Flexible(child: _baloncuk(m, sag, icNot, zemin, yazi, yeniGonderen, genis, yaziBoyu, r)),
         ],

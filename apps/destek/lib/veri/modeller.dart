@@ -94,6 +94,7 @@ class Mesaj {
   Mesaj.coz(Map<String, dynamic> m)
     : id = tamsayi(m['id']),
       gonderen = metin(m['sender']),
+      gonderenId = m['sender_id'] == null ? null : tamsayi(m['sender_id']),
       ad = metin(m['name']),
       avatar = metinYa(m['avatar']),
       tur = metin(m['type'], 'text'),
@@ -107,6 +108,7 @@ class Mesaj {
       benim = mantik(m['own']),
       ek = m['file'] is Map ? Ek.coz(harita(m['file'])) : null;
   final int id;
+  final int? gonderenId;
   final String gonderen, ad, tur, saat;
   final String? govde, avatar;
   final bool icNot, fisilti, okundu, duzenlendi, silindi, benim;
@@ -115,6 +117,7 @@ class Mesaj {
   const Mesaj._({
     required this.id,
     required this.gonderen,
+    required this.gonderenId,
     required this.ad,
     required this.avatar,
     required this.tur,
@@ -133,6 +136,7 @@ class Mesaj {
   Mesaj copyWith({bool? okundu}) => Mesaj._(
     id: id,
     gonderen: gonderen,
+    gonderenId: gonderenId,
     ad: ad,
     avatar: avatar,
     tur: tur,
@@ -148,6 +152,9 @@ class Mesaj {
   );
 
   bool get ziyaretci => gonderen == 'visitor';
+
+  /// Butoi (yapay zeka) mesajı: temsilci tarafında, personel kimliği olmadan gelir.
+  bool get botMu => gonderen == 'agent' && gonderenId == null && !icNot;
   bool get sistem => gonderen == 'system' || tur == 'event';
   bool get temsilci => gonderen == 'agent';
 }

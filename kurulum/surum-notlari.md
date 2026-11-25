@@ -1,3 +1,8 @@
+## 1.2.18 (25 Kas 2026)
+- Düzeltme: sohbet ekranında Butoi mesajlarında "B" baş harfi yerine Butoi maskotu.
+- Yeni: asistan şeridi botu devralan personelin adını gösterir (meta.ai_handoff_by).
+- Sunucu: son personel ayrılınca Butoi sohbeti geri alır; "butoi ile devam" isteği bota döner; temsilci bekleyen zili personel sohbetteyken susar.
+
 ## 1.2.17 (25 Kasım 2026)
 - Yeni: Butoi devrettiğinde sohbet yeniden çalar (panel `handoffs` + bekleyen alarmı `Conversation::temsilciBekleyen`); devir olay satırı müşteri/panelde görünür.
 - Düzeltme: "Devral" sohbete katılır (AiController::handoff → join) ve sonucu bildirir; join/takeover/reply → `AiService::insanDevraldi` (bot düşer).

@@ -2,6 +2,20 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.18',
+    'date': '2026-11-25',
+    'title': 'Butoi avatarı, devralan personel',
+    'items': [
+      {'type': 'fix', 'text': 'Sohbet ekranında Butoi mesajlarında baş harf yerine Butoi maskotu görünür.'},
+      {'type': 'new', 'text': 'Asistan şeridi botu kimin devraldığını gösterir ("Asistan devredildi · Yusuf yanıtlıyor").'},
+      {
+        'type': 'new',
+        'text':
+            'Son personel sohbetten ayrılınca Butoi sohbeti geri alır ve bekleyen müşteri mesajını yanıtlar; müşteri "butoi ile devam" derse de geri döner.',
+      },
+    ],
+  },
+  {
     'version': '1.2.17',
     'date': '2026-11-25',
     'title': 'Devir zili, Devral katılımı, yasak demetleri',
