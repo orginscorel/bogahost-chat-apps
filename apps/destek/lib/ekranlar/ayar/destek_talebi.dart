@@ -127,8 +127,9 @@ class _GovdeState extends State<_Govde> {
     final o = harita(v['summary']);
     final depts = haritalar(v['departments']);
     final kuru = _kuru;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    // AyarSayfa gövdeyi kaydırmaz; sayfa ListView ile kayar (Column sabit kalıyordu, alt bölümlere ulaşılamıyordu)
+    return ListView(
+      padding: EdgeInsets.zero,
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 10),

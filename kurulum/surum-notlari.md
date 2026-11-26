@@ -1,3 +1,6 @@
+## 1.2.23 (26 Kas 2026)
+- Düzeltme: Destek talebi karşılama gövdesi `ListView` (AyarSayfa gövdeyi kaydırmaz; Column ile alt bölümlere ulaşılamıyordu).
+
 ## 1.2.22 (26 Kas 2026)
 - Yeni: Ayarlar > "Destek talebi karşılama" ayrı sayfa (`lib/ekranlar/ayar/destek_talebi.dart`, `DestekTalebiEkrani`); Yapay Zeka ekranındaki sekme kaldırıldı.
 - Düzeltme: Yapay Zeka sekme çipleri `Wrap` ile sarar (yatay kaydırma masaüstünde çalışmıyordu).

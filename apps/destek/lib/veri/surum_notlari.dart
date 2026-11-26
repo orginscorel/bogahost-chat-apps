@@ -2,6 +2,14 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.23',
+    'date': '2026-11-26',
+    'title': 'Destek talebi sayfası kayar',
+    'items': [
+      {'type': 'fix', 'text': 'Destek talebi karşılama sayfası aşağı kaydırılamıyordu; departman şablonları, Kaydet ve gönderilenler bölümlerine ulaşılamıyordu. Düzeltildi.'},
+    ],
+  },
+  {
     'version': '1.2.22',
     'date': '2026-11-26',
     'title': 'Destek talebi karşılama ayrı sayfada',
