@@ -2,6 +2,15 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.22',
+    'date': '2026-11-26',
+    'title': 'Destek talebi karşılama ayrı sayfada',
+    'items': [
+      {'type': 'new', 'text': 'Ayarlar menüsüne "Destek talebi karşılama" sayfası eklendi; Butoi\'nin talep karşılama ayarları artık Yapay Zeka sekmeleri içinde değil, kendi sayfasında.'},
+      {'type': 'fix', 'text': 'Yapay Zeka ekranındaki sekme çipleri yan yana sığmayınca alt satıra sarar (masaüstünde kaydırma gerekmez).'},
+    ],
+  },
+  {
     'version': '1.2.21',
     'date': '2026-11-26',
     'title': 'Destek talebi karşılama (Butoi)',

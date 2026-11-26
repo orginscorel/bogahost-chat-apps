@@ -14,6 +14,7 @@ import 'ayar/acil.dart';
 import 'ayar/bildirim.dart';
 import 'ayar/cihazlar.dart';
 import 'ayar/denetim.dart';
+import 'ayar/destek_talebi.dart';
 import 'ayar/gecmis.dart';
 import 'ayar/hazir.dart';
 import 'ayar/mesai.dart';
@@ -83,6 +84,8 @@ class _AyarlarEkraniState extends State<AyarlarEkrani> {
         _Oge('Hazır yanıtlar', 'Kısayollu şablon mesajlar', Simgeler.chatText, Marka.mavi, () => _git(const HazirYanitlarEkrani())),
       if (Uyg.yetki('settings.manage'))
         _Oge('Yapay zeka asistanı', 'Öneri, otomatik yanıt, bilgi tabanı, öğrenme', Simgeler.sparkle, Marka.mor, () => _git(const YapayZekaEkrani())),
+      if (Uyg.yetki('settings.manage'))
+        _Oge('Destek talebi karşılama', 'Yanıtsız taleplere Butoi adıyla otomatik yanıt, departman şablonları', Simgeler.receiptLong, Marka.zumrut, () => _git(const DestekTalebiEkrani())),
       if (Uyg.yetki('departments.manage'))
         _Oge('Bölümler', 'Departmanlar, otomatik yanıtlar', Simgeler.accountTree, Marka.lavanta, () => _git(const BolumlerEkrani())),
     ];

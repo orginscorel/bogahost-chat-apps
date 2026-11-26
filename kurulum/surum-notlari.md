@@ -1,3 +1,7 @@
+## 1.2.22 (26 Kas 2026)
+- Yeni: Ayarlar > "Destek talebi karşılama" ayrı sayfa (`lib/ekranlar/ayar/destek_talebi.dart`, `DestekTalebiEkrani`); Yapay Zeka ekranındaki sekme kaldırıldı.
+- Düzeltme: Yapay Zeka sekme çipleri `Wrap` ile sarar (yatay kaydırma masaüstünde çalışmıyordu).
+
 ## 1.2.21 (26 Kas 2026)
 - Yeni: Yapay Zeka > "Destek talebi" sekmesi — Butoi destek talebi otomatik karşılama (sunucu `TicketOtoYanitServis`, panel API `ai/ticket`, `ai/ticket/kuru`, `ai/ticket/gecmis`). Eski task `ticket_auto_reply` mantığı; yanıt WHMCS'te "Butoi" adıyla görünür, departman şablonları, yer tutucular {isim_ek} {tid} {konu} {departman}.
 - Sunucu: Butoi İngilizce sorulara İngilizce yanıt (AiService::dilTespit, AiOrkestra dil parametresi, yerel yanıt çevirisi).
