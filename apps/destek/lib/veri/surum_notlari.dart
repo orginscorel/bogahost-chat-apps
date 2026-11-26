@@ -2,6 +2,18 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.21',
+    'date': '2026-11-26',
+    'title': 'Destek talebi karşılama (Butoi)',
+    'items': [
+      {
+        'type': 'new',
+        'text': 'Yapay Zeka > "Destek talebi": yanıtsız kalan WHMCS destek taleplerine Butoi adıyla otomatik karşılama yanıtı. Bekleme süresi, yanıt sonrası durum, genel mesaj ve imza, departmana göre şablonlar, kuru çalıştırma ve gönderilenler listesi uygulamadan yönetilir.',
+      },
+      {'type': 'new', 'text': 'Butoi İngilizce yazan müşteriye İngilizce yanıt verir (sunucu).'},
+    ],
+  },
+  {
     'version': '1.2.20',
     'date': '2026-11-25',
     'title': 'Düzelt kutusu talimat alır',

@@ -1,3 +1,7 @@
+## 1.2.21 (26 Kas 2026)
+- Yeni: Yapay Zeka > "Destek talebi" sekmesi — Butoi destek talebi otomatik karşılama (sunucu `TicketOtoYanitServis`, panel API `ai/ticket`, `ai/ticket/kuru`, `ai/ticket/gecmis`). Eski task `ticket_auto_reply` mantığı; yanıt WHMCS'te "Butoi" adıyla görünür, departman şablonları, yer tutucular {isim_ek} {tid} {konu} {departman}.
+- Sunucu: Butoi İngilizce sorulara İngilizce yanıt (AiService::dilTespit, AiOrkestra dil parametresi, yerel yanıt çevirisi).
+
 ## 1.2.20 (25 Kas 2026)
 - Yeni: Düzelt kutusu = talimat/bilgi (sunucu `AiService::egitimOgret` → `talimatTaslagi`, Claude katmanı; mevcut yanıta %60+ benzer metin ya da "Doğrusu: …" aynen öğretilir). Uygulamada kutu boş açılır, etiket "Talimat ya da bilgi", düğme "Yeniden yaz".
 - Sunucu: `serbestTalimat` 4+ kelime ve -ebilirsin/-malısın kalıplarını tanır; 24+ kelimelik talimatlar "ayrıca" ile bölünmez; butoi-claude sarmalayıcısı `--max-turns 2` (error_max_turns düzeltmesi).

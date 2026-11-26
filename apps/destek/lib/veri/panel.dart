@@ -158,4 +158,9 @@ class Panel {
       _post('ai/train/teach', {'question': soru, 'answer': yanit, 'log_id': ?logId});
   static Future<Map<String, dynamic>> aiEgitimOnayla(int? logId) => _post('ai/train/approve', {'log_id': ?logId});
   static Future<Map<String, dynamic>> aiEgitimTemizle() => _del('ai/train');
+  // Butoi — destek talebi otomatik karşılama
+  static Future<Map<String, dynamic>> aiTicket() => _get('ai/ticket');
+  static Future<Map<String, dynamic>> aiTicketKaydet(Map<String, dynamic> g) => _post('ai/ticket', g);
+  static Future<Map<String, dynamic>> aiTicketKuru() => _post('ai/ticket/kuru', {});
+  static Future<Map<String, dynamic>> aiTicketGecmis() => _get('ai/ticket/gecmis');
 }
