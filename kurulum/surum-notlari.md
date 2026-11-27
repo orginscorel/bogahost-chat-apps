@@ -1,3 +1,7 @@
+## 1.2.25 (27 Kas 2026)
+- Yeni: Sohbet listesi satırında kişiye özel sessize alma (`Sohbet.sessiz` ← `muted`, `Depo.sohbetSessiz` → POST `chats/{id}/mute`). Sunucu: `conversation_mutes` tablosu, `SohbetSessiz` servisi; notifications/feed ve bekleyen sayacı sessiz sohbetleri kişi bazında dışlar; join/takeover sessizi temizler.
+- Yeni: `Ek.karantina` (`quarantined`) → görüşmede uyarı, indirme yok. Sunucu: `message_attachments.scan_*`, `ekler:yeniden-tara` saatlik, FileService karantina + sıkı tür denetimi (çift uzantı, PE/ELF başlığı, şifreli zip, makro belgeleri).
+
 ## 1.2.24 (27 Kas 2026)
 - Yeni: Üst çubukta `SesDugmesi` (hoparlör) — bildirim sesini tek dokunuşla sessize al/aç; `sesAcik`/`sesKaydet` (SharedPreferences, cihaza özel). Dar ekranda `kabukEylemleri` içinde, geniş ekranda Müsaitlik ile Zil arasında.
 - Sunucu: Web paneli üst çubuğa `#lcMute` düğmesi geri geldi (LCNotify.toggleMute, localStorage lc_muted); sessize alma bekleyen sohbet alarmını durdurur, ses açılınca `applyWaiting(_waiting)` ile alarm hemen geri gelir.

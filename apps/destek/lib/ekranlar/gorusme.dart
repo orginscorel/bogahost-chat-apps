@@ -1247,6 +1247,25 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
 
   Widget _ekGorunumu(Ek e, Color yazi, Renkler r) {
     final url = Uyg.tamAdres(e.url);
+    if (e.karantina) {
+      // Sunucu yeniden taramada tehdit buldu: dosya karantinada, indirme kapalı.
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 6),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Simgeler.gppMaybe, color: Marka.gul, size: 20),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                '${e.ad}\nVirüs taramasında tehdit bulundu; dosya karantinada, indirilemez.',
+                style: TextStyle(color: yazi, fontSize: 12.5, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     if (e.gorsel) {
       return Padding(
         padding: const EdgeInsets.only(bottom: 6),

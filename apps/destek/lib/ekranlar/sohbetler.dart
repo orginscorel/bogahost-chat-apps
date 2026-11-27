@@ -365,6 +365,7 @@ class _SohbetlerEkraniState extends State<SohbetlerEkrani> {
                           ),
                         const SizedBox(width: 6),
                         Text(s.son, style: TextStyle(color: r.silik, fontSize: 11.5)),
+                        _sessizDugmesi(s, r),
                       ],
                     ),
                     const SizedBox(height: 3),
@@ -426,6 +427,26 @@ class _SohbetlerEkraniState extends State<SohbetlerEkrani> {
       ),
     );
   }
+
+  /// Sohbet başına sessize alma (yalnız bu kullanıcı): bekleyen sohbet alarmı ve o sohbetin mesaj sesi susar;
+  /// bir personel katılınca sunucu sessizi kaldırır.
+  Widget _sessizDugmesi(Sohbet s, Renkler r) => Padding(
+    padding: const EdgeInsets.only(left: 2),
+    child: Tooltip(
+      message: s.sessiz ? 'Sessize alındı — sesi aç' : 'Bu sohbeti sessize al (yalnız benim için)',
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: () async {
+          final v = await islem(() => Depo.sohbetSessiz(s.id), tamam: s.sessiz ? 'Sohbetin sesi açıldı' : 'Sohbet sessize alındı');
+          if (v != null) _yukle();
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: Icon(Simgeler.bellSlash, size: 15, color: s.sessiz ? Marka.gul : r.soluk.withValues(alpha: 0.55)),
+        ),
+      ),
+    ),
+  );
 
   Future<void> _hepsiniCoz() async {
     if (!await onayla(

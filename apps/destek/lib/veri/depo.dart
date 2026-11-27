@@ -57,6 +57,8 @@ class Depo {
 
   /// Ziyaretçi dilini zorla + son mesajları çevir (web: changeLang).
   static Future<void> dilAyarla(int id, String dil) => _post('chats/$id/lang', {'lang': dil});
+  /// Sohbeti kişiye özel sessize al/aç; yeni durumu döndürür (true = sessiz).
+  static Future<bool> sohbetSessiz(int id) async => mantik(harita(await _post('chats/$id/mute'))['muted']);
 
   /// Ziyaretçinin sesli/görüntülü/ekran talebi şeridini kapat.
   static Future<void> iletisimTalebiTemizle(int id) => _post('chats/$id/contact-request/clear');

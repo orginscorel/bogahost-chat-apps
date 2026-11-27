@@ -55,16 +55,18 @@ class Sohbet {
       sonGonderen = metin(m['last_from']),
       favori = mantik(m['favorite']),
       arsiv = mantik(m['archived']),
-      kacan = mantik(m['missed']);
+      kacan = mantik(m['missed']),
+      sessiz = mantik(m['muted']);
   final int id, okunmamis;
   final String ziyaretci, durum, son, sonGonderen;
   final String? eposta, bolum, temsilci, ulke, onizleme, yaziyor;
-  final bool cevrimici, favori, arsiv, kacan;
+  /// Bu kullanıcı sohbeti sessize almış (kişiye özel; biri katılınca sunucu otomatik açar).
+  final bool cevrimici, favori, arsiv, kacan, sessiz;
   final int? puan;
 
   /// Görünür alanların imzası: liste yoklamasında değişiklik yoksa setState atlanır.
   String get imza =>
-      '$id|$ziyaretci|$durum|$son|$sonGonderen|$eposta|$bolum|$temsilci|$ulke|$onizleme|$yaziyor|$cevrimici|$favori|$arsiv|$kacan|$puan|$okunmamis';
+      '$id|$ziyaretci|$durum|$son|$sonGonderen|$eposta|$bolum|$temsilci|$ulke|$onizleme|$yaziyor|$cevrimici|$favori|$arsiv|$kacan|$puan|$okunmamis|$sessiz';
 
   String get durumAdi => switch (durum) {
     'open' => 'Açık',
@@ -83,10 +85,12 @@ class Ek {
       boyut = tamsayi(m['size']),
       gorsel = mantik(m['image']),
       ses = mantik(m['audio']),
-      video = mantik(m['video']);
+      video = mantik(m['video']),
+      karantina = mantik(m['quarantined']);
   final String url, indir, ad;
   final int boyut;
-  final bool gorsel, ses, video;
+  /// karantina: virüs taramasında tehdit bulundu, sunucu indirmeyi kapattı.
+  final bool gorsel, ses, video, karantina;
 }
 
 /// Görüşme mesajı (poll → messages[]).

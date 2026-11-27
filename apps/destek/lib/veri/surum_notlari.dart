@@ -2,6 +2,15 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.25',
+    'date': '2026-11-27',
+    'title': 'Sohbet başına sessize alma',
+    'items': [
+      {'type': 'new', 'text': 'Sohbet listesinde her satırın sağında zil-kapalı simgesi: o sohbetin bekleyen alarmı ve mesaj sesi yalnız sizde susar (kişiye özel, ekibi etkilemez). Bir personel katılınca sohbet kendiliğinden sessizden çıkar.'},
+      {'type': 'new', 'text': 'Güvenlik: yüklenen dosyalar yeni virüs imzalarıyla saatlik yeniden taranır; tehdit bulunan ek karantinaya alınır, görüşmede uyarıyla gösterilir ve indirilemez (sunucu).'},
+    ],
+  },
+  {
     'version': '1.2.24',
     'date': '2026-11-27',
     'title': 'Tek dokunuşla sessize al',
