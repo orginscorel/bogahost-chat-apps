@@ -95,13 +95,17 @@ jobs:
           [ -x "$BIN" ] || BIN=$(find build/macos/Build/Products/Release -path '*/Contents/MacOS/*' -type f | head -1)
           echo "ikili: $BIN"
           for E in $(echo "$EKRANLAR" | tr ',' ' '); do
+            rm -f "$HOME"/Library/Containers/$PAKET/Data/Library/Application\ Support/*/vitrin-$E.png 2>/dev/null || true
             VITRIN_EKRAN=$E "$BIN" >/dev/null 2>&1 &
             PID=$!
-            sleep 14
-            screencapture -x "../../vitrin-cikti/tam-$E.png" || true
-            kill $PID || true; sleep 1
+            F=""
+            for i in $(seq 1 45); do
+              F=$(find "$HOME/Library/Containers/$PAKET" "$HOME/Library/Application Support" -name "vitrin-$E.png" 2>/dev/null | head -1)
+              [ -n "$F" ] && break; sleep 1
+            done
+            if [ -n "$F" ]; then cp "$F" "../../vitrin-cikti/mac-$E.png"; echo "mac-$E: $F"; else echo "::warning::mac-$E alınamadı"; screencapture -x "../../vitrin-cikti/mac-$E-tamekran.png" || true; fi
+            kill $PID 2>/dev/null || true; sleep 1
           done
-          system_profiler SPDisplaysDataType | grep -i resolution || true
           ls -la ../../vitrin-cikti
       - uses: actions/upload-artifact@v4
         if: always()

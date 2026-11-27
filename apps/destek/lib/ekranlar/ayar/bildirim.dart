@@ -5,6 +5,7 @@ import '../../ortak/simgeler.dart';
 import '../../oturum.dart';
 import '../../veri/json.dart';
 import '../../veri/panel.dart';
+import '../../veri/vitrin.dart';
 import '../../veri/tercihler.dart';
 import 'ortak.dart';
 
@@ -30,7 +31,11 @@ class _BildirimAyarEkraniState extends State<BildirimAyarEkrani> {
   @override
   void initState() {
     super.initState();
-    if (Push.destekli) Push.anahtar().then((t) => mounted ? setState(() => _pushVar = t != null) : null);
+    if (vitrinAcik) {
+      _pushVar = true; // vitrin: sistem izin kutusu görseli kapatmasın
+    } else if (Push.destekli) {
+      Push.anahtar().then((t) => mounted ? setState(() => _pushVar = t != null) : null);
+    }
   }
 
   Future<Map<String, dynamic>> _yukle() async {

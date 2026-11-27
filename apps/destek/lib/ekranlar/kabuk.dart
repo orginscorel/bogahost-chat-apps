@@ -274,6 +274,7 @@ class _KabukState extends State<Kabuk> with WidgetsBindingObserver {
       default:
         _git(Bolum.sohbetler);
     }
+    unawaited(vitrinYakala(ekran));
   }
 
   @override

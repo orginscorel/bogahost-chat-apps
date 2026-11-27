@@ -55,7 +55,9 @@ class DestekUygulamasi extends StatelessWidget {
         supportedLocales: const [Locale('tr', 'TR')],
         localizationsDelegates: const [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
         scrollBehavior: const _Kaydirma(),
-        builder: (_, child) => OlcekSarmal(child: child ?? const SizedBox.shrink()),
+        builder: (_, child) => vitrinAcik
+            ? RepaintBoundary(key: vitrinAnahtar, child: OlcekSarmal(child: child ?? const SizedBox.shrink()))
+            : OlcekSarmal(child: child ?? const SizedBox.shrink()),
         home: AcilisChat(hazirla: () async => await Uyg.yukle() ? const Kabuk() : Uyg.girisEkrani()),
       ),
     );

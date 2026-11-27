@@ -6,6 +6,9 @@ import 'dart:typed_data';
 
 import 'package:boga_ortak/boga_ortak.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'dart:ui' as ui;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,6 +35,31 @@ Future<String> vitrinEkranOku() async {
     if (v.isNotEmpty) return v;
   } catch (_) {}
   return const String.fromEnvironment('VITRIN_EKRAN', defaultValue: 'sohbetler');
+}
+
+/// Masaüstünde pencere ekrana sığmasa da tam kareyi almak için uygulama kendi görüntüsünü yazar: kök RepaintBoundary.
+final vitrinAnahtar = GlobalKey();
+
+/// Ekran yerleşince (yaklaşık [bekle] sonra) uygulamayı 2× piksel oranında PNG'ye yazar ve masaüstünde çıkar.
+/// Dosya: uygulama destek dizini/vitrin-<ekran>.png (Mac'te ~/Library/Containers/<paket>/Data/Library/Application Support/…).
+Future<void> vitrinYakala(String ekran, {Duration bekle = const Duration(seconds: 6)}) async {
+  if (!vitrinAcik || !(Platform.isMacOS || Platform.isWindows || Platform.isLinux)) return;
+  await Future<void>.delayed(bekle);
+  try {
+    final ro = vitrinAnahtar.currentContext?.findRenderObject();
+    if (ro is! RenderRepaintBoundary) return;
+    final img = await ro.toImage(pixelRatio: 2);
+    final bd = await img.toByteData(format: ui.ImageByteFormat.png);
+    if (bd == null) return;
+    final d = await getApplicationSupportDirectory();
+    final f = File('${d.path}/vitrin-$ekran.png');
+    await f.writeAsBytes(bd.buffer.asUint8List(), flush: true);
+    debugPrint('vitrin: ${f.path}');
+  } catch (e) {
+    debugPrint('vitrin yakalama hatası: $e');
+  }
+  await Future<void>.delayed(const Duration(milliseconds: 500));
+  exit(0);
 }
 
 /// Ağ yerine sabit yanıtlar döndüren istemci. Yollar `/api/app/v1/…` biçiminde gelir.
