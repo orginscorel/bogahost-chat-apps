@@ -2,6 +2,15 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.26',
+    'date': '2026-11-27',
+    'title': 'Telefonda ayarlar düzeni',
+    'items': [
+      {'type': 'fix', 'text': 'Ayarlar: Tema ve Görünüm boyutu seçicileri telefonda başlığın altına iniyor; yazılar artık sıkışıp alt alta kırılmıyor.'},
+      {'type': 'fix', 'text': 'Widget ayarları (Konum, Başlık stili, Köşeler), Yasaklar süzgeci ve Bildirim ayarlarındaki APNs satırı dar ekranda alt alta yerleşiyor.'},
+    ],
+  },
+  {
     'version': '1.2.25',
     'date': '2026-11-27',
     'title': 'Sohbet başına sessize alma',

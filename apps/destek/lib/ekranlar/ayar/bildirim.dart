@@ -92,28 +92,37 @@ class _BildirimAyarEkraniState extends State<BildirimAyarEkrani> {
                       contentPadding: const EdgeInsets.symmetric(horizontal: 4),
                       leading: Icon(_pushVar == true ? Simgeler.bellRinging : Simgeler.bellSlash, color: _pushVar == true ? Marka.zumrut : Marka.kehribar),
                       title: const Text('Anlık bildirimler (APNs)'),
-                      subtitle: Text(
-                        _pushVar == null
-                            ? 'Denetleniyor…'
-                            : _pushVar!
-                            ? 'Bu cihaz kayıtlı; uygulama kapalıyken de bildirim gelir.'
-                            : 'İzin verilmemiş. Sistem ayarlarından bildirimi açın, sonra yeniden deneyin.',
-                        style: TextStyle(color: r.silik, fontSize: 12),
+                      // Düğme sağda (trailing) değil açıklamanın altında: telefonda açıklama sıkışıp alt alta kırılıyordu.
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _pushVar == null
+                                ? 'Denetleniyor…'
+                                : _pushVar!
+                                ? 'Bu cihaz kayıtlı; uygulama kapalıyken de bildirim gelir.'
+                                : 'İzin verilmemiş. Sistem ayarlarından bildirimi açın, sonra yeniden deneyin.',
+                            style: TextStyle(color: r.silik, fontSize: 12),
+                          ),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: _pushVar == false
+                                ? TextButton(
+                                    onPressed: () async {
+                                      await Push.izin();
+                                      final ok = await Push.kaydet(Uyg.api, yol: Uyg.pushYolu, konu: Uyg.pushKonu);
+                                      if (mounted) setState(() => _pushVar = ok);
+                                    },
+                                    child: const Text('Yeniden dene'),
+                                  )
+                                : TextButton.icon(
+                                    onPressed: () => kaydet(Panel.pushTest),
+                                    icon: const Icon(Simgeler.send, size: 16),
+                                    label: const Text('Test gönder'),
+                                  ),
+                          ),
+                        ],
                       ),
-                      trailing: _pushVar == false
-                          ? TextButton(
-                              onPressed: () async {
-                                await Push.izin();
-                                final ok = await Push.kaydet(Uyg.api, yol: Uyg.pushYolu, konu: Uyg.pushKonu);
-                                if (mounted) setState(() => _pushVar = ok);
-                              },
-                              child: const Text('Yeniden dene'),
-                            )
-                          : TextButton.icon(
-                              onPressed: () => kaydet(Panel.pushTest),
-                              icon: const Icon(Simgeler.send, size: 16),
-                              label: const Text('Test gönder'),
-                            ),
                     )
                   else
                     ListTile(

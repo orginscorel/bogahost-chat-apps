@@ -235,28 +235,27 @@ class _WidgetAyarEkraniState extends State<WidgetAyarEkrani> {
   ];
 
   /// Etiket + SegmentedButton satırı.
-  Widget _secenek(String ad, Renkler r, List<(String, String, IconData)> secenekler, String deger, ValueChanged<String> onSec) => Padding(
-    padding: const EdgeInsets.only(bottom: 12),
-    child: Row(
-      children: [
-        SizedBox(
-          width: 110,
-          child: Text(
-            ad,
-            style: TextStyle(color: r.soluk, fontSize: 13, fontWeight: FontWeight.w500),
-          ),
-        ),
-        Expanded(
-          child: SegmentedButton<String>(
-            showSelectedIcon: false,
-            segments: [for (final (k, etiket, ikon) in secenekler) ButtonSegment(value: k, label: Text(etiket), icon: Icon(ikon, size: 16))],
-            selected: {deger},
-            onSelectionChanged: (s) => onSec(s.first),
-          ),
-        ),
-      ],
-    ),
-  );
+  Widget _secenek(String ad, Renkler r, List<(String, String, IconData)> secenekler, String deger, ValueChanged<String> onSec) {
+    final etiket = Text(ad, style: TextStyle(color: r.soluk, fontSize: 13, fontWeight: FontWeight.w500));
+    final dugme = SegmentedButton<String>(
+      showSelectedIcon: false,
+      segments: [for (final (k, e, ikon) in secenekler) ButtonSegment(value: k, label: Text(e), icon: Icon(ikon, size: 16))],
+      selected: {deger},
+      onSelectionChanged: (s) => onSec(s.first),
+    );
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: LayoutBuilder(
+        // Telefonda (dar) etiket üstte, düğme tam genişlikte: segment yazıları kırılmasın.
+        builder: (_, k) => k.maxWidth < 460
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [etiket, const SizedBox(height: 6), SizedBox(width: double.infinity, child: dugme)],
+              )
+            : Row(children: [SizedBox(width: 110, child: etiket), Expanded(child: dugme)]),
+      ),
+    );
+  }
 
   Widget _onizlemeKutusu(Renkler r) => Kutu(
     padding: const EdgeInsets.all(14),

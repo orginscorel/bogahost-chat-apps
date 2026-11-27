@@ -164,22 +164,19 @@ class _YasaklarEkraniState extends State<YasaklarEkrani> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _q,
-                        onChanged: (_) => setState(() {}),
-                        decoration: InputDecoration(
-                          hintText: 'Kişi, IP, e-posta, sebep ya da ekleyen…',
-                          prefixIcon: const Icon(Simgeler.search, size: 18),
-                          isDense: true,
-                          suffixIcon: _q.text.isEmpty ? null : IconButton(icon: const Icon(Simgeler.close, size: 16), onPressed: () => setState(_q.clear)),
-                        ),
+                LayoutBuilder(
+                  builder: (_, k) {
+                    final arama = TextField(
+                      controller: _q,
+                      onChanged: (_) => setState(() {}),
+                      decoration: InputDecoration(
+                        hintText: 'Kişi, IP, e-posta, sebep ya da ekleyen…',
+                        prefixIcon: const Icon(Simgeler.search, size: 18),
+                        isDense: true,
+                        suffixIcon: _q.text.isEmpty ? null : IconButton(icon: const Icon(Simgeler.close, size: 16), onPressed: () => setState(_q.clear)),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    SegmentedButton<String>(
+                    );
+                    final suzgec = SegmentedButton<String>(
                       showSelectedIcon: false,
                       segments: const [
                         ButtonSegment(value: 'aktif', label: Text('Aktif')),
@@ -188,8 +185,13 @@ class _YasaklarEkraniState extends State<YasaklarEkrani> {
                       ],
                       selected: {_durum},
                       onSelectionChanged: (s) => setState(() => _durum = s.first),
-                    ),
-                  ],
+                    );
+                    // Telefonda arama kutusu ile süzgeç alt alta; yan yana sığmayınca ipucu ve segmentler kırılıyordu.
+                    if (k.maxWidth < 520) {
+                      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [arama, const SizedBox(height: 8), suzgec]);
+                    }
+                    return Row(children: [Expanded(child: arama), const SizedBox(width: 10), suzgec]);
+                  },
                 ),
                 const SizedBox(height: 8),
                 Wrap(

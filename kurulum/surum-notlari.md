@@ -1,3 +1,7 @@
+## 1.2.26 (27 Kas 2026)
+- Düzeltme: Ayarlar ekranında telefon genişliğinde trailing SegmentedButton başlığı sıkıştırıyordu → `_kontrolSatiri` (dar ekranda düğme başlığın altında, FittedBox). Widget ayarı `_secenek`, Yasaklar arama/süzgeç satırı ve Bildirim APNs düğmesi de dar ekranda alt alta.
+- Vitrin kipi (`--dart-define=VITRIN=true`, `lib/veri/vitrin.dart`): mağaza ekran görüntüleri için anonim örnek veri; `VITRIN_EKRAN` ile açılış ekranı. `.github/workflows/vitrin.yml` iPhone/iPad simülatörü + Mac penceresinden görüntü alır (artifact).
+
 ## 1.2.25 (27 Kas 2026)
 - Yeni: Sohbet listesi satırında kişiye özel sessize alma (`Sohbet.sessiz` ← `muted`, `Depo.sohbetSessiz` → POST `chats/{id}/mute`). Sunucu: `conversation_mutes` tablosu, `SohbetSessiz` servisi; notifications/feed ve bekleyen sayacı sessiz sohbetleri kişi bazında dışlar; join/takeover sessizi temizler.
 - Yeni: `Ek.karantina` (`quarantined`) → görüşmede uyarı, indirme yok. Sunucu: `message_attachments.scan_*`, `ekler:yeniden-tara` saatlik, FileService karantina + sıkı tür denetimi (çift uzantı, PE/ELF başlığı, şifreli zip, makro belgeleri).

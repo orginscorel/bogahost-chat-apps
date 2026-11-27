@@ -196,10 +196,11 @@ class _AyarlarEkraniState extends State<AyarlarEkrani> {
                     ),
                     ValueListenableBuilder<ThemeMode>(
                       valueListenable: temaKipi,
-                      builder: (_, kip, _) => ListTile(
-                        leading: _ikon(Simgeler.palette, Marka.indigo),
-                        title: const Text('Tema'),
-                        trailing: SegmentedButton<ThemeMode>(
+                      builder: (_, kip, _) => _kontrolSatiri(
+                        ikon: Simgeler.palette,
+                        renk: Marka.indigo,
+                        baslik: 'Tema',
+                        kontrol: SegmentedButton<ThemeMode>(
                           showSelectedIcon: false,
                           segments: const [
                             ButtonSegment(value: ThemeMode.system, label: Text('Sistem')),
@@ -213,11 +214,12 @@ class _AyarlarEkraniState extends State<AyarlarEkrani> {
                     ),
                     ValueListenableBuilder<double>(
                       valueListenable: arayuzOlcegi,
-                      builder: (_, v, _) => ListTile(
-                        leading: _ikon(Simgeler.search, Marka.gok),
-                        title: const Text('Görünüm boyutu'),
-                        subtitle: Text('Büyük monitörde yazı ve düğmeler birlikte büyür', style: TextStyle(color: r.silik, fontSize: 12)),
-                        trailing: SegmentedButton<double>(
+                      builder: (_, v, _) => _kontrolSatiri(
+                        ikon: Simgeler.search,
+                        renk: Marka.gok,
+                        baslik: 'Görünüm boyutu',
+                        alt: 'Büyük monitörde yazı ve düğmeler birlikte büyür',
+                        kontrol: SegmentedButton<double>(
                           showSelectedIcon: false,
                           segments: const [
                             ButtonSegment(value: 0, label: Text('Oto')),
@@ -289,6 +291,28 @@ class _AyarlarEkraniState extends State<AyarlarEkrani> {
     height: 36,
     decoration: BoxDecoration(color: c.withValues(alpha: .12), borderRadius: BorderRadius.circular(10)),
     child: Icon(i, color: c, size: 20),
+  );
+
+  /// Başlık + seçim düğmesi. Geniş ekranda düğme sağda (trailing); telefonda başlığın altına iner. Aksi hâlde
+  /// trailing başlığı birkaç karaktere sıkıştırıp yazıyı alt alta kırıyordu.
+  Widget _kontrolSatiri({required IconData ikon, required Color renk, required String baslik, String? alt, required Widget kontrol}) => LayoutBuilder(
+    builder: (ctx, k) {
+      final altYazi = alt == null ? null : Text(alt, style: TextStyle(color: ctx.r.silik, fontSize: 12));
+      if (k.maxWidth >= 560) return ListTile(leading: _ikon(ikon, renk), title: Text(baslik), subtitle: altYazi, trailing: kontrol);
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListTile(leading: _ikon(ikon, renk), title: Text(baslik), subtitle: altYazi),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: kontrol),
+            ),
+          ),
+        ],
+      );
+    },
   );
 
   Widget _satir(String ad, String alt, IconData i, Color c, VoidCallback onTap) => ListTile(

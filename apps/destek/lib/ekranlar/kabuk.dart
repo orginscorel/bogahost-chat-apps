@@ -251,6 +251,17 @@ class _KabukState extends State<Kabuk> with WidgetsBindingObserver {
         _git(Bolum.ziyaretciler);
       case 'raporlar':
         _git(Bolum.raporlar);
+      case 'ayarlar':
+        _git(Bolum.ayarlar);
+      case 'ayar-bildirim':
+        _git(Bolum.ayarlar);
+        yanPanelAc(context, const BildirimAyarEkrani());
+      case 'ayar-widget':
+        _git(Bolum.ayarlar);
+        yanPanelAc(context, const WidgetAyarEkrani());
+      case 'ayar-yasaklar':
+        _git(Bolum.ayarlar);
+        yanPanelAc(context, const YasaklarEkrani());
       case 'gorusme':
         sohbetIstegi.value = 1;
       case 'butoi':
