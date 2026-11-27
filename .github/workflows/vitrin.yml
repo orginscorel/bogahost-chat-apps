@@ -8,6 +8,11 @@ on:
       ekranlar:
         description: 'Virgülle ekranlar'
         default: 'sohbetler,gorusme,butoi,ziyaretciler,raporlar,ozet'
+      platform:
+        description: 'Hangi platform'
+        type: choice
+        options: [hepsi, ios, mac]
+        default: hepsi
 
 permissions:
   contents: read
@@ -39,8 +44,10 @@ jobs:
 
       # ---------- iPhone + iPad (simülatör) ----------
       - name: iOS simülatör derlemesi (vitrin)
+        if: github.event.inputs.platform != 'mac'
         run: flutter build ios --simulator --debug --dart-define=VITRIN=true
       - name: Simülatör görüntüleri
+        if: github.event.inputs.platform != 'mac'
         env:
           EKRANLAR: ${{ github.event.inputs.ekranlar }}
         run: |
@@ -85,8 +92,10 @@ jobs:
 
       # ---------- Mac ----------
       - name: Mac derlemesi (vitrin)
+        if: github.event.inputs.platform != 'ios'
         run: flutter build macos --release --dart-define=VITRIN=true
       - name: Mac görüntüleri
+        if: github.event.inputs.platform != 'ios'
         env:
           EKRANLAR: ${{ github.event.inputs.ekranlar }}
         run: |

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:boga_ortak/boga_ortak.dart';
 import 'package:flutter/gestures.dart';
@@ -76,6 +77,34 @@ class OlcekSarmal extends StatelessWidget {
       builder: (ctx, k) {
         final w = k.maxWidth, h = k.maxHeight;
         if (!w.isFinite || !h.isFinite) return child;
+        if (vitrinAcik && !Platform.isAndroid && !Platform.isIOS) {
+          // Vitrin (mağaza karesi): pencere ekrana sığmasa da içerik 1440×900 mantıksal boyutta yerleşir, pencereye
+          // sığacak kadar küçültülerek çizilir; yakalama bu ölçeğin tersiyle yapılır → tam 2880×1800 piksel.
+          const tw = 1440.0, th = 900.0;
+          final f = math.min(w / tw, h / th);
+          if (f < 1) {
+            final mq = MediaQuery.of(ctx);
+            return Transform.scale(
+              scale: f,
+              alignment: Alignment.topLeft,
+              child: OverflowBox(
+                alignment: Alignment.topLeft,
+                minWidth: tw,
+                maxWidth: tw,
+                minHeight: th,
+                maxHeight: th,
+                child: SizedBox(
+                  width: tw,
+                  height: th,
+                  child: MediaQuery(
+                    data: mq.copyWith(size: const Size(tw, th), devicePixelRatio: mq.devicePixelRatio / f, padding: EdgeInsets.zero, viewPadding: EdgeInsets.zero, viewInsets: EdgeInsets.zero),
+                    child: RepaintBoundary(child: child),
+                  ),
+                ),
+              ),
+            );
+          }
+        }
         final f = tercih > 0 ? tercih : otomatikOlcek(w);
         if ((f - 1).abs() < .01) return RepaintBoundary(child: child);
         final mq = MediaQuery.of(ctx);

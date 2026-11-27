@@ -48,7 +48,9 @@ Future<void> vitrinYakala(String ekran, {Duration bekle = const Duration(seconds
   try {
     final ro = vitrinAnahtar.currentContext?.findRenderObject();
     if (ro is! RenderRepaintBoundary) return;
-    final img = await ro.toImage(pixelRatio: 2);
+    // Genişlik 1440 mantıksal pikselin 2 katı (2880) olacak şekilde oran: pencere küçükse içerik ölçeklenmiştir.
+    final oran = ro.size.width > 0 ? 2880 / ro.size.width : 2.0;
+    final img = await ro.toImage(pixelRatio: oran);
     final bd = await img.toByteData(format: ui.ImageByteFormat.png);
     if (bd == null) return;
     final d = await getApplicationSupportDirectory();
