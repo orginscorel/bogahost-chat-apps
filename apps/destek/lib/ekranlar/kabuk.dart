@@ -504,7 +504,7 @@ class _YanMenuState extends State<YanMenu> {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 160),
             curve: Curves.easeOut,
-            width: acik ? 248 : 74,
+            width: acik ? 249 : 75, // +1: sağ kenar çizgisi kutunun içinde; 54 px satır genişliği taşmasın (RIGHT OVERFLOWED BY 1 px)
             decoration: BoxDecoration(
               color: _zemin,
               border: Border(right: BorderSide(color: _kenar)),

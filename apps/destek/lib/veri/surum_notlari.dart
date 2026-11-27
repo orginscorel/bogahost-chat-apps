@@ -8,6 +8,7 @@ const uygulamaNotlari = <Map<String, dynamic>>[
     'items': [
       {'type': 'fix', 'text': 'Ayarlar: Tema ve Görünüm boyutu seçicileri telefonda başlığın altına iniyor; yazılar artık sıkışıp alt alta kırılmıyor.'},
       {'type': 'fix', 'text': 'Widget ayarları (Konum, Başlık stili, Köşeler), Yasaklar süzgeci ve Bildirim ayarlarındaki APNs satırı dar ekranda alt alta yerleşiyor.'},
+      {'type': 'fix', 'text': 'Geniş düzende daraltılmış yan menü satırları 1 piksel taşıyordu (kenar çizgisi hesaba katılmamıştı); düzeltildi.'},
     ],
   },
   {
