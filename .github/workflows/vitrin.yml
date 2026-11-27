@@ -66,11 +66,12 @@ jobs:
             local U=$1 ON=$2
             xcrun simctl boot "$U" || true
             xcrun simctl bootstatus "$U" -b
-            xcrun simctl status_bar "$U" override --time 9:41 --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3 --operatorName '' || true
+            xcrun simctl status_bar "$U" override --time 9:41 --batteryState discharging --batteryLevel 100 --cellularBars 4 --wifiBars 3 --operatorName '' || true
             xcrun simctl install "$U" "$APP"
             sleep 3
             for E in $(echo "$EKRANLAR" | tr ',' ' '); do
-              SIMCTL_CHILD_VITRIN_EKRAN=$E xcrun simctl launch "$U" "$PAKET"
+              D=$(xcrun simctl get_app_container "$U" "$PAKET" data); mkdir -p "$D/Documents"; echo "$E" > "$D/Documents/vitrin-ekran.txt"
+              SIMCTL_CHILD_VITRIN_EKRAN=$E xcrun simctl launch "$U" "$PAKET" -flutter.vitrin_ekran "$E"
               sleep 12
               xcrun simctl io "$U" screenshot --type=png "../../vitrin-cikti/$ON-$E.png"
               xcrun simctl terminate "$U" "$PAKET" || true
@@ -90,7 +91,6 @@ jobs:
           EKRANLAR: ${{ github.event.inputs.ekranlar }}
         run: |
           set -e
-          pip3 install -q pillow 2>/dev/null || python3 -m pip install -q --user pillow
           BIN="build/macos/Build/Products/Release/Bogahost Chat.app/Contents/MacOS/Bogahost Chat"
           [ -x "$BIN" ] || BIN=$(find build/macos/Build/Products/Release -path '*/Contents/MacOS/*' -type f | head -1)
           echo "ikili: $BIN"
@@ -100,19 +100,8 @@ jobs:
             sleep 14
             screencapture -x "../../vitrin-cikti/tam-$E.png" || true
             kill $PID || true; sleep 1
-            python3 - "$E" <<'PY'
-          import sys
-          from PIL import Image
-          e=sys.argv[1]; im=Image.open(f'../../vitrin-cikti/tam-{e}.png'); W,H=im.size
-          # Pencere 1440×900 nokta ortalanmış; başlık çubuğu ~28 px. Retina ise ölçek 2.
-          o=2 if W>=2600 else 1; w,h,t=1440*o,900*o,28*o
-          # Pencere ortalanınca başlık dahil yükseklik h+t; görünür bölgeyi ortadan kes.
-          x0=(W-w)//2; y0=(H-(h+t))//2
-          im.crop((x0,y0,x0+w,y0+h+t)).save(f'../../vitrin-cikti/mac-{e}.png')
-          print('mac',e,w,h+t,'ekran',W,H)
-          PY
           done
-          rm -f ../../vitrin-cikti/tam-*.png
+          system_profiler SPDisplaysDataType | grep -i resolution || true
           ls -la ../../vitrin-cikti
       - uses: actions/upload-artifact@v4
         if: always()

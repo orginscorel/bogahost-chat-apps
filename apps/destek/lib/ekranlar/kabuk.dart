@@ -242,9 +242,10 @@ class _KabukState extends State<Kabuk> with WidgetsBindingObserver {
   }
 
   /// Vitrin kipi: VITRIN_EKRAN'a göre ilgili ekranı açar (geniş düzende kabuk içinde, telefonda rota olarak).
-  void _vitrinAc() {
+  Future<void> _vitrinAc() async {
+    final ekran = await vitrinEkranOku();
     if (!mounted) return;
-    switch (vitrinEkran) {
+    switch (ekran) {
       case 'ozet':
         _git(Bolum.ozet);
       case 'ziyaretciler':

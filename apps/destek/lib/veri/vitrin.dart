@@ -6,15 +6,32 @@ import 'dart:typed_data';
 
 import 'package:boga_ortak/boga_ortak.dart';
 import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const vitrinAcik = bool.fromEnvironment('VITRIN');
 
-/// Açılışta gösterilecek ekran: VITRIN_EKRAN ortam değişkeni (simülatörde SIMCTL_CHILD_VITRIN_EKRAN) ya da
-/// --dart-define=VITRIN_EKRAN=…  Değerler: sohbetler | gorusme | butoi | ziyaretciler | raporlar | ozet
-String get vitrinEkran {
+/// Açılışta gösterilecek ekran. Sırayla: VITRIN_EKRAN ortam değişkeni (Mac), uygulama belgeler dizinindeki
+/// `vitrin-ekran.txt` (simülatör: `simctl get_app_container … data`), NSUserDefaults `flutter.vitrin_ekran`
+/// (simctl launch … -flutter.vitrin_ekran X), en son --dart-define=VITRIN_EKRAN.
+/// Değerler: sohbetler | gorusme | butoi | ziyaretciler | raporlar | ozet | ayarlar | ayar-bildirim | ayar-widget | ayar-yasaklar
+Future<String> vitrinEkranOku() async {
   if (!vitrinAcik) return '';
   final e = Platform.environment['VITRIN_EKRAN'] ?? '';
-  return e.isNotEmpty ? e : const String.fromEnvironment('VITRIN_EKRAN', defaultValue: 'sohbetler');
+  if (e.isNotEmpty) return e;
+  try {
+    final d = await getApplicationDocumentsDirectory();
+    final f = File('${d.path}/vitrin-ekran.txt');
+    if (await f.exists()) {
+      final v = (await f.readAsString()).trim();
+      if (v.isNotEmpty) return v;
+    }
+  } catch (_) {}
+  try {
+    final v = (await SharedPreferences.getInstance()).getString('vitrin_ekran') ?? '';
+    if (v.isNotEmpty) return v;
+  } catch (_) {}
+  return const String.fromEnvironment('VITRIN_EKRAN', defaultValue: 'sohbetler');
 }
 
 /// Ağ yerine sabit yanıtlar döndüren istemci. Yollar `/api/app/v1/…` biçiminde gelir.
