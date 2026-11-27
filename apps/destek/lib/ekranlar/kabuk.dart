@@ -203,7 +203,7 @@ Future<void> bildirimAc(Bildirim b) async {
 /// Ekran AppBar'ına eklenen ortak eylemler. Geniş ekranda (kabuk içinde) üst çubuk zaten arama / durum / zil /
 /// tema / profil taşır, ekranlar hiçbir şey eklemez; telefonda ve itilmiş rotalarda durum noktası + zil.
 List<Widget> kabukEylemleri(BuildContext context) =>
-    kabukGomulu(context) || context.genis ? const [] : const [MusaitlikDugmesi(kisa: true), ZilDugmesi(), SizedBox(width: 4)];
+    kabukGomulu(context) || context.genis ? const [] : const [MusaitlikDugmesi(kisa: true), SesDugmesi(), ZilDugmesi(), SizedBox(width: 4)];
 
 /// Ekranın AppBar'ı: kabuk içinde gömülüyken yok (başlık üst çubukta); `alt` varsa yalnız o gösterilir.
 PreferredSizeWidget? ekranBasligi(BuildContext context, String baslik, {List<Widget> eylemler = const [], PreferredSizeWidget? alt}) {
@@ -819,6 +819,7 @@ class UstCubuk extends StatelessWidget {
           const SizedBox(width: 8),
           const MusaitlikDugmesi(),
           const SizedBox(width: 2),
+          const SesDugmesi(),
           const ZilDugmesi(),
           const TemaDugmesi(),
           const SizedBox(width: 6),
@@ -1168,6 +1169,23 @@ class BosKucukMetin extends StatelessWidget {
 }
 
 /// Açık/koyu tema anahtarı.
+/// Bildirim sesi: tek dokunuşla sessize al / aç (bu cihaza özel; Ayarlar'daki "Uygulama açıkken ses" ile aynı tercih).
+class SesDugmesi extends StatelessWidget {
+  const SesDugmesi({super.key});
+  @override
+  Widget build(BuildContext context) => ValueListenableBuilder<bool>(
+    valueListenable: sesAcik,
+    builder: (_, acik, _) => IconButton(
+      tooltip: acik ? 'Sessize al' : 'Sessize alındı — sesi aç',
+      onPressed: () {
+        sesKaydet(!acik);
+        bildir(acik ? 'Bildirim sesi kapatıldı' : 'Bildirim sesi açıldı', mesaj: acik ? 'Yalnız bu cihaz için; tekrar dokununca açılır.' : null, tur: MesajTur.bilgi);
+      },
+      icon: Icon(acik ? Simgeler.speaker : Simgeler.speakerOff, color: acik ? null : Marka.gul),
+    ),
+  );
+}
+
 class TemaDugmesi extends StatelessWidget {
   const TemaDugmesi({super.key});
   @override

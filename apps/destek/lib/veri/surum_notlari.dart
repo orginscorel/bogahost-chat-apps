@@ -2,6 +2,15 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.24',
+    'date': '2026-11-27',
+    'title': 'Tek dokunuşla sessize al',
+    'items': [
+      {'type': 'new', 'text': 'Üst çubuğa hoparlör düğmesi eklendi: yeni sohbet ve mesaj sesini tek dokunuşla sessize alır, tekrar dokununca açılır. Tercih bu cihaza özeldir; Ayarlar\'daki "Uygulama açıkken ses" ile aynıdır.'},
+      {'type': 'fix', 'text': 'Web panelinde üst çubuktaki ses düğmesi geri getirildi; bekleyen sohbet alarmı sessize alınabilir, ses açılınca bekleyen varsa alarm hemen yeniden çalar (sunucu).'},
+    ],
+  },
+  {
     'version': '1.2.23',
     'date': '2026-11-26',
     'title': 'Destek talebi sayfası kayar',

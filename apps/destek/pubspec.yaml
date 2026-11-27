@@ -1,7 +1,7 @@
 name: destek
 description: "Bogahost Chat — chat.bogahost.com canlı destek temsilci uygulaması"
 publish_to: 'none'
-version: 1.2.23+30
+version: 1.2.24+31
 resolution: workspace
 
 environment:

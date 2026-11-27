@@ -1,3 +1,7 @@
+## 1.2.24 (27 Kas 2026)
+- Yeni: Üst çubukta `SesDugmesi` (hoparlör) — bildirim sesini tek dokunuşla sessize al/aç; `sesAcik`/`sesKaydet` (SharedPreferences, cihaza özel). Dar ekranda `kabukEylemleri` içinde, geniş ekranda Müsaitlik ile Zil arasında.
+- Sunucu: Web paneli üst çubuğa `#lcMute` düğmesi geri geldi (LCNotify.toggleMute, localStorage lc_muted); sessize alma bekleyen sohbet alarmını durdurur, ses açılınca `applyWaiting(_waiting)` ile alarm hemen geri gelir.
+
 ## 1.2.23 (26 Kas 2026)
 - Düzeltme: Destek talebi karşılama gövdesi `ListView` (AyarSayfa gövdeyi kaydırmaz; Column ile alt bölümlere ulaşılamıyordu).
 
