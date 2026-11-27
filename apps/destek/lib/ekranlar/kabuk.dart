@@ -27,6 +27,7 @@ import 'ayar/tetikleyiciler.dart';
 import 'ayar/whatsapp.dart';
 import 'ayar/widget_ayar.dart';
 import 'ayar/yasaklar.dart';
+import 'ayar/yapay_zeka.dart';
 import 'ayarlar.dart';
 import 'bildirimler.dart';
 import 'ekip.dart';
@@ -34,6 +35,7 @@ import 'gorusme.dart';
 import 'ozet.dart';
 import 'sohbetler.dart';
 import 'ziyaretciler.dart';
+import '../veri/vitrin.dart';
 
 /// Kabuktaki bölümler. İlk beşi telefonda alt gezinmede; geri kalanı yan menüde (geniş) ya da Menü sekmesinde.
 enum Bolum {
@@ -236,6 +238,30 @@ class _KabukState extends State<Kabuk> with WidgetsBindingObserver {
     _pushHazirla();
     _yenile();
     _sayac = Timer.periodic(const Duration(seconds: 6), (_) => _yenile());
+    if (vitrinAcik) WidgetsBinding.instance.addPostFrameCallback((_) => _vitrinAc());
+  }
+
+  /// Vitrin kipi: VITRIN_EKRAN'a göre ilgili ekranı açar (geniş düzende kabuk içinde, telefonda rota olarak).
+  void _vitrinAc() {
+    if (!mounted) return;
+    switch (vitrinEkran) {
+      case 'ozet':
+        _git(Bolum.ozet);
+      case 'ziyaretciler':
+        _git(Bolum.ziyaretciler);
+      case 'raporlar':
+        _git(Bolum.raporlar);
+      case 'gorusme':
+        sohbetIstegi.value = 1;
+      case 'butoi':
+        if (context.genis) {
+          secilenSohbet.value = -1;
+        } else {
+          Navigator.of(context).push(HizliRota(builder: (_) => const ButoiSohbetEkrani()));
+        }
+      default:
+        _git(Bolum.sohbetler);
+    }
   }
 
   @override
@@ -254,7 +280,7 @@ class _KabukState extends State<Kabuk> with WidgetsBindingObserver {
   }
 
   Future<void> _pushHazirla() async {
-    if (!Push.destekli) return;
+    if (!Push.destekli || vitrinAcik) return; // vitrin: izin iletişim kutusu görseli bozmasın
     Push.gosterilsinMi = (v) => true;
     _push = Push.acildi.listen(_bildirimAcildi);
     final ilk = await Push.baslangic();

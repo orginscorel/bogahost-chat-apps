@@ -1,0 +1,122 @@
+# Mağaza ekran görüntüleri: uygulamayı VITRIN kipinde (anonim örnek veri, ağ yok) iPhone/iPad simülatöründe ve
+# Mac penceresinde çalıştırıp gerçek ekran görüntülerini alır. Elle tetiklenir; üretim derlemelerine dokunmaz.
+name: vitrin
+
+on:
+  workflow_dispatch:
+    inputs:
+      ekranlar:
+        description: 'Virgülle ekranlar'
+        default: 'sohbetler,gorusme,butoi,ziyaretciler,raporlar,ozet'
+
+permissions:
+  contents: read
+
+env:
+  FLUTTER_VERSION: '3.47.8'
+  PAKET: com.bogahost.destek
+
+jobs:
+  vitrin:
+    runs-on: macos-15
+    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: apps/destek
+    steps:
+      - uses: actions/checkout@v4
+      - name: Xcode 26 seç
+        run: |
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          [ -n "$X" ] && sudo xcode-select -s "$X/Contents/Developer"; xcodebuild -version
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze --no-fatal-infos
+
+      # ---------- iPhone + iPad (simülatör) ----------
+      - name: iOS simülatör derlemesi (vitrin)
+        run: flutter build ios --simulator --debug --dart-define=VITRIN=true
+      - name: Simülatör görüntüleri
+        env:
+          EKRANLAR: ${{ github.event.inputs.ekranlar }}
+        run: |
+          set -e
+          mkdir -p ../../vitrin-cikti
+          xcrun simctl list devices available -j > cihazlar.json
+          sec() { python3 - "$1" <<'PY'
+          import json,sys,re
+          d=json.load(open('cihazlar.json'))['devices']; pat=re.compile(sys.argv[1]); best=None
+          for rt,devs in d.items():
+              if 'iOS' not in rt: continue
+              for x in devs:
+                  if x.get('isAvailable') and pat.search(x['name']):
+                      key=(x['name'], rt)
+                      if best is None or key>best[0]: best=(key,x['udid'],x['name'],rt)
+          print(best[1] if best else '', best[2] if best else '', best[3] if best else '')
+          PY
+          }
+          IPHONE=$(sec 'iPhone .*Pro Max$'); IPAD=$(sec 'iPad Pro 13-inch')
+          echo "iPhone: $IPHONE"; echo "iPad: $IPAD"
+          APP=build/ios/iphonesimulator/Runner.app
+          cek() { # $1=udid $2=önek
+            local U=$1 ON=$2
+            xcrun simctl boot "$U" || true
+            xcrun simctl bootstatus "$U" -b
+            xcrun simctl status_bar "$U" override --time 9:41 --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3 --operatorName '' || true
+            xcrun simctl install "$U" "$APP"
+            sleep 3
+            for E in $(echo "$EKRANLAR" | tr ',' ' '); do
+              SIMCTL_CHILD_VITRIN_EKRAN=$E xcrun simctl launch "$U" "$PAKET"
+              sleep 12
+              xcrun simctl io "$U" screenshot --type=png "../../vitrin-cikti/$ON-$E.png"
+              xcrun simctl terminate "$U" "$PAKET" || true
+              sleep 1
+            done
+            xcrun simctl shutdown "$U" || true
+          }
+          cek "$(echo $IPHONE | awk '{print $1}')" iphone
+          cek "$(echo $IPAD | awk '{print $1}')" ipad
+          ls -la ../../vitrin-cikti
+
+      # ---------- Mac ----------
+      - name: Mac derlemesi (vitrin)
+        run: flutter build macos --release --dart-define=VITRIN=true
+      - name: Mac görüntüleri
+        env:
+          EKRANLAR: ${{ github.event.inputs.ekranlar }}
+        run: |
+          set -e
+          pip3 install -q pillow 2>/dev/null || python3 -m pip install -q --user pillow
+          BIN="build/macos/Build/Products/Release/Bogahost Chat.app/Contents/MacOS/Bogahost Chat"
+          [ -x "$BIN" ] || BIN=$(find build/macos/Build/Products/Release -path '*/Contents/MacOS/*' -type f | head -1)
+          echo "ikili: $BIN"
+          for E in $(echo "$EKRANLAR" | tr ',' ' '); do
+            VITRIN_EKRAN=$E "$BIN" >/dev/null 2>&1 &
+            PID=$!
+            sleep 14
+            screencapture -x "../../vitrin-cikti/tam-$E.png" || true
+            kill $PID || true; sleep 1
+            python3 - "$E" <<'PY'
+          import sys
+          from PIL import Image
+          e=sys.argv[1]; im=Image.open(f'../../vitrin-cikti/tam-{e}.png'); W,H=im.size
+          # Pencere 1440×900 nokta ortalanmış; başlık çubuğu ~28 px. Retina ise ölçek 2.
+          o=2 if W>=2600 else 1; w,h,t=1440*o,900*o,28*o
+          # Pencere ortalanınca başlık dahil yükseklik h+t; görünür bölgeyi ortadan kes.
+          x0=(W-w)//2; y0=(H-(h+t))//2
+          im.crop((x0,y0,x0+w,y0+h+t)).save(f'../../vitrin-cikti/mac-{e}.png')
+          print('mac',e,w,h+t,'ekran',W,H)
+          PY
+          done
+          rm -f ../../vitrin-cikti/tam-*.png
+          ls -la ../../vitrin-cikti
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vitrin-${{ github.run_number }}
+          path: vitrin-cikti/*.png
+          if-no-files-found: warn

@@ -12,6 +12,7 @@ import 'ekranlar/acilis.dart';
 import 'ekranlar/kabuk.dart';
 import 'oturum.dart';
 import 'veri/tercihler.dart';
+import 'veri/vitrin.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +24,13 @@ Future<void> main() async {
     await windowManager.ensureInitialized();
     await windowManager.setMinimumSize(const Size(420, 640));
     await windowManager.setTitle('Bogahost Chat');
+    if (vitrinAcik) {
+      // Mağaza görseli: Mac penceresi 1440×900 nokta (Retina'da 2880×1800), ekranın ortasında.
+      await windowManager.setSize(const Size(1440, 900));
+      await windowManager.center();
+    }
   }
+  if (vitrinAcik) temaKipi.value = ThemeMode.light;
   await Uyg.api.baslat();
   Uyg.api.oturumDustu = Uyg.oturumDustu;
   runApp(const DestekUygulamasi());

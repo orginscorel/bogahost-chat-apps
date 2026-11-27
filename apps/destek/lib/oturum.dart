@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'ekranlar/kabuk.dart';
 import 'veri/json.dart';
 import 'veri/modeller.dart';
+import 'veri/vitrin.dart';
 
 /// Uygulamanın tekil durumu: API istemcisi, oturumdaki temsilci, yetkiler.
 class Uyg {
@@ -17,6 +18,7 @@ class Uyg {
   static final BogaApi api = _kur();
 
   static BogaApi _kur() {
+    if (vitrinAcik) return VitrinApi(); // mağaza ekran görüntüsü kipi: ağ yok, örnek veri
     final a = BogaApi(uygulama: 'destek', csrfCerezi: 'destek_csrf');
     a.jetonYolu = '$apiKok/login';
     return a;
