@@ -100,6 +100,7 @@ jobs:
           EKRANLAR: ${{ github.event.inputs.ekranlar }}
         run: |
           set -e
+          mkdir -p ../../vitrin-cikti
           BIN="build/macos/Build/Products/Release/Bogahost Chat.app/Contents/MacOS/Bogahost Chat"
           [ -x "$BIN" ] || BIN=$(find build/macos/Build/Products/Release -path '*/Contents/MacOS/*' -type f | head -1)
           echo "ikili: $BIN"
