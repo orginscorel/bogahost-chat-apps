@@ -1,3 +1,9 @@
+## 1.2.27 (28 Kas 2026)
+- Düzeltme: `gorusme.dart` gövde sütununda "Yazıyor" şeridi, talep şeridi, hazır yanıt kutusu ve yazım kutusu anahtarsız `Container`'lardı; biri belirince Flutter eski yazım kutusu elemanını şeride eşleyip `TextField`'ı yeniden kuruyordu (FocusNode ayrılınca odak düşer). Tüm bölmeler `ValueKey` ile sabitlendi (`talep`, `yaziyor`, `oneri`, `yukleme`, `yazim`; kutu içinde `ai`, `kip`, `giris`).
+- Düzeltme: `BogaApi` artık `Http2Adapter` değil `IOHttpClientAdapter` (HttpClient idleTimeout 30 sn < nginx keepalive_timeout 65, maxConnectionsPerHost 6). nginx `keepalive_requests` (1000) dolunca h2 bağlantısı GOAWAY alıyor; sık yoklamada ~8 dk'da bir istekler askıda kalıyordu. `receiveTimeout` 60→30 sn. `dio_http2_adapter` bağımlılığı kaldırıldı.
+- Sunucu: chat.bogahost.com nginx bloğuna `keepalive_requests 100000; keepalive_timeout 120s;` (web paneli için de aynı sorun).
+- İyileştirme: gönderimde kutu hemen temizlenir (hata olursa metin geri gelir); sohbet listesinde sessize alma iyimser.
+
 ## 1.2.26 (27 Kas 2026)
 - Düzeltme: Ayarlar ekranında telefon genişliğinde trailing SegmentedButton başlığı sıkıştırıyordu → `_kontrolSatiri` (dar ekranda düğme başlığın altında, FittedBox). Widget ayarı `_secenek`, Yasaklar arama/süzgeç satırı ve Bildirim APNs düğmesi de dar ekranda alt alta.
 - Vitrin kipi (`--dart-define=VITRIN=true`, `lib/veri/vitrin.dart`): mağaza ekran görüntüleri için anonim örnek veri; `VITRIN_EKRAN` ile açılış ekranı. `.github/workflows/vitrin.yml` iPhone/iPad simülatörü + Mac penceresinden görüntü alır (artifact).

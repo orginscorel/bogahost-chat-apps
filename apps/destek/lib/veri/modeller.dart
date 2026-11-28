@@ -60,8 +60,9 @@ class Sohbet {
   final int id, okunmamis;
   final String ziyaretci, durum, son, sonGonderen;
   final String? eposta, bolum, temsilci, ulke, onizleme, yaziyor;
-  /// Bu kullanıcı sohbeti sessize almış (kişiye özel; biri katılınca sunucu otomatik açar).
-  final bool cevrimici, favori, arsiv, kacan, sessiz;
+  final bool cevrimici, favori, arsiv, kacan;
+  /// Bu kullanıcı sohbeti sessize almış (kişiye özel; biri katılınca sunucu otomatik açar). İyimser güncelleme için değişebilir.
+  bool sessiz;
   final int? puan;
 
   /// Görünür alanların imzası: liste yoklamasında değişiklik yoksa setState atlanır.

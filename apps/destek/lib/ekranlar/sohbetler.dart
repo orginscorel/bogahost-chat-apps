@@ -437,8 +437,13 @@ class _SohbetlerEkraniState extends State<SohbetlerEkrani> {
       child: InkWell(
         borderRadius: BorderRadius.circular(8),
         onTap: () async {
-          final v = await islem(() => Depo.sohbetSessiz(s.id), tamam: s.sessiz ? 'Sohbetin sesi açıldı' : 'Sohbet sessize alındı');
-          if (v != null) _yukle();
+          // İyimser: simge anında değişir; sunucu yanıtı gelince gerçek durum yazılır, hata olursa geri döner.
+          final eski = s.sessiz;
+          setState(() => s.sessiz = !eski);
+          final v = await islem(() => Depo.sohbetSessiz(s.id), tamam: eski ? 'Sohbetin sesi açıldı' : 'Sohbet sessize alındı');
+          if (!mounted) return;
+          setState(() => s.sessiz = v ?? eski);
+          if (v != null) _yukle(sessiz: true);
         },
         child: Padding(
           padding: const EdgeInsets.all(4),

@@ -4,7 +4,6 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:dio_http2_adapter/dio_http2_adapter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -98,7 +97,7 @@ class BogaApi {
       BaseOptions(
         baseUrl: sunucu,
         connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 30),
         sendTimeout: const Duration(seconds: 120),
         headers: {
           'User-Agent': 'BogaMail-${uygulama == 'posta' ? 'Posta' : 'Yonetim'}/$surum ($platform)',
@@ -107,10 +106,17 @@ class BogaApi {
         validateStatus: (_) => true,
       ),
     );
-    // HTTP/2 (sunucu h2 sunar): paralel istekler (liste, ileti, önyükleme, görseller) tek bağlantıda çoğullanır,
-    // her istek için yeni TLS el sıkışması yapılmaz. ALPN ile h2 yoksa HTTP/1.1 bağdaştırıcısına düşülür.
+    // HTTP/1.1 keep-alive (dart:io HttpClient). Önceki HTTP/2 bağdaştırıcısı sunucunun bağlantıyı kapatmasını
+    // (nginx keepalive_requests sonrası GOAWAY, boşta kapanma) geç fark ediyordu: sık yoklamada ~8 dk'da bir
+    // istekler zaman aşımına kadar askıda kalıyor, gönder/sessize al/yenile gecikiyordu. HttpClient kapanan
+    // bağlantıyı atıp yenisini açar; boşta süresi sunucununkinden (65 sn) kısa tutulur ki kapanma yarışı olmasın.
     if (!kIsWeb) {
-      dio.httpClientAdapter = Http2Adapter(ConnectionManager(idleTimeout: const Duration(seconds: 45)), fallbackAdapter: IOHttpClientAdapter());
+      dio.httpClientAdapter = IOHttpClientAdapter(
+        createHttpClient: () => HttpClient()
+          ..idleTimeout = const Duration(seconds: 30)
+          ..connectionTimeout = const Duration(seconds: 15)
+          ..maxConnectionsPerHost = 6,
+      );
     }
     jeton = prefs.getString('$uygulama.jeton');
     dio.interceptors.add(CookieManager(_jar));

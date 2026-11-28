@@ -270,6 +270,8 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
     if (t.isEmpty || _gonderiyor) return;
     setState(() => _gonderiyor = true);
     try {
+      // Metin hemen kutudan alınır: temsilci yanıt beklerken yazmaya devam edebilir; hata olursa geri konur.
+      _kutu.clear();
       if (_fisilti) {
         await Depo.fisilda(_id, t);
       } else {
@@ -281,11 +283,14 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
           _aiSon = null;
         }
       }
-      _kutu.clear();
       _altaKay();
       _hizlan();
       _yokla();
     } catch (e) {
+      if (_kutu.text.trim().isEmpty) {
+        _kutu.text = t;
+        _kutu.selection = TextSelection.collapsed(offset: t.length);
+      }
       bildir('Gönderilemedi', mesaj: hataMetni(e), tur: MesajTur.hata);
     } finally {
       if (mounted) setState(() => _gonderiyor = false);
@@ -781,9 +786,12 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
                   ),
                 ),
         ),
-        if (_talep != null && !_kapali) _talepSeridi(r),
+        // Her bölme anahtarlı: "Yazıyor" şeridi, talep şeridi ya da hazır yanıt kutusu belirince Flutter anahtarsız
+        // Container'ları eşleştirip yazım kutusunu yeniden kuruyordu → yazarken odak (ve klavye) düşüyordu.
+        if (_talep != null && !_kapali) KeyedSubtree(key: const ValueKey('talep'), child: _talepSeridi(r)),
         if (yaziyor != null && yaziyor.isNotEmpty)
           Container(
+            key: const ValueKey('yaziyor'),
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
             color: Marka.mor.withValues(alpha: .07),
@@ -802,9 +810,10 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
               ],
             ),
           ),
-        if (_oneriler.isNotEmpty) _oneriKutusu(r),
-        if (_yuklemeOrani != null) LinearProgressIndicator(value: _yuklemeOrani == 0 ? null : _yuklemeOrani, minHeight: 3),
-        _yazimKutusu(r, durum),
+        if (_oneriler.isNotEmpty) KeyedSubtree(key: const ValueKey('oneri'), child: _oneriKutusu(r)),
+        if (_yuklemeOrani != null)
+          LinearProgressIndicator(key: const ValueKey('yukleme'), value: _yuklemeOrani == 0 ? null : _yuklemeOrani, minHeight: 3),
+        KeyedSubtree(key: const ValueKey('yazim'), child: _yazimKutusu(r, durum)),
       ],
     );
     // Geniş ekranda mesaj sütunu en çok 1180 px: balonlar ve yazım kutusu ortada, uçsuz bucaksız boşluk yok.
@@ -1444,9 +1453,10 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (_aiDevredildi || _aiTur > 0) _aiSeridi(r),
+            if (_aiDevredildi || _aiTur > 0) KeyedSubtree(key: const ValueKey('ai'), child: _aiSeridi(r)),
             if (kipRengi != null)
               Padding(
+                key: const ValueKey('kip'),
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Row(
                   children: [
@@ -1463,6 +1473,7 @@ class _GorusmeEkraniState extends State<GorusmeEkrani> with WidgetsBindingObserv
                 ),
               ),
             Row(
+              key: const ValueKey('giris'),
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 PopupMenuButton<String>(

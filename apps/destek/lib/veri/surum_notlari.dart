@@ -2,6 +2,16 @@
 /// "Native" rozetiyle gösterilir. En yeni en üstte.
 const uygulamaNotlari = <Map<String, dynamic>>[
   {
+    'version': '1.2.27',
+    'date': '2026-11-28',
+    'title': 'Yazarken odak düşmesi ve gecikmeler',
+    'items': [
+      {'type': 'fix', 'text': 'Görüşmede yanıt yazarken ziyaretçi yazmaya başlayınca, talep şeridi çıkınca ya da "/" ile hazır yanıt listesi açılınca yazım kutusu yeniden kuruluyor, odak ve klavye düşüyordu; kutu artık sabit kalır.'},
+      {'type': 'fix', 'text': 'Ağ katmanı HTTP/1.1 keep-alive\'a alındı: sunucu bağlantıyı kapattığında istekler zaman aşımına kadar askıda kalıyor; gönderme, sessize alma, yenileme ve yoklama ara ara saniyelerce gecikiyordu.'},
+      {'type': 'fix', 'text': 'Gönder\'e basınca metin hemen kutudan çıkar, yanıt beklenirken yazmaya devam edilebilir; gönderilemezse metin geri konur. Sohbet sessize alma simgesi anında döner.'},
+    ],
+  },
+  {
     'version': '1.2.26',
     'date': '2026-11-27',
     'title': 'Telefonda ayarlar düzeni',
