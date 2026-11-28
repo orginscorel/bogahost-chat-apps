@@ -98,7 +98,7 @@ class OlcekSarmal extends StatelessWidget {
                   height: th,
                   child: MediaQuery(
                     data: mq.copyWith(size: const Size(tw, th), devicePixelRatio: mq.devicePixelRatio / f, padding: EdgeInsets.zero, viewPadding: EdgeInsets.zero, viewInsets: EdgeInsets.zero),
-                    child: RepaintBoundary(child: child),
+                    child: RepaintBoundary(key: vitrinIcAnahtar, child: child),
                   ),
                 ),
               ),

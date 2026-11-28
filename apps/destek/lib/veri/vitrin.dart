@@ -40,15 +40,19 @@ Future<String> vitrinEkranOku() async {
 /// Masaüstünde pencere ekrana sığmasa da tam kareyi almak için uygulama kendi görüntüsünü yazar: kök RepaintBoundary.
 final vitrinAnahtar = GlobalKey();
 
+/// Masaüstünde 1440×900 mantıksal içeriğin kendi sınırı (OlcekSarmal içinde, pencere küçükse ölçeklenir): bundan
+/// pixelRatio 2 ile alınan kare pencereden bağımsız tam 2880×1800 olur.
+final vitrinIcAnahtar = GlobalKey();
+
 /// Ekran yerleşince (yaklaşık [bekle] sonra) uygulamayı 2× piksel oranında PNG'ye yazar ve masaüstünde çıkar.
 /// Dosya: uygulama destek dizini/vitrin-<ekran>.png (Mac'te ~/Library/Containers/<paket>/Data/Library/Application Support/…).
 Future<void> vitrinYakala(String ekran, {Duration bekle = const Duration(seconds: 6)}) async {
   if (!vitrinAcik || !(Platform.isMacOS || Platform.isWindows || Platform.isLinux)) return;
   await Future<void>.delayed(bekle);
   try {
-    final ro = vitrinAnahtar.currentContext?.findRenderObject();
+    final ro = (vitrinIcAnahtar.currentContext ?? vitrinAnahtar.currentContext)?.findRenderObject();
     if (ro is! RenderRepaintBoundary) return;
-    // Genişlik 1440 mantıksal pikselin 2 katı (2880) olacak şekilde oran: pencere küçükse içerik ölçeklenmiştir.
+    // İç sınır 1440×900 mantıksal → 2×; dış sınıra düşülürse genişlik 2880 olacak oran.
     final oran = ro.size.width > 0 ? 2880 / ro.size.width : 2.0;
     final img = await ro.toImage(pixelRatio: oran);
     final bd = await img.toByteData(format: ui.ImageByteFormat.png);
